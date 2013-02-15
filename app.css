@@ -1,0 +1,11 @@
+ul.small-margin {
+    margin-left: 0.2em;
+}
+
+li {
+    margin-bottom: 0.3em;
+}
+
+.default-avatar {
+    background-image: app-asset-url("avatar.png") no-repeat;
+}

@@ -1,0 +1,13 @@
+{
+  "name": "User Data",
+  "author": {
+    "name": "Pierre Nespo",
+    "email": "pierre.nespo@gmail.com"
+  },
+
+  "defaultLocale": "en",
+  "private": false,
+  "singleInstall": true,
+  "location": "ticket_sidebar",
+  "frameworkVersion": "0.5"
+}

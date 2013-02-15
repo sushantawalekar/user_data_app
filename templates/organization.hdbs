@@ -1,0 +1,77 @@
+<div class="row-fluid">
+  <h5>Organization</h5>
+  <ul class="small-margin">
+    <li>
+      <strong>
+        <i class="icon-briefcase"></i>
+        <a href="/#/tickets/{{ticket.id}}/organization/tickets">{{organization.name}}</a>
+      </strong>
+    </li>
+    <li>
+      <i class="icon-list"></i>
+      <a href="/#/tickets/{{ticket.id}}/organization/tickets">Tickets <strong>(<span class="ticket-count">...</span>)</strong></a>
+      <ul>
+        <li>
+          <span class="ticket_status_label new">
+            <strong>
+              NEW
+              (<span class="new-ticket-count"></span>)
+            </strong>
+          </span>
+        </li>
+        <li>
+          <span class="ticket_status_label open">
+            <strong>
+              OPEN
+              (<span class="open-ticket-count"></span>)
+            </strong>
+          </span>
+        </li>
+        <li>
+          <span class="ticket_status_label solved">
+            <strong>
+              SOLVED
+              (<span class="solved-ticket-count"></span>)
+            </strong>
+          </span>
+        </li>
+        <li>
+          <span class="ticket_status_label closed">
+            <strong>
+              CLOSED
+              (<span class="closed-ticket-count"></span>)
+            </strong>
+          </span>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <i class="icon-pencil"></i>
+      Details: <span>{{organization.details}}</span>
+    </li>
+    <li>
+      <i class="icon-pencil"></i>
+      Notes: <span>{{organization.notes}}</span>
+    </li>
+    <li>
+      <i class="icon-tag"></i>
+      {{#if organization.tags}}
+      {{#each organization.tags}}
+      <span>{{this}}</span>
+      {{/each}}
+      {{else}}
+      {{t "info.no_tags"}}
+      {{/if}}
+    </li>
+    <li>
+      <i class="icon-bookmark"></i>
+      {{#if organization.domain_names}}
+      {{#each organization.domain_names}}
+      <span>{{this}}</span>
+      {{/each}}
+      {{else}}
+      {{t "info.no_domain_names"}}
+      {{/if}}
+    </li>
+  </ul>
+</div>

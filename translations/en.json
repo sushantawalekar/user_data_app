@@ -1,0 +1,12 @@
+{
+  "app": {
+    "description":  "Displays information about the ticket requester and requesters organization.",
+    "name":         "User info App"
+  },
+  "info": {
+    "no_tags": "No tags",
+    "no_domain_names": "No domain names"
+  },
+  "update_user_done": "User notes and details updated!",
+  "ajax_error": "An error occurred, please try again later."
+}
