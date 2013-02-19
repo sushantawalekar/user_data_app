@@ -8,5 +8,21 @@
     "no_domain_names": "No domain names"
   },
   "update_user_done": "User notes and details updated!",
-  "ajax_error": "An error occurred, please try again later."
+  "ajax_error": "An error occurred, please try again later.",
+
+  "tickets": "Tickets",
+  "locale": "Locale",
+  "timezone": "Timezone",
+  "details": "Details",
+  "notes": "Notes",
+  "organization": "Organization",
+  "ticket_status": {
+    "new": "new",
+    "open": "open",
+    "solved": "solved",
+    "closed": "closed"
+  },
+  "this_is_spoke_ticket": "This is a spoke ticket !",
+  "account": "Account",
+  "ticket_id": "Ticket ID"
 }

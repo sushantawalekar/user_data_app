@@ -1,7 +1,6 @@
-<div class="well well-small">
-  <section data-user>
-  </section>
-  <section data-organization>
-  </section>
-</div>
-
+<section data-spoke-ticket>
+</section>
+<section data-user>
+</section>
+<section data-organization>
+</section>

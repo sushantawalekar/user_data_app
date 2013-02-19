@@ -1,9 +1,31 @@
-/* global Handlebars:false */
 (function() {
   function TicketAsJson(ticket){
     return{
       id: ticket.id()
     };
+  }
+
+  function AuditEvent(event){
+    this.event = event;
+
+    this.containsSpokeData = function(){
+      return this.isComment() && /spoke_id_/.test(this.event.body);
+    };
+
+    this.isComment = function(){
+      return this.event.type === "Comment"
+    };
+
+    this.spokeData = function(){
+      var data = /spoke_id_(.*)\nspoke_account_(.*)\nrequester_email_(.*)\nrequester_phone_(.*)/.exec(this.event.body);
+
+      return {
+        id: data[1],
+        account: data[2],
+        email: data[3],
+        phone: data[4]
+      };
+    }
   }
 
   function HeaderView($el){
@@ -56,11 +78,20 @@
     };
   }
 
+  function SpokeTicketView($el){
+    this.$el = $el;
+
+    this.render = function(html){
+      this.$el.html(html);
+    };
+  }
+
   function AppView($el){
     this.$el = $el;
     this.header = new HeaderView(this.$el.find('header'));
     this.user = new UserView(this.$el.find('section[data-user]'));
     this.organization = new OrganizationView(this.$el.find('section[data-organization]'));
+    this.spokeTicket = new SpokeTicketView(this.$el.find('section[data-spoke-ticket]'));
 
     this.toggle = function(){
       var mainView = this.$el.find('section[data-main]');
@@ -173,15 +204,13 @@
     initialize: function(){
       this.appView = new AppView(this.$());
 
-      if (this.ticket().requester().id()){
-        this.appView.header.renderUser({
-          name: this.ticket().requester().name(),
-          email: this.ticket().requester().email()
-        });
+      this.appView.header.renderUser({
+        name: this.ticket().requester().name() || this.ticket().requester().id(),
+        email: this.ticket().requester().email()
+      });
 
-        return this.ajax('fetchUser', this.ticket().requester().id());
-      }
-      return this.ajax('fetchTicketAudits', this.ticket().id());
+      this.ajax('fetchUser', this.ticket().requester().id());
+      this.ajax('fetchTicketAudits', this.ticket().id());
     },
 
     fetchUserDone: function(data){
@@ -204,6 +233,17 @@
 
       this.ajax('fetchUserRequests', user.id);
       this.ajax('fetchLocale', user.locale_id);
+    },
+
+    fetchTicketAuditsDone: function(data){
+      _.each(data.audits, function(audit){
+        _.each(audit.events, function(e){
+          var event = new AuditEvent(e);
+
+          if (event.containsSpokeData())
+            return this.appView.spokeTicket.render(this.renderTemplate('spoke-ticket', event.spokeData()));
+        }, this);
+      }, this);
     },
 
     detailsOrNotesChanged: function(){

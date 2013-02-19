@@ -1,62 +1,63 @@
-<div class="row-fluid">
-  <h5>User</h5>
-  <ul class="small-margin">
-    <li class="pull-right">
-      {{#if user.photo}}
-      <img src="{{user.photo}}"/>
-      {{else}}
-      <div class="default-avatar"></div>
-      {{/if}}
-    </li>
-    <li>
-      <a href="/#/tickets/{{ticket.id}}/requester/tickets">
-        <i class="icon-user"></i>
-        <strong>{{user.name}}</strong>
-      </a>
-    </li>
-    <li>
-      <a href="mailto:{{user.email}}">
-        <i class="icon-envelope"></i>
-        {{user.email}}
-      </a>
-    </li>
-    <li>
-      <a href="/#/tickets/{{ticket.id}}/requester/tickets">
-        <i class="icon-list"></i>
-        Tickets <strong>(<span class="ticket-count">...</span>)</strong>
-      </a>
-    </li>
-    <li>
-      <i class="icon-globe"></i>
-      <strong>Locale:</strong> <span class="locale"></span>
-    </li>
-    <li>
-      <i class="icon-globe"></i>
-      <strong>Timezone:</strong> {{user.time_zone}}
-    </li>
-    <li>
-      <i class="icon-tag"></i>
-      {{#if user.tags}}
-      {{#each user.tags}}
-      <span>{{this}}</span>
-      {{/each}}
-      {{else}}
-      {{t "info.no_tags"}}
-      {{/if}}
-    </li>
-    <li>
-      <div class="span3">
-        <i class="icon-pencil"></i>
-        Details:
-      </div>
-      <textarea rows="4" cols="28" id="details">{{user.details}}</textarea>
-    </li>
-    <li>
-      <div class="span3">
-        <i class="icon-pencil"></i>
-        Notes:
-      </div>
-      <textarea rows="4" cols="28" id="notes">{{user.notes}}</textarea>
-    </li>
-  </ul>
+<div class="well well-small">
+  <div class="row-fluid">
+    <ul class="small-margin">
+      <li class="pull-right">
+        {{#if user.photo}}
+        <img src="{{user.photo}}"/>
+        {{else}}
+        <div class="default-avatar"></div>
+        {{/if}}
+      </li>
+      <li>
+        <a href="/#/tickets/{{ticket.id}}/requester/tickets">
+          <i class="icon-user"></i>
+          <strong>{{user.name}}</strong>
+        </a>
+      </li>
+      <li>
+        <a href="mailto:{{user.email}}" target="_blank">
+          <i class="icon-envelope"></i>
+          {{user.email}}
+        </a>
+      </li>
+      <li>
+        <a href="/#/tickets/{{ticket.id}}/requester/tickets">
+          <i class="icon-list"></i>
+          {{t "tickets"}} <strong>(<span class="ticket-count">-</span>)</strong>
+        </a>
+      </li>
+      <li>
+        <i class="icon-globe"></i>
+        <strong>{{t "locale"}}:</strong> <span class="locale"></span>
+      </li>
+      <li>
+        <i class="icon-globe"></i>
+        <strong>{{t "timezone"}}:</strong> {{user.time_zone}}
+      </li>
+      <li>
+        <i class="icon-tag"></i>
+        {{#if user.tags}}
+        {{#each user.tags}}
+        <span>{{this}}</span>
+        {{/each}}
+        {{else}}
+        {{t "info.no_tags"}}
+        {{/if}}
+      </li>
+      <li>
+        <div class="span3">
+          <i class="icon-pencil"></i>
+          {{t "details"}}:
+        </div>
+        <textarea rows="4" cols="28" id="details">{{user.details}}</textarea>
+      </li>
+      <li>
+        <div class="span3">
+          <i class="icon-pencil"></i>
+          {{t "notes"}}:
+        </div>
+        <textarea rows="4" cols="28" id="notes">{{user.notes}}</textarea>
+      </li>
+    </ul>
+  </div>
 </div>

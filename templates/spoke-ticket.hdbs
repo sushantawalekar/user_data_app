@@ -1,0 +1,20 @@
+<div class="well well-small alert">
+  <h5>{{t "this_is_spoke_ticket"}}</h5>
+
+  <ul class="small-margin">
+    <li>
+      <a href="mailto:{{email}}" target="_blank">
+        <i class="icon-envelope"></i>
+        {{email}}
+      </a>
+    </li>
+    <li>
+      <i class="icon-home"></i>
+      <strong>{{t "account"}}:</strong> <a href="https://{{account}}.zendesk.com">{{account}}</a>
+    </li>
+    <li>
+      <i class="icon-list"></i>
+      <strong>{{t "ticket_id"}}: <a href="https://{{account}}.zendesk.com/tickets/{{id}}">{{id}}</a></strong>
+    </li>
+  </ul>
+</div>
