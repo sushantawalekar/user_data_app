@@ -3,7 +3,7 @@
     <ul class="small-margin">
       <li class="pull-right">
         {{#if user.photo}}
-        <img src="{{user.photo}}"/>
+        <img src="{{user.photo.content_url}}"/>
         {{else}}
         <div class="default-avatar"></div>
         {{/if}}
