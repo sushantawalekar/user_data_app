@@ -16,10 +16,8 @@
         </a>
       </li>
       <li>
-        <a href="mailto:{{user.email}}" target="_blank" class="email">
-          <i class="icon-envelope"></i>
-          <span>{{user.email}}</span>
-        </a>
+        <i class="icon-envelope"></i>
+        <span class="email">{{user.email}}</span>
       </li>
       <li>
         <a href="/#/tickets/{{ticket.id}}/requester/tickets">
@@ -45,10 +43,10 @@
     </div>
     <div class="details_and_notes_container" style="display:none">
       <label><strong>{{t "details"}}:</strong>
-        <textarea rows="4" cols="28" class="details_or_notes details">{{user.details}}</textarea>
+        <textarea class="details_or_notes details">{{user.details}}</textarea>
       </label>
       <label><strong>{{t "notes"}}:</strong>
-        <textarea rows="4" cols="28" class="details_or_notes notes">{{user.notes}}</textarea>
+        <textarea class="details_or_notes notes">{{user.notes}}</textarea>
       </label>
     </div>
     {{#if user_has_organization}}

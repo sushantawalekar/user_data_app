@@ -16,11 +16,17 @@ li {
     text-align:center;
 }
 
+.ticket_status_label {
+    font-size: 11px;
+}
+
 .details_and_notes_container {
     margin-left: 1.7em;
 }
 .details_and_notes_container textarea{
-    margin-left: 4.0em;
+    margin: 0.5em;
+    width: 95%;
+    height: 50px;
 }
 /* =============================================================================
    FLAG CSS

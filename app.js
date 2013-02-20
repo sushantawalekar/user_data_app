@@ -56,7 +56,7 @@
     };
 
     this.email = function(email){
-      return this.$el.find('.email span').html(email);
+      return this.$el.find('span.email').html(email);
     };
 
     this.ticketCount = function(count, type){

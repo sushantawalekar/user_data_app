@@ -12,24 +12,18 @@
         <i class="icon-list"></i>
         <a href="/#/tickets/{{ticket.id}}/organization/tickets">{{t "tickets"}} <strong>(<span class="ticket-count">-</span>)</strong></a>
         <span class="ticket_status_label new">
-          <strong>
-            {{t "ticket_status.new"}}
-            (<span class="new-ticket-count"></span>)
-          </strong>
+          {{t "ticket_status.new"}}
+          (<span class="new-ticket-count"></span>)
         </span>
         &nbsp;
         <span class="ticket_status_label open">
-          <strong>
-            {{t "ticket_status.open"}}
-            (<span class="open-ticket-count"></span>)
-          </strong>
+          {{t "ticket_status.open"}}
+          (<span class="open-ticket-count"></span>)
         </span>
         &nbsp;
         <span class="ticket_status_label pending">
-          <strong>
-            {{t "ticket_status.pending"}}
-            (<span class="pending-ticket-count"></span>)
-          </strong>
+          {{t "ticket_status.pending"}}
+          (<span class="pending-ticket-count"></span>)
         </span>
       </li>
       <li>
