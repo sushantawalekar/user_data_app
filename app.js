@@ -66,7 +66,7 @@
 
     this.toggleDetailsAndNotes = function(){
       return this.$el.find('.details_and_notes_container').toggle();
-    }
+    };
   }
 
   function OrganizationView($el){
