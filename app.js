@@ -13,7 +13,7 @@
     };
 
     this.isComment = function(){
-      return this.event.type === "Comment"
+      return this.event.type === "Comment";
     };
 
     this.spokeData = function(){
@@ -25,7 +25,7 @@
         email: data[3],
         phone: data[4]
       };
-    }
+    };
   }
 
   function HeaderView($el){
