@@ -1,12 +1,13 @@
 <div class="well well-small">
   <div class="row-fluid">
     <ul class="small-margin">
-      <li class="pull-right">
+      <li class="pull-right centered">
         {{#if user.photo}}
-        <img src="{{user.photo.content_url}}"/>
+        <img src="{{user.photo.content_url}}" height="45" width="45" alt="image"/>
         {{else}}
         <div class="default-avatar"></div>
         {{/if}}
+        <i class="locale"></i>
       </li>
       <li>
         <a href="/#/tickets/{{ticket.id}}/requester/tickets">
@@ -15,9 +16,9 @@
         </a>
       </li>
       <li>
-        <a href="mailto:{{user.email}}" target="_blank">
+        <a href="mailto:{{user.email}}" target="_blank" class="email">
           <i class="icon-envelope"></i>
-          {{user.email}}
+          <span>{{user.email}}</span>
         </a>
       </li>
       <li>
@@ -25,14 +26,6 @@
           <i class="icon-list"></i>
           {{t "tickets"}} <strong>(<span class="ticket-count">-</span>)</strong>
         </a>
-      </li>
-      <li>
-        <i class="icon-globe"></i>
-        <strong>{{t "locale"}}:</strong> <span class="locale"></span>
-      </li>
-      <li>
-        <i class="icon-globe"></i>
-        <strong>{{t "timezone"}}:</strong> {{user.time_zone}}
       </li>
       <li>
         <i class="icon-tag"></i>
@@ -44,20 +37,24 @@
         {{t "info.no_tags"}}
         {{/if}}
       </li>
-      <li>
-        <div class="span3">
-          <i class="icon-pencil"></i>
-          {{t "details"}}:
-        </div>
-        <textarea rows="4" cols="28" id="details">{{user.details}}</textarea>
-      </li>
-      <li>
-        <div class="span3">
-          <i class="icon-pencil"></i>
-          {{t "notes"}}:
-        </div>
-        <textarea rows="4" cols="28" id="notes">{{user.notes}}</textarea>
-      </li>
     </ul>
+    <div class="row-fluid">
+    <a class="details_and_notes pull-right">
+      <em>({{t "toggle_details_notes"}})</em>
+    </a>
+    </div>
+    <div class="details_and_notes_container" style="display:none">
+      <label><strong>{{t "details"}}:</strong>
+        <textarea rows="4" cols="28" class="details_or_notes details">{{user.details}}</textarea>
+      </label>
+      <label><strong>{{t "notes"}}:</strong>
+        <textarea rows="4" cols="28" class="details_or_notes notes">{{user.notes}}</textarea>
+      </label>
+    </div>
+    {{#if user_has_organization}}
+    <a class="organization pull-right">
+      <em>({{t "toggle_organization"}})</em>
+    </a>
+    {{/if}}
   </div>
 </div>

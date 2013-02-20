@@ -11,18 +11,21 @@
   "ajax_error": "An error occurred, please try again later.",
 
   "tickets": "Tickets",
-  "locale": "Locale",
-  "timezone": "Timezone",
+  "toggle_details_notes": "Toggle Details and Notes",
+  "toggle_organization": "Toggle organization",
   "details": "Details",
   "notes": "Notes",
   "organization": "Organization",
   "ticket_status": {
     "new": "new",
     "open": "open",
-    "solved": "solved",
-    "closed": "closed"
+    "pending": "pending"
   },
-  "this_is_spoke_ticket": "This is a spoke ticket !",
+  "spoke-ticket": {
+    "link": {
+      "pre": "This ticket is from the",
+      "post": "Spoke."
+    }},
   "account": "Account",
-  "ticket_id": "Ticket ID"
+  "spoke_ticket_id": "Spoke Ticket ID"
 }

@@ -20,10 +20,10 @@
       var data = /spoke_id_(.*)\nspoke_account_(.*)\nrequester_email_(.*)\nrequester_phone_(.*)/.exec(this.event.body);
 
       return {
-        id: data[1],
-        account: data[2],
-        email: data[3],
-        phone: data[4]
+        id: data[1].trim(),
+        account: data[2].trim(),
+        email: data[3].trim(),
+        phone: data[4].trim()
       };
     };
   }
@@ -46,25 +46,34 @@
     this.$el = $el;
 
     this.render = function(html){
-      this.$el.html(html);
+      return this.$el.html(html);
     };
 
     this.locale = function(locale){
-      this.$el.find('span.locale')
-        .html(locale.name+' <small>('+locale.locale+ ')</small>');
+      return this.$el.find('i.locale').addClass('flag-' + locale.locale.split('-')[1].toLowerCase())
+        .attr("title", locale.name + ' ('+locale.locale+')');
+
+    };
+
+    this.email = function(email){
+      return this.$el.find('.email span').html(email);
     };
 
     this.ticketCount = function(count, type){
-      this.$el.find('span.ticket-count')
+      return this.$el.find('span.ticket-count')
         .html(count);
     };
+
+    this.toggleDetailsAndNotes = function(){
+      return this.$el.find('.details_and_notes_container').toggle();
+    }
   }
 
   function OrganizationView($el){
     this.$el = $el;
 
     this.render = function(html){
-      this.$el.html(html);
+      return this.$el.html(html);
     };
 
     this.ticketCount = function(count, type){
@@ -73,8 +82,12 @@
       if (type && !_.isEmpty(type))
         selector =  type + '-' + selector;
 
-      this.$el.find('span.' + selector)
+      return this.$el.find('span.' + selector)
         .html(count);
+    };
+
+    this.toggle = function(){
+      return this.$el.find('.well').toggle();
     };
   }
 
@@ -82,7 +95,7 @@
     this.$el = $el;
 
     this.render = function(html){
-      this.$el.html(html);
+      return this.$el.html(html);
     };
   }
 
@@ -180,8 +193,9 @@
        *  DOM EVENTS
        */
       'click header'                    : function(){ this.appView.toggle(); },
-      'change #details'                 : 'detailsOrNotesChanged',
-      'change #notes'                   : 'detailsOrNotesChanged'
+      'change .details_or_notes'        : 'detailsOrNotesChanged',
+      'click a.details_and_notes'       : function(){ this.appView.user.toggleDetailsAndNotes();},
+      'click a.organization'            : function(){ this.appView.organization.toggle();}
     },
 
     onActivated: function() {
@@ -204,11 +218,6 @@
     initialize: function(){
       this.appView = new AppView(this.$());
 
-      this.appView.header.renderUser({
-        name: this.ticket().requester().name() || this.ticket().requester().id(),
-        email: this.ticket().requester().email()
-      });
-
       this.ajax('fetchUser', this.ticket().requester().id());
       this.ajax('fetchTicketAudits', this.ticket().id());
     },
@@ -218,9 +227,15 @@
       var organization = data.organizations[0];
       var ticket = new TicketAsJson(this.ticket());
 
+      this.appView.header.renderUser({
+        name: user.name,
+        email: user.email || "..."
+      });
+
       this.appView.user.render(this.renderTemplate('user', {
         user: user,
-        ticket: ticket
+        ticket: ticket,
+        user_has_organization: !!organization
       }));
 
       if (organization){
@@ -240,8 +255,18 @@
         _.each(audit.events, function(e){
           var event = new AuditEvent(e);
 
-          if (event.containsSpokeData())
-            return this.appView.spokeTicket.render(this.renderTemplate('spoke-ticket', event.spokeData()));
+          if (event.containsSpokeData()){
+            var spokeData = event.spokeData();
+
+            this.appView.header.renderUser({
+              name: this.ticket().requester().name(),
+              email: spokeData.email
+            });
+
+            this.appView.user.email(spokeData.email);
+
+            return this.appView.spokeTicket.render(this.renderTemplate('spoke-ticket', spokeData));
+          }
         }, this);
       }, this);
     },
@@ -249,14 +274,14 @@
     detailsOrNotesChanged: function(){
       this.ajax('updateUser', this.ticket().requester().id(), {
         user: {
-          details: this.$('#details').val(),
-          notes: this.$('#notes').val()
+          details: this.$('.details').val(),
+          notes: this.$('.notes').val()
         }
       });
     },
 
     fetchOrganizationMetrics: function(organization){
-      _.each(['', 'new', 'open','solved', 'closed'], function(status){
+      _.each(['', 'new', 'open','pending'], function(status){
         var condition = 'status:' + status;
 
         if (_.isEmpty(status))

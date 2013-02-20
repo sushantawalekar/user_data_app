@@ -1,4 +1,4 @@
-<div class="well well-small">
+<div class="well well-small" style="display:none;">
   <div class="row-fluid">
     <h4>{{t "organization"}}</h4>
     <ul class="small-margin">
@@ -11,48 +11,26 @@
       <li>
         <i class="icon-list"></i>
         <a href="/#/tickets/{{ticket.id}}/organization/tickets">{{t "tickets"}} <strong>(<span class="ticket-count">-</span>)</strong></a>
-        <ul>
-          <li>
-            <span class="ticket_status_label new">
-              <strong>
-                {{t "ticket_status.new"}}
-                (<span class="new-ticket-count"></span>)
-              </strong>
-            </span>
-          </li>
-          <li>
-            <span class="ticket_status_label open">
-              <strong>
-                {{t "ticket_status.open"}}
-                (<span class="open-ticket-count"></span>)
-              </strong>
-            </span>
-          </li>
-          <li>
-            <span class="ticket_status_label solved">
-              <strong>
-                {{t "ticket_status.solved"}}
-                (<span class="solved-ticket-count"></span>)
-              </strong>
-            </span>
-          </li>
-          <li>
-            <span class="ticket_status_label closed">
-              <strong>
-                {{t "ticket_status.closed"}}
-                (<span class="closed-ticket-count"></span>)
-              </strong>
-            </span>
-          </li>
-        </ul>
-      </li>
-      <li>
-        <i class="icon-pencil"></i>
-        {{t "details"}}: <span>{{organization.details}}</span>
-      </li>
-      <li>
-        <i class="icon-pencil"></i>
-        {{t "notes"}}: <span>{{organization.notes}}</span>
+        <span class="ticket_status_label new">
+          <strong>
+            {{t "ticket_status.new"}}
+            (<span class="new-ticket-count"></span>)
+          </strong>
+        </span>
+        &nbsp;
+        <span class="ticket_status_label open">
+          <strong>
+            {{t "ticket_status.open"}}
+            (<span class="open-ticket-count"></span>)
+          </strong>
+        </span>
+        &nbsp;
+        <span class="ticket_status_label pending">
+          <strong>
+            {{t "ticket_status.pending"}}
+            (<span class="pending-ticket-count"></span>)
+          </strong>
+        </span>
       </li>
       <li>
         <i class="icon-tag"></i>
@@ -73,6 +51,14 @@
         {{else}}
         {{t "info.no_domain_names"}}
         {{/if}}
+      </li>
+      <li>
+        <i class="icon-pencil"></i>
+        {{t "details"}}: <span>{{organization.details}}</span>
+      </li>
+      <li>
+        <i class="icon-pencil"></i>
+        {{t "notes"}}: <span>{{organization.notes}}</span>
       </li>
     </ul>
   </div>
