@@ -17,7 +17,11 @@ li {
 }
 
 .ticket_status_label {
-    font-size: 11px;
+    font-size: 10px;
+}
+
+.ticket_details {
+    margin-left: 20px;
 }
 
 .details_and_notes_container {
