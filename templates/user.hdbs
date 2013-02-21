@@ -41,14 +41,6 @@
       <em>({{t "toggle_details_notes"}})</em>
     </a>
     </div>
-    <div class="details_and_notes_container" style="display:none">
-      <label><strong>{{t "details"}}:</strong>
-        <textarea class="details_or_notes details">{{user.details}}</textarea>
-      </label>
-      <label><strong>{{t "notes"}}:</strong>
-        <textarea class="details_or_notes notes">{{user.notes}}</textarea>
-      </label>
-    </div>
     {{#if user_has_organization}}
     <a class="organization pull-right">
       <em>({{t "toggle_organization"}})</em>

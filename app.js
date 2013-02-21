@@ -42,11 +42,12 @@
     };
   }
 
-  function UserView($el){
+  function UserView($el, template){
     this.$el = $el;
+    this.template = template;
 
-    this.render = function(html){
-      return this.$el.html(html);
+    this.render = function(params){
+      return this.$el.html(this.template('user', params));
     };
 
     this.locale = function(locale){
@@ -63,17 +64,14 @@
       return this.$el.find('span.ticket-count')
         .html(count);
     };
-
-    this.toggleDetailsAndNotes = function(){
-      return this.$el.find('.details_and_notes_container').toggle();
-    };
   }
 
-  function OrganizationView($el){
+  function OrganizationView($el, template){
     this.$el = $el;
+    this.template = template;
 
-    this.render = function(html){
-      return this.$el.html(html);
+    this.render = function(params){
+      return this.$el.html(this.template('organization', params));
     };
 
     this.ticketCount = function(count, type){
@@ -91,20 +89,46 @@
     };
   }
 
-  function SpokeTicketView($el){
+  function SpokeTicketView($el, template){
     this.$el = $el;
+    this.template = template;
 
-    this.render = function(html){
-      return this.$el.html(html);
+    this.render = function(params){
+      return this.$el.html(this.template('spoke-ticket', params));
     };
   }
 
-  function AppView($el){
+  function DetailsNotesView($el, template){
     this.$el = $el;
+    this.template = template;
+
+    this.render = function(params){
+      return this.$el.html(this.template('details-notes', params));
+    };
+
+    this.toggle = function(){
+      return this.$el.find('.well').toggle();
+    };
+
+    this.details = function(){
+      return this.$el.find('.details').val();
+    };
+
+    this.notes = function(){
+      return this.$el.find('.notes').val();
+    };
+  }
+
+
+  function AppView($el, template){
+    this.$el = $el;
+    this.template = template;
+
     this.header = new HeaderView(this.$el.find('header'));
-    this.user = new UserView(this.$el.find('section[data-user]'));
-    this.organization = new OrganizationView(this.$el.find('section[data-organization]'));
-    this.spokeTicket = new SpokeTicketView(this.$el.find('section[data-spoke-ticket]'));
+    this.user = new UserView(this.$el.find('section[data-user]'), this.template);
+    this.organization = new OrganizationView(this.$el.find('section[data-organization]'), this.template);
+    this.spokeTicket = new SpokeTicketView(this.$el.find('section[data-spoke-ticket]'), this.template);
+    this.detailsNotes = new DetailsNotesView(this.$el.find('section[data-details-notes]'), this.template);
 
     this.toggle = function(){
       var mainView = this.$el.find('section[data-main]');
@@ -194,8 +218,8 @@
        */
       'click header'                    : function(){ this.appView.toggle(); },
       'change .details_or_notes'        : 'detailsOrNotesChanged',
-      'click a.details_and_notes'       : function(){ this.appView.user.toggleDetailsAndNotes();},
-      'click a.organization'            : function(){ this.appView.organization.toggle();}
+      'click a.details_and_notes'       : function(){ this.appView.detailsNotes.toggle(); },
+      'click a.organization'            : function(){ this.appView.organization.toggle(); }
     },
 
     onActivated: function() {
@@ -216,7 +240,12 @@
     },
 
     initialize: function(){
-      this.appView = new AppView(this.$());
+      var self = this;
+
+      this.appView = new AppView(this.$(),
+                                 function(tmpl,params){
+                                   return self.renderTemplate(tmpl,params);
+                                 });
 
       this.ajax('fetchUser', this.ticket().requester().id());
       this.ajax('fetchTicketAudits', this.ticket().id());
@@ -232,17 +261,22 @@
         email: user.email || "..."
       });
 
-      this.appView.user.render(this.renderTemplate('user', {
+      this.appView.user.render({
         user: user,
         ticket: ticket,
         user_has_organization: !!organization
-      }));
+      });
+
+      this.appView.detailsNotes.render({
+        details: user.details,
+        notes: user.notes
+      });
 
       if (organization){
-        this.appView.organization.render(this.renderTemplate('organization', {
+        this.appView.organization.render({
           organization: organization,
           ticket: ticket
-        }));
+        });
         this.fetchOrganizationMetrics(organization);
       }
 
@@ -265,7 +299,7 @@
 
             this.appView.user.email(spokeData.email);
 
-            return this.appView.spokeTicket.render(this.renderTemplate('spoke-ticket', spokeData));
+            return this.appView.spokeTicket.render(spokeData);
           }
         }, this);
       }, this);
@@ -274,8 +308,8 @@
     detailsOrNotesChanged: function(){
       this.ajax('updateUser', this.ticket().requester().id(), {
         user: {
-          details: this.$('.details').val(),
-          notes: this.$('.notes').val()
+          details: this.appView.detailsNotes.details(),
+          notes: this.appView.detailsNotes.notes()
         }
       });
     },
