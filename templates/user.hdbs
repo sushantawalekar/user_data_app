@@ -22,8 +22,33 @@
       <li>
         <a href="/#/tickets/{{ticket.id}}/requester/tickets">
           <i class="icon-list"></i>
-          {{t "tickets"}} <strong>(<span class="ticket-count">-</span>)</strong>
+          {{t "tickets"}} <strong>(<span class="ticket-count"></span>)</strong>
         </a>
+      </li>
+      <li>
+        <div class="ticket_details">
+          <span class="ticket_status_label new ticket-count-new" data-label="{{t "ticket_status.new"}}">
+            <strong>{{t "ticket_status.new"}}</strong>
+          </span>
+          &nbsp;
+          <span class="ticket_status_label open ticket-count-open" data-label="{{t "ticket_status.open"}}">
+            <strong>
+              {{t "ticket_status.open"}}
+            </strong>
+          </span>
+          &nbsp;
+          <span class="ticket_status_label pending ticket-count-pending" data-label="{{t "ticket_status.pending"}}">
+            <strong>
+              {{t "ticket_status.pending"}}
+            </strong>
+          </span>
+          &nbsp;
+          <span class="ticket_status_label hold ticket-count-hold" data-label="{{t "ticket_status.hold"}}">
+            <strong>
+              {{t "ticket_status.hold"}}
+            </strong>
+          </span>
+        </div>
       </li>
       <li>
         <i class="icon-tag"></i>

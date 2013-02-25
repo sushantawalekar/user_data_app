@@ -20,7 +20,8 @@
   "ticket_status": {
     "new": "new",
     "open": "open",
-    "pending": "pending"
+    "pending": "pending",
+    "hold": "on-hold"
   },
   "spoke-ticket": {
     "link": {

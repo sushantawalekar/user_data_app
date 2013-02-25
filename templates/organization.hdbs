@@ -14,24 +14,25 @@
       </li>
       <li>
         <div class="ticket_details">
-          <span class="ticket_status_label new">
-            <strong>
-              {{t "ticket_status.new"}}
-              (<span class="new-ticket-count"></span>)
-            </strong>
+          <span class="ticket_status_label new ticket-count-new" data-label="{{t "ticket_status.new"}}">
+            <strong>{{t "ticket_status.new"}}</strong>
           </span>
           &nbsp;
-          <span class="ticket_status_label open">
+          <span class="ticket_status_label open ticket-count-open" data-label="{{t "ticket_status.open"}}">
             <strong>
               {{t "ticket_status.open"}}
-              (<span class="open-ticket-count"></span>)
             </strong>
           </span>
           &nbsp;
-          <span class="ticket_status_label pending">
+          <span class="ticket_status_label pending ticket-count-pending" data-label="{{t "ticket_status.pending"}}">
             <strong>
               {{t "ticket_status.pending"}}
-              (<span class="pending-ticket-count"></span>)
+            </strong>
+          </span>
+          &nbsp;
+          <span class="ticket_status_label hold ticket-count-hold" data-label="{{t "ticket_status.hold"}}">
+            <strong>
+              {{t "ticket_status.hold"}}
             </strong>
           </span>
         </div>

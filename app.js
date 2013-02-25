@@ -61,8 +61,20 @@
     };
 
     this.ticketCount = function(count, type){
-      return this.$el.find('span.ticket-count')
-        .html(count);
+      var selector = 'ticket-count';
+      var html = count;
+
+      if (type && !_.isEmpty(type))
+        selector =  selector + '-' + type;
+
+      if (this.$el.find('span.' + selector).data('label'))
+        html = _.template('<strong><%= label %> (<%= count %>)</strong>',{
+          label: this.$el.find('span.' + selector).data('label'),
+          count: count
+        });
+
+      return this.$el.find('span.' + selector)
+        .html(html);
     };
   }
 
@@ -76,12 +88,19 @@
 
     this.ticketCount = function(count, type){
       var selector = 'ticket-count';
+      var html = count;
 
       if (type && !_.isEmpty(type))
-        selector =  type + '-' + selector;
+        selector =  selector + '-' + type;
+
+      if (this.$el.find('span.' + selector).data('label'))
+        html = _.template('<strong><%= label %> (<%= count %>)</strong>',{
+          label: this.$el.find('span.' + selector).data('label'),
+          count: count
+        });
 
       return this.$el.find('span.' + selector)
-        .html(count);
+        .html(html);
     };
 
     this.toggle = function(){
@@ -145,6 +164,7 @@
 
   return {
     defaultState: 'list',
+    searchableTicketStatuses: ['', 'new', 'open','pending', 'hold'],
 
     requests: {
       fetchUser: function(id) {
@@ -184,9 +204,9 @@
         };
       },
 
-      searchOrganizationTickets: function(name, condition){
+      searchTickets: function(condition){
         return {
-          url: '/api/v2/search.json?query=type:ticket '+condition+' organization:'+name,
+          url: '/api/v2/search.json?query=type:ticket '+ condition,
           dataType: 'json'
         };
       }
@@ -259,9 +279,12 @@
       var organization = data.organizations[0];
       var ticket = new TicketAsJson(this.ticket());
 
+      this.fetchUserMetrics(user);
+      this.ajax('fetchLocale', user.locale_id);
+
       this.appView.header.renderUser({
         name: user.name,
-        email: user.email || "..."
+        email: user.email || "-"
       });
 
       this.appView.user.render({
@@ -282,9 +305,6 @@
         });
         this.fetchOrganizationMetrics(organization);
       }
-
-      this.ajax('fetchUserRequests', user.id);
-      this.ajax('fetchLocale', user.locale_id);
     },
 
     fetchTicketAuditsDone: function(data){
@@ -317,14 +337,27 @@
       });
     },400),
 
+    fetchUserMetrics: function(user){
+      if (_.isEmpty(user.email))
+        return;
+
+      _.each(this.searchableTicketStatuses, function(status){
+        var condition = (_.isEmpty(status) ? '' : 'status:' + status) +
+          ' requester:' + user.email;
+
+        this.ajax('searchTickets', condition)
+          .done(function(data) {
+            this.appView.user.ticketCount(data.count, status);
+          });
+      }, this);
+    },
+
     fetchOrganizationMetrics: function(organization){
-      _.each(['', 'new', 'open','pending'], function(status){
-        var condition = 'status:' + status;
+      _.each(this.searchableTicketStatuses, function(status){
+        var condition = (_.isEmpty(status) ? '' : 'status:' + status) +
+          ' organization:'+organization.name;
 
-        if (_.isEmpty(status))
-          condition = '';
-
-        this.ajax('searchOrganizationTickets', organization.name, condition)
+        this.ajax('searchTickets', condition)
           .done(function(data) {
             this.appView.organization.ticketCount(data.count, status);
           });
