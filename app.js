@@ -217,7 +217,10 @@
        *  DOM EVENTS
        */
       'click header'                    : function(){ this.appView.toggle(); },
-      'change .details_or_notes'        : 'detailsOrNotesChanged',
+      'change textarea.details_or_notes': 'detailsOrNotesChanged',
+      'keyup textarea.details_or_notes' : 'detailsOrNotesChanged',
+      'input textarea.details_or_notes' : 'detailsOrNotesChanged',
+      'paste textarea.details_or_notes' : 'detailsOrNotesChanged',
       'click a.details_and_notes'       : function(){ this.appView.detailsNotes.toggle(); },
       'click a.organization'            : function(){ this.appView.organization.toggle(); }
     },
@@ -305,14 +308,14 @@
       }, this);
     },
 
-    detailsOrNotesChanged: function(){
+    detailsOrNotesChanged: _.debounce(function(){
       this.ajax('updateUser', this.ticket().requester().id(), {
         user: {
           details: this.appView.detailsNotes.details(),
           notes: this.appView.detailsNotes.notes()
         }
       });
-    },
+    },400),
 
     fetchOrganizationMetrics: function(organization){
       _.each(['', 'new', 'open','pending'], function(status){
