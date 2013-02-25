@@ -51,9 +51,13 @@
     };
 
     this.locale = function(locale){
-      return this.$el.find('i.locale').addClass('flag-' + locale.locale.split('-')[1].toLowerCase())
-        .attr("title", locale.name + ' ('+locale.locale+')');
+      var locale_for_flag = locale.locale.split('-')[1];
 
+      if(_.isEmpty(locale_for_flag))
+        return;
+
+      return this.$el.find('i.locale').addClass('flag-' + locale_for_flag.toLowerCase())
+        .attr("title", locale.name + ' ('+locale.locale+')');
     };
 
     this.email = function(email){
