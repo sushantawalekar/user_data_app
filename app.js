@@ -86,6 +86,8 @@
       return this.$el.html(this.template('organization', params));
     };
 
+    // Not dry, it's the same as UserView#ticketCount...
+    // Look at inheritance using javascript.
     this.ticketCount = function(count, type){
       var selector = 'ticket-count';
       var html = count;
@@ -245,10 +247,12 @@
       'click a.organization'            : function(){ this.appView.organization.toggle(); }
     },
 
-    onActivated: function() {
-      this.doneLoading = false;
+    onActivated: function(data) {
+      if (data.firstLoad){
+        this.doneLoading = false;
 
-      this.loadIfDataReady();
+        this.loadIfDataReady();
+      }
     },
 
     loadIfDataReady: function(){
