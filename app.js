@@ -52,7 +52,7 @@
 
     this.locale = function(locale){
       var locale_for_flag = locale.locale.split('-');
-      locale_for_flag = locale.locale.split('-')[1] || locale.locale.split('-')[0];
+      locale_for_flag = locale_for_flag[1] || locale_for_flag[0];
 
       if(_.isEmpty(locale_for_flag))
         return;
