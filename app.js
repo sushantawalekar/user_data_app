@@ -214,6 +214,7 @@
       searchTickets: function(condition){
         return {
           url: '/api/v2/search.json?query=type:ticket '+ condition,
+          processData: false,
           dataType: 'json'
         };
       }
@@ -352,7 +353,7 @@
 
       _.each(this.searchableTicketStatuses, function(status){
         var condition = (_.isEmpty(status) ? '' : 'status:' + status) +
-          ' requester:' + user.email;
+          ' requester:' + encodeURIComponent(user.email);
 
         this.ajax('searchTickets', condition)
           .done(function(data) {
