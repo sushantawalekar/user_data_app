@@ -214,7 +214,6 @@
       searchTickets: function(condition){
         return {
           url: '/api/v2/search.json?query=type:ticket '+ condition,
-          processData: false,
           dataType: 'json'
         };
       }
