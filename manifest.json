@@ -4,7 +4,12 @@
     "name": "Pierre Nespo",
     "email": "pierre.nespo@gmail.com"
   },
-
+  "parameters": [
+    {
+      "name": "unfolded_on_startup",
+      "type": "checkbox"
+    }
+  ],
   "defaultLocale": "en",
   "private": false,
   "singleInstall": true,

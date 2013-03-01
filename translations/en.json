@@ -1,7 +1,12 @@
 {
   "app": {
     "description":  "Displays information about the ticket requester and requesters organization.",
-    "name":         "User info App"
+    "name":         "User info App",
+    "parameters": {
+      "unfolded_on_startup": {
+        "label": "Unfolded on startup"
+      }
+    }
   },
   "info": {
     "no_tags": "No tags",
