@@ -6,9 +6,12 @@ li {
     margin-bottom: 0.4em;
 }
 
-.default-avatar {
+.avatar {
     height: 45px;
     width: 45px;
+}
+
+.avatar.default {
     background-image: app-asset-url("avatar.png");
 }
 

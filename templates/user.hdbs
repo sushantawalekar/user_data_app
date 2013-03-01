@@ -3,9 +3,11 @@
     <ul class="small-margin">
       <li class="pull-right centered">
         {{#if user.photo}}
-        <img src="{{user.photo.content_url}}" height="45" width="45" alt="image"/>
+        <div class="avatar">
+          <img src="{{user.photo.content_url}}" height="45" width="45" alt="image"/>
+        </div>
         {{else}}
-        <div class="default-avatar"></div>
+        <div class="avatar default"></div>
         {{/if}}
         <i class="locale"></i>
       </li>
