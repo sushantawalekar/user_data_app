@@ -282,8 +282,10 @@
       this.ajax('fetchUser', this.ticket().requester().id());
       this.ajax('fetchTicketAudits', this.ticket().id());
 
-      if (this.setting('unfolded_on_startup'))
+      if (this.setting('unfolded_on_startup')){
         this.appView.toggle();
+        services.appsTray().show();
+      }
     },
 
     fetchUserDone: function(data){
