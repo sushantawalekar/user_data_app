@@ -92,7 +92,7 @@
     };
 
     // Not dry, it's the same as UserView#ticketCount...
-    // Look at inheritance using javascript.
+    // Look at inheritance in javascript.
     this.ticketCount = function(count, type){
       var selector = 'ticket-count';
       var html = count;
@@ -263,6 +263,7 @@
     loadIfDataReady: function(){
       if(!this.doneLoading &&
          this.ticket() &&
+         this.ticket().id() &&
          this.ticket().requester()){
 
         this.initialize();
