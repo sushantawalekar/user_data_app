@@ -170,7 +170,6 @@
   }
 
   return {
-    defaultState: 'list',
     searchableTicketStatuses: ['', 'new', 'open','pending', 'hold'],
 
     requests: {
@@ -253,11 +252,9 @@
     },
 
     onActivated: function(data) {
-      if (data.firstLoad){
         this.doneLoading = false;
 
         this.loadIfDataReady();
-      }
     },
 
     loadIfDataReady: function(){
@@ -265,6 +262,8 @@
          this.ticket() &&
          this.ticket().id() &&
          this.ticket().requester()){
+
+        this.switchTo('list');
 
         this.initialize();
 
