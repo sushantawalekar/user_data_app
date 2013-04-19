@@ -103,7 +103,7 @@
       this.ajax('fetchTicketAudits', this.ticket().id());
 
       if (this.setting('unfolded_on_startup')){
-        this.toggleAppView();
+        this.toggleApp();
         services.appsTray().show();
       }
     },
