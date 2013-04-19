@@ -118,7 +118,7 @@
     },
 
     renderUser: function(params){
-      this.renderUserInHeader(params.user)
+      this.renderUserInHeader(params.user);
 
       this.$('section[data-user]')
         .html(this.renderTemplate('user', params));
@@ -167,7 +167,7 @@
 
     renderOrganization: function(params){
       return this.$('section[data-organization]')
-        .html(this.renderTemplate('organization', params))
+        .html(this.renderTemplate('organization', params));
     },
 
     toggleApp: function(){
