@@ -27,17 +27,6 @@
     }
   };
 
-  var SpokeTicketView = function($el, template){
-    this.$el = $el;
-    this.template = template;
-  };
-
-  SpokeTicketView.prototype = {
-    render: function(params){
-      return this.$el.html(this.template('spoke-ticket', params));
-    }
-  };
-
   var AppView = function(app){
     this.app = app;
   };
