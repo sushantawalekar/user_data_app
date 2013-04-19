@@ -1,23 +1,22 @@
 (function() {
-  function TicketAsJson(ticket){
-    return{
-      id: ticket.id()
-    };
-  }
-
-  function AuditEvent(event){
+  var AuditEvent = function(event){
     this.event = event;
+  };
 
-    this.containsSpokeData = function(){
+  AuditEvent.prototype = {
+    containsSpokeData: function(){
       return this.isComment() && /spoke_id_/.test(this.event.body);
-    };
+    },
 
-    this.isComment = function(){
+    isComment:function(){
       return this.event.type === "Comment";
-    };
+    },
 
-    this.spokeData = function(){
+    spokeData: function(){
       var data = /spoke_id_(.*)\nspoke_account_(.*)\nrequester_email_(.*)\nrequester_phone_(.*)/.exec(this.event.body);
+
+      if (_.isEmpty(data))
+        return;
 
       return {
         id: data[1].trim(),
@@ -25,149 +24,128 @@
         email: data[3].trim(),
         phone: data[4].trim()
       };
-    };
-  }
+    }
+  };
 
-  function HeaderView($el){
-    this.$el = $el;
-
-    this.renderUser = function(user){
-      return this.$el.find('h3 span')
-        .html(user.name + ' <small>('+ user.email +')</small>');
-    };
-
-    this.setIcon = function(val){
-      return this.$el.find('h3 i')
-        .attr('class', "icon-" + val);
-    };
-  }
-
-  function UserView($el, template){
+  var SpokeTicketView = function($el, template){
     this.$el = $el;
     this.template = template;
+  };
 
-    this.render = function(params){
-      return this.$el.html(this.template('user', params));
-    };
+  SpokeTicketView.prototype = {
+    render: function(params){
+      return this.$el.html(this.template('spoke-ticket', params));
+    }
+  };
 
-    this.locale = function(locale){
+  var AppView = function(app){
+    this.app = app;
+  };
+
+  AppView.prototype = {
+    userView: 'section[data-user]',
+    detailsNotesView: 'section[data-details-notes]',
+    organizationView: 'section[data-organization]',
+
+    toggle: function(){
+      var mainView = this.app.$('section[data-main]');
+
+      if (mainView.is(':visible')){
+        mainView.hide();
+        this.setHeaderIcon('plus');
+      } else {
+        mainView.show();
+        this.setHeaderIcon('minus');
+      }
+    },
+
+    toggleDetailsAndNotes: function(){
+      return this.app.$(this.detailsNotesView + ' .well').toggle();
+    },
+
+    toggleOrganization: function(){
+      return this.app.$(this.organizationView + ' .well').toggle();
+    },
+
+    setHeaderIcon: function(sign){
+      return this.app.$('h3 i').attr('class', 'icon-' + sign);
+    },
+
+    setHeaderUser: function(user){
+      return this.app.$('h3 span')
+        .html(user.name + ' <small>('+ (user.email || '-') +')</small>');
+    },
+
+    setUser: function(args){
+      this.setHeaderUser(args.user);
+
+      this.renderTemplate(this.userView, 'user', args);
+      this.renderTemplate(this.detailsNotesView, 'details-notes', {
+        details: args.user.details,
+        notes: args.user.notes
+      });
+    },
+
+    setUserLocale: function(locale){
       var locale_for_flag = locale.locale.split('-');
       locale_for_flag = locale_for_flag[1] || locale_for_flag[0];
 
       if(_.isEmpty(locale_for_flag))
         return;
 
-      return this.$el.find('i.locale').addClass('flag-' + locale_for_flag.toLowerCase())
+      return this.app
+        .$(this.userView)
+        .find('i.locale')
+        .addClass('flag-' + locale_for_flag.toLowerCase())
         .attr("title", locale.name + ' ('+locale.locale+')');
-    };
+    },
 
-    this.email = function(email){
-      return this.$el.find('span.email').html(email);
-    };
+    setUserEmail: function(email){
+      return this.render(this.userView + ' span.email', email);
+    },
 
-    this.ticketCount = function(count, type){
+    getUserDetails: function(){
+      return this.app.$(this.detailsNotesView +' .details').val();
+    },
+
+    getUserNotes: function(){
+      return this.app.$(this.detailsNotesView +' .notes').val();
+    },
+
+    setOrganization: function(args){
+      this.renderTemplate(this.organizationView, 'organization', args);
+    },
+
+    setTicketCount: function(entity, count, type){
+      var el = this.app.$('section[data-'+entity+']');
       var selector = 'ticket-count';
       var html = count;
 
       if (type && !_.isEmpty(type))
         selector =  selector + '-' + type;
 
-      if (this.$el.find('span.' + selector).data('label'))
+      if (el.find('span.' + selector).data('label'))
         html = _.template('<strong><%= label %> (<%= count %>)</strong>',{
-          label: this.$el.find('span.' + selector).data('label'),
+          label: el.find('span.' + selector).data('label'),
           count: count
         });
 
-      return this.$el.find('span.' + selector)
+      return el.find('span.' + selector)
         .html(html);
-    };
-  }
+    },
 
-  function OrganizationView($el, template){
-    this.$el = $el;
-    this.template = template;
+    setSpokeTicket: function(args){
+      return this.renderTemplate('section[data-spoke-ticket]', 'spoke-ticket', args);
+    },
 
-    this.render = function(params){
-      return this.$el.html(this.template('organization', params));
-    };
+    renderTemplate: function(selector, template, args){
+      return this.render(selector, this.app.renderTemplate(template, args));
+    },
 
-    // Not dry, it's the same as UserView#ticketCount...
-    // Look at inheritance in javascript.
-    this.ticketCount = function(count, type){
-      var selector = 'ticket-count';
-      var html = count;
-
-      if (type && !_.isEmpty(type))
-        selector =  selector + '-' + type;
-
-      if (this.$el.find('span.' + selector).data('label'))
-        html = _.template('<strong><%= label %> (<%= count %>)</strong>',{
-          label: this.$el.find('span.' + selector).data('label'),
-          count: count
-        });
-
-      return this.$el.find('span.' + selector)
-        .html(html);
-    };
-
-    this.toggle = function(){
-      return this.$el.find('.well').toggle();
-    };
-  }
-
-  function SpokeTicketView($el, template){
-    this.$el = $el;
-    this.template = template;
-
-    this.render = function(params){
-      return this.$el.html(this.template('spoke-ticket', params));
-    };
-  }
-
-  function DetailsNotesView($el, template){
-    this.$el = $el;
-    this.template = template;
-
-    this.render = function(params){
-      return this.$el.html(this.template('details-notes', params));
-    };
-
-    this.toggle = function(){
-      return this.$el.find('.well').toggle();
-    };
-
-    this.details = function(){
-      return this.$el.find('.details').val();
-    };
-
-    this.notes = function(){
-      return this.$el.find('.notes').val();
-    };
-  }
-
-
-  function AppView($el, template){
-    this.$el = $el;
-    this.template = template;
-
-    this.header = new HeaderView(this.$el.find('header'));
-    this.user = new UserView(this.$el.find('section[data-user]'), this.template);
-    this.organization = new OrganizationView(this.$el.find('section[data-organization]'), this.template);
-    this.spokeTicket = new SpokeTicketView(this.$el.find('section[data-spoke-ticket]'), this.template);
-    this.detailsNotes = new DetailsNotesView(this.$el.find('section[data-details-notes]'), this.template);
-
-    this.toggle = function(){
-      var mainView = this.$el.find('section[data-main]');
-
-      if (mainView.is(':visible')){
-        mainView.hide();
-        this.header.setIcon('plus');
-      } else {
-        mainView.show();
-        this.header.setIcon('minus');
-      }
-    };
-  }
+    render: function(selector, html){
+      return this.app.$(selector).html(html);
+    }
+  };
 
   return {
     searchableTicketStatuses: ['', 'new', 'open','pending', 'hold'],
@@ -230,9 +208,9 @@
        */
       'fetchUser.done'                  : 'fetchUserDone',
       'fetchTicketAudits.done'          : 'fetchTicketAuditsDone',
-      'fetchLocale.done'                : function(data){ this.appView.user.locale(data.locale); },
+      'fetchLocale.done'                : function(data){ this.appView.setUserLocale(data.locale); },
       'updateUser.done'                 : function(){ services.notify(this.I18n.t("update_user_done")); },
-      'fetchUserRequests.done'          : function(data){ this.appView.user.ticketCount(data.count); },
+      'fetchUserRequests.done'          : function(data){ this.appView.setTicketCount('user',data.count); },
 
       'fetchTicketAudits.fail'          : 'genericAjaxFailure',
       'fetchLocale.fail'                : 'genericAjaxFailure',
@@ -243,12 +221,9 @@
        *  DOM EVENTS
        */
       'click header'                    : function(){ this.appView.toggle(); },
-      'change textarea.details_or_notes': 'detailsOrNotesChanged',
-      'keyup textarea.details_or_notes' : 'detailsOrNotesChanged',
-      'input textarea.details_or_notes' : 'detailsOrNotesChanged',
-      'paste textarea.details_or_notes' : 'detailsOrNotesChanged',
-      'click a.details_and_notes'       : function(){ this.appView.detailsNotes.toggle(); },
-      'click a.organization'            : function(){ this.appView.organization.toggle(); }
+      'change,keyup,input,paste textarea.details_or_notes': 'detailsOrNotesChanged',
+      'click a.details_and_notes'       : function(){ this.appView.toggleDetailsAndNotes(); },
+      'click a.organization'            : function(){ this.appView.toggleOrganization(); }
     },
 
     onActivated: function(data) {
@@ -272,12 +247,7 @@
     },
 
     initialize: function(){
-      var self = this;
-
-      this.appView = new AppView(this.$(),
-                                 function(tmpl,params){
-                                   return self.renderTemplate(tmpl,params);
-                                 });
+      this.appView = new AppView(this);
 
       this.ajax('fetchUser', this.ticket().requester().id());
       this.ajax('fetchTicketAudits', this.ticket().id());
@@ -291,29 +261,19 @@
     fetchUserDone: function(data){
       var user = data.user;
       var organization = data.organizations[0];
-      var ticket = new TicketAsJson(this.ticket());
+      var ticket =  { id: this.ticket().id() };
 
       this.fetchUserMetrics(user);
       this.ajax('fetchLocale', user.locale_id);
 
-      this.appView.header.renderUser({
-        name: user.name,
-        email: user.email || "-"
-      });
-
-      this.appView.user.render({
+      this.appView.setUser({
         user: user,
         ticket: ticket,
         user_has_organization: !!organization
       });
 
-      this.appView.detailsNotes.render({
-        details: user.details,
-        notes: user.notes
-      });
-
       if (organization){
-        this.appView.organization.render({
+        this.appView.setOrganization({
           organization: organization,
           ticket: ticket
         });
@@ -329,14 +289,16 @@
           if (event.containsSpokeData()){
             var spokeData = event.spokeData();
 
-            this.appView.header.renderUser({
-              name: this.ticket().requester().name(),
-              email: spokeData.email
-            });
+            if (spokeData){
+              this.appView.setHeaderUser({
+                name: this.ticket().requester().name(),
+                email: spokeData.email
+              });
 
-            this.appView.user.email(spokeData.email);
+              this.appView.setUserEmail(spokeData.email);
 
-            return this.appView.spokeTicket.render(spokeData);
+              return this.appView.setSpokeTicket(spokeData);
+            }
           }
         }, this);
       }, this);
@@ -345,8 +307,8 @@
     detailsOrNotesChanged: _.debounce(function(){
       this.ajax('updateUser', this.ticket().requester().id(), {
         user: {
-          details: this.appView.detailsNotes.details(),
-          notes: this.appView.detailsNotes.notes()
+          details: this.appView.getUserDetails(),
+          notes: this.appView.getUserNotes()
         }
       });
     },400),
@@ -361,7 +323,7 @@
 
         this.ajax('searchTickets', condition)
           .done(function(data) {
-            this.appView.user.ticketCount(data.count, status);
+            this.appView.setTicketCount('user', data.count, status);
           });
       }, this);
     },
@@ -373,7 +335,7 @@
 
         this.ajax('searchTickets', condition)
           .done(function(data) {
-            this.appView.organization.ticketCount(data.count, status);
+            this.appView.setTicketCount('organization', data.count, status);
           });
       }, this);
     },
