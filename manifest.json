@@ -13,6 +13,6 @@
   "defaultLocale": "en",
   "private": false,
   "singleInstall": true,
-  "location": "ticket_sidebar",
+  "location": ["ticket_sidebar", "new_ticket_sidebar"],
   "frameworkVersion": "0.5"
 }
