@@ -94,13 +94,12 @@
     isReady: function(){
       return(!this.doneLoading &&
              this.ticket() &&
-             this.ticket().id() &&
              this.ticket().requester());
     },
 
     initialize: function(){
       this.ajax('fetchUser', this.ticket().requester().id());
-      this.ajax('fetchTicketAudits', this.ticket().id());
+      if (this.ticket().id()) { this.ajax('fetchTicketAudits', this.ticket().id()); }
 
       if (this.setting('unfolded_on_startup')){
         this.$('section[data-main]').show();
