@@ -1,0 +1,96 @@
+---
+title: "User Data"
+packages:
+  - default
+  - app_user_data_app
+
+parts:
+  - translation:
+      key: "txt.apps.user_data_app.app.description"
+      title: "This is the description of the app"
+      value: "Displays information about the ticket requester and requesters organization."
+  - translation:
+      key: "txt.apps.user_data_app.app.name"
+      title: "This is the name of the app. This app displays information about the user on the right hand side of a ticket, thus minimizing the need for the agent to click to see relevant information"
+      value: "User info App"
+  - translation:
+      key: "txt.apps.user_data_app.app.parameters.unfolded_on_startup.label"
+      title: "This is a settings option of the app to be opened when the ticket is opened without needing an extra click to open the apps tray"
+      value: "Unfolded on startup"
+  - translation:
+      key: "txt.apps.user_data_app.info.no_tags"
+      title: "this is the message displayed when the user has no tags"
+      value: "No tags"
+  - translation:
+      key: "txt.apps.user_data_app.info.no_domain_names"
+      title: "this is the message displayed when the user has no domain names"
+      value: "No domain names"
+  - translation:
+      key: "txt.apps.user_data_app.update_user_done"
+      title: "this is the message displayed when you update the notes and details of the user"
+      value: "User notes and details updated!"
+  - translation:
+      key: "txt.apps.user_data_app.ajax_error"
+      title: "error message"
+      value: "An error occurred, please try again later."
+  - translation:
+      key: "txt.apps.user_data_app.tickets"
+      title: "list of tickets for that user"
+      value: "Tickets"
+  - translation:
+      key: "txt.apps.user_data_app.toggle_details_notes"
+      title: "show/hide details and notes. that's a link and when clicking on it the details/notes box appears and disappears"
+      value: "Toggle Details and Notes"
+  - translation:
+      key: "txt.apps.user_data_app.toggle_organization"
+      title: "show/hide organization. that's a link and when clicking on it the organization box appears and disappears"
+      value: "Toggle organization"
+  - translation:
+      key: "txt.apps.user_data_app.details_and_notes"
+      title: "details and notes text box for this user"
+      value: "Details and Notes"
+  - translation:
+      key: "txt.apps.user_data_app.details"
+      title: "details box for this user"
+      value: "Details"
+  - translation:
+      key: "txt.apps.user_data_app.notes"
+      title: "notes box for this user"
+      value: "Notes"
+  - translation:
+      key: "txt.apps.user_data_app.organization"
+      title: "organization for this user"
+      value: "Organization"
+  - translation:
+      key: "txt.apps.user_data_app.ticket_status.new"
+      title: "this is a tag labelled new"
+      value: "new"
+  - translation:
+      key: "txt.apps.user_data_app.ticket_status.open"
+      title: "this is a tag labelled open"
+      value: "open"
+  - translation:
+      key: "txt.apps.user_data_app.ticket_status.pending"
+      title: "this is a tag labelled pending"
+      value: "pending"
+  - translation:
+      key: "txt.apps.user_data_app.ticket_status.hold"
+      title: "this is a tag labelled on hold"
+      value: "on-hold"
+  - translation:
+      key: "txt.apps.user_data_app.spoke-ticket.link.pre"
+      title: "this is text displayed in the app to say which account does the ticket come from, it will say for instance this ticket is from the COMPANY spoke. The only variable here is the word Company, the word spoke is added as a string after"
+      value: "This ticket is from the"
+  - translation:
+      key: "txt.apps.user_data_app.spoke-ticket.link.post"
+      title: "this is text displayed in the app to say which account does the ticket come from, it will say for instance this ticket is from the COMPANY spoke. The only variable here is the word Company, the word spoke is added as a string after"
+      value: "Spoke."
+  - translation:
+      key: "txt.apps.user_data_app.account"
+      title: "This is the account from this user"
+      value: "Account"
+  - translation:
+      key: "txt.apps.user_data_app.spoke_ticket_id"
+      title: "this is the ticket ID from the spoke of that user"
+      value: "Spoke Ticket ID"
+
