@@ -79,12 +79,8 @@ parts:
       value: "on-hold"
   - translation:
       key: "txt.apps.user_data_app.spoke-ticket.link.pre"
-      title: "this is text displayed in the app to say which account does the ticket come from, it will say for instance this ticket is from the COMPANY spoke. The only variable here is the word Company, the word spoke is added as a string after"
-      value: "This ticket is from the"
-  - translation:
-      key: "txt.apps.user_data_app.spoke-ticket.link.post"
-      title: "this is text displayed in the app to say which account does the ticket come from, it will say for instance this ticket is from the COMPANY spoke. The only variable here is the word Company, the word spoke is added as a string after"
-      value: "Spoke."
+      title: "this is text displayed in the app to say which account does the ticket come from, it will say for instance this ticket is from the spoke account COMPANY. The only variable here is the word Company, the word spoke is added as a string after"
+      value: "This ticket is from the spoke account:"
   - translation:
       key: "txt.apps.user_data_app.account"
       title: "This is the account from this user"

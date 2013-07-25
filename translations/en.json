@@ -30,9 +30,9 @@
   },
   "spoke-ticket": {
     "link": {
-      "pre": "This ticket is from the",
-      "post": "Spoke."
-    }},
+      "pre": "This ticket is from the spoke account:"
+    }
+  },
   "account": "Account",
   "spoke_ticket_id": "Spoke Ticket ID"
 }
