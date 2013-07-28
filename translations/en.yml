@@ -32,7 +32,7 @@ parts:
   - translation:
       key: "txt.apps.user_data_app.ajax_error"
       title: "error message"
-      value: "An error occurred, please try again later."
+      value: "An error occurred. Please try again later."
   - translation:
       key: "txt.apps.user_data_app.tickets"
       title: "list of tickets for that user"
