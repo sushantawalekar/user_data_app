@@ -12,7 +12,7 @@
         <i class="locale"></i>
       </li>
       <li>
-        <a href="/#/tickets/{{ticket.id}}/requester/tickets">
+        <a href="/agent/#/tickets/{{ticket.id}}/requester/tickets">
           <i class="icon-user"></i>
           <strong>{{user.name}}</strong>
         </a>
@@ -22,7 +22,7 @@
         <span class="email">{{user.email}}</span>
       </li>
       <li>
-        <a href="/#/tickets/{{ticket.id}}/requester/tickets">
+        <a href="/agent/#/tickets/{{ticket.id}}/requester/tickets">
           <i class="icon-list"></i>
           {{t "tickets"}} <strong>(<span class="ticket-count"></span>)</strong>
         </a>
