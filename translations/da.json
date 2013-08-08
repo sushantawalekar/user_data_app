@@ -1,0 +1,37 @@
+{
+  "app": {
+    "description": "Viser oplysninger om ticket-anmoderen og anmoderens organisation.",
+    "name": "Brugerinfo-applikation",
+    "parameters": {
+      "unfolded_on_startup": {
+        "label": "Foldede ud ved opstart"
+      }
+    }
+  },
+  "info": {
+    "no_tags": "Ingen tags",
+    "no_domain_names": "Ingen domænenavne"
+  },
+  "update_user_done": "Brugernotater og –detaljer opdateret.",
+  "ajax_error": "Der forekom en fejl. Prøv igen senere.",
+  "tickets": "Tickets",
+  "toggle_details_notes": "Skift detaljer og noter",
+  "toggle_organization": "Skift organisation",
+  "details_and_notes": "Detaljer og noter",
+  "details": "Detaljer",
+  "notes": "Notater",
+  "organization": "Organisation",
+  "ticket_status": {
+    "new": "ny",
+    "open": "åben",
+    "pending": "venter",
+    "hold": "i bero"
+  },
+  "spoke-ticket": {
+    "link": {
+      "pre": "Denne ticket er fra spoke-kontoen:"
+    }
+  },
+  "account": "Konto",
+  "spoke_ticket_id": "Spoke-ticket-id"
+}

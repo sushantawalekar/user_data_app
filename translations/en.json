@@ -1,7 +1,7 @@
 {
   "app": {
-    "description":  "Displays information about the ticket requester and requesters organization.",
-    "name":         "User info App",
+    "description": "Displays information about the ticket requester and requesters organization.",
+    "name": "User info App",
     "parameters": {
       "unfolded_on_startup": {
         "label": "Unfolded on startup"
@@ -13,8 +13,7 @@
     "no_domain_names": "No domain names"
   },
   "update_user_done": "User notes and details updated!",
-  "ajax_error": "An error occurred, please try again later.",
-
+  "ajax_error": "An error occurred. Please try again later.",
   "tickets": "Tickets",
   "toggle_details_notes": "Toggle Details and Notes",
   "toggle_organization": "Toggle organization",

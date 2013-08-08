@@ -1,0 +1,37 @@
+{
+  "app": {
+    "description": "Afficher les informations au sujet du demandeur du ticket et de son organisation.",
+    "name": "Application User Info",
+    "parameters": {
+      "unfolded_on_startup": {
+        "label": "Ouverture au démarrage"
+      }
+    }
+  },
+  "info": {
+    "no_tags": "Aucun marqueur",
+    "no_domain_names": "Aucun nom de domaine"
+  },
+  "update_user_done": "Notes et détails de l’utilisateur mis à jour !",
+  "ajax_error": "Une erreur est survenue. Réessayez plus tard.",
+  "tickets": "Tickets",
+  "toggle_details_notes": "Afficher/masquer les détails et les notes",
+  "toggle_organization": "Afficher/masquer l’organisation",
+  "details_and_notes": "Détails et notes",
+  "details": "Détails",
+  "notes": "Remarques",
+  "organization": "Organisation",
+  "ticket_status": {
+    "new": "nouveau",
+    "open": "ouvert",
+    "pending": "en attente",
+    "hold": "en pause"
+  },
+  "spoke-ticket": {
+    "link": {
+      "pre": "Ce ticket provient du compte satellite :"
+    }
+  },
+  "account": "Compte",
+  "spoke_ticket_id": "ID de ticket satellite"
+}
