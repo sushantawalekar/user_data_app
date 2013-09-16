@@ -6,6 +6,7 @@
       fetchUser: function(id) {
         return {
           url: '/api/v2/users/' + id + '.json?include=organizations',
+          proxy_v2: true,
           dataType: 'json'
         };
       },
@@ -13,6 +14,7 @@
       fetchUserRequests: function(id){
         return {
           url: '/api/v2/users/' + id + '/requests.json',
+          proxy_v2: true,
           dataType: 'json'
         };
       },
@@ -21,6 +23,7 @@
         return {
           url: '/api/v2/users/' + id + '.json',
           type: 'PUT',
+          proxy_v2: true,
           dataType: 'json',
           data: data
         };
@@ -29,6 +32,7 @@
       fetchTicketAudits: function(id){
         return {
           url: '/api/v2/tickets/' + id + '/audits.json',
+          proxy_v2: true,
           dataType: 'json'
         };
       },
@@ -36,6 +40,7 @@
       fetchLocale: function(id){
         return {
           url: '/api/v2/locales/' + id +'.json',
+          proxy_v2: true,
           dataType: 'json'
         };
       },
@@ -43,6 +48,7 @@
       searchTickets: function(condition){
         return {
           url: '/api/v2/search.json?query=type:ticket '+ condition,
+          proxy_v2: true,
           dataType: 'json'
         };
       }
@@ -275,8 +281,8 @@
         return;
 
       _.each(this.searchableTicketStatuses, function(status){
-        var condition = (_.isEmpty(status) ? '' : 'status:' + status) +
-          ' requester:' + encodeURIComponent(user.email);
+        var condition = (_.isEmpty(status) ? '' : 'status:' + status + ' ') +
+          'requester:' + user.email;
 
         this.ajax('searchTickets', condition)
           .done(function(data) {
@@ -287,8 +293,8 @@
 
     fetchOrganizationMetrics: function(organization){
       _.each(this.searchableTicketStatuses, function(status){
-        var condition = (_.isEmpty(status) ? '' : 'status:' + status) +
-          ' organization:'+organization.name;
+        var condition = (_.isEmpty(status) ? '' : 'status:' + status + ' ') +
+          'organization:"' + organization.name + '"';
 
         this.ajax('searchTickets', condition)
           .done(function(data) {
