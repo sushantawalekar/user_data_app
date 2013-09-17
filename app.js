@@ -26,7 +26,7 @@
       'click .save': 'onSaveClick',
 
       // Misc
-      'requestsFinished': 'onRequestsFinished',
+      'requestsFinished': 'onRequestsFinished'
     },
 
     requests: {
@@ -195,7 +195,7 @@
     },
 
     onBackClick: function() {
-      this.$('div[data-main]').height('auto').removeClass('effect open')
+      this.$('div[data-main]').height('auto').removeClass('effect open');
     },
 
     onSaveClick: function() {
