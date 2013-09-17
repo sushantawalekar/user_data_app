@@ -193,8 +193,7 @@
     },
 
     onBackClick: function() {
-      var height = this.$('.whole').height() + 25;
-      this.$('div[data-main]').removeClass('effect open').height(height);
+      this.$('div[data-main]').height('auto').removeClass('effect open')
     },
 
     onSaveClick: function() {
