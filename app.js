@@ -185,8 +185,8 @@
         fields: this.storage.fields
       });
       this.$('.admin').html(html);
-      var height = _.max([this.$('.admin').height(),
-                          this.$('.whole').height()]) + 20;
+      var height = _.max([this.$('.admin').outerHeight(),
+                          this.$('.whole').outerHeight()]) + 50;
       this.$('div[data-main]').height(height);
       this.$('div[data-main]').addClass('effect');
       _.defer((function() {
