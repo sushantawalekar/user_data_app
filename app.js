@@ -5,7 +5,9 @@
       user: null,
       ticketsCounters: {
       },
-      requestsCount: 0
+      requestsCount: 0,
+      fields: [],
+      selectedKeys: []
     },
 
     events: {
@@ -14,12 +16,15 @@
 
       // Requests
       'getUser.done': 'onGetUserDone',
+      'getUserFields.done': 'onGetUserFieldsDone',
 
       // UI
       'click .expandBar': 'onClickExpandBar',
+      'click .cog': 'onCogClick',
+      'click .back': 'onBackClick',
 
       // Misc
-      'requestsFinished': 'onRequestsFinished'
+      'requestsFinished': 'onRequestsFinished',
     },
 
     requests: {
@@ -31,11 +36,33 @@
         };
       },
 
+      'getUserFields': {
+        url: '/api/v2/user_fields.json',
+        proxy_v2: true
+      },
+
       'searchTickets': function(cond) {
         return {
           url: helpers.fmt("/api/v2/search.json?query=type:ticket %@", cond),
           dataType: 'json',
           proxy_v2: true
+        };
+      },
+
+      'saveSelectedFields': function() {
+        var appId = this.installationId();
+        var selectedKeys = _.pluck(_.filter(this.storage.fields, function(field) {
+          return field.selected;
+        }), 'key');
+        var fieldsString = JSON.stringify(this.storage.fields);
+        return {
+          type: 'PUT',
+          url: helpers.fmt("/api/v2/apps/installations/%@.json", appId),
+          dataType: 'json',
+          data: {
+            'settings': {'selectedFields': fieldsString},
+            'enabled': true
+          }
         };
       }
     },
@@ -74,13 +101,36 @@
       }
     },
 
+    fieldsForCurrentUser: function() {
+      return _.map(this.storage.selectedKeys, (function(key) {
+        var result = { key: key };
+        if (key.indexOf('##builtin') === 0) {
+          var name = key.split('_')[1];
+          result.value = this.storage.user[name];
+          result.title = this.I18n.t(name);
+        }
+        else {
+          var field = _.find(this.storage.fields, function(field) {
+            return field.key === key;
+          });
+          result.title = field.title;
+          result.description = field.description;
+          result.value = this.storage.user.user_fields[key];
+        }
+        return result;
+      }).bind(this));
+    },
+
     // EVENTS ==================================================================
 
     onAppActivation: function() {
       _.defer((function() {
+        var defaultSelection = '["##builtin_tags", "##builtin_notes", "##builtin_details"]';
+        this.storage.selectedKeys = JSON.parse(this.setting('selectedFields') || defaultSelection);
         if (this.ticket().requester()) {
           this.countedAjax('getUser', this.ticket().requester().id());
         }
+        this.countedAjax('getUserFields');
       }).bind(this));
     },
 
@@ -91,8 +141,10 @@
         }
       });
       this.switchTo('display', {
+        isAdmin: this.currentUser().role() === 'admin',
         user: this.storage.user,
-        tickets: this.storage.ticketsCounters
+        tickets: this.storage.ticketsCounters,
+        fields: this.fieldsForCurrentUser()
       });
     },
 
@@ -110,6 +162,18 @@
       }
     },
 
+    onCogClick: function() {
+      this.switchTo('admin', {
+        fields: this.storage.fields
+      });
+    },
+
+    onBackClick: function() {
+      this.$('input').prop('disabled', true);
+      this.$('.waitSpin').show();
+      this.onAppActivation();
+    },
+
     // REQUESTS ================================================================
 
     onGetUserDone: function(data) {
@@ -121,6 +185,46 @@
 
     onSearchResultDone: function(status, data) {
       this.storage.ticketsCounters[status] = parseInt(data.count, 10);
+    },
+
+    onGetUserFieldsDone: function(data) {
+      var selectedFields = this.storage.selectedKeys;
+      var fields = [
+        {
+          key: "##builtin_tags",
+          title: this.I18n.t("tags"),
+          description: "",
+          position: 0,
+          active: true
+        },
+        {
+          key: "##builtin_notes",
+          title: this.I18n.t("notes"),
+          description: "",
+          position: Number.MAX_VALUE - 1,
+          active: true
+        },
+        {
+          key: "##builtin_details",
+          title: this.I18n.t("details"),
+          description: "",
+          position: Number.MAXVALUE,
+          active: true
+        }
+      ].concat(data.user_fields);
+      var activeFields = _.filter(fields, function(field) {
+        return field.active;
+      });
+      var restrictedFields = _.map(activeFields, function(field) {
+        return {
+          key: field.key,
+          title: field.title,
+          description: field.description,
+          position: field.position,
+          selected: _.contains(selectedFields, field.key)
+        };
+      });
+      this.storage.fields = _.sortBy(restrictedFields, 'position');
     }
   };
 }());
