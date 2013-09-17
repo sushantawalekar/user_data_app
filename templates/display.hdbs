@@ -15,7 +15,7 @@
       {{#if user.identities.length}}
       <div class='social pull-right'>
         {{#each user.identities}}
-          <a href="{{value}}" class="{{type}}"></a>
+          <a href="{{value}}" target="_blank" class="{{type}}"></a>
         {{/each}}
       </div>
       {{/if}}
