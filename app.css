@@ -15,6 +15,15 @@
     opacity: 0.5;
     margin-top: 3px;
   }
+
+  .save {
+    display: block;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
 }
 
 .whole {

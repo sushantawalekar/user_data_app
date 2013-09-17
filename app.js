@@ -22,6 +22,7 @@
       'click .expandBar': 'onClickExpandBar',
       'click .cog': 'onCogClick',
       'click .back': 'onBackClick',
+      'click .save': 'onSaveClick',
 
       // Misc
       'requestsFinished': 'onRequestsFinished',
@@ -121,6 +122,15 @@
       }).bind(this));
     },
 
+    showDisplay: function() {
+      this.switchTo('display', {
+        isAdmin: this.currentUser().role() === 'admin',
+        user: this.storage.user,
+        tickets: this.storage.ticketsCounters,
+        fields: this.fieldsForCurrentUser()
+      });
+    },
+
     // EVENTS ==================================================================
 
     onAppActivation: function() {
@@ -140,12 +150,7 @@
           ticketCounters[key] = '-';
         }
       });
-      this.switchTo('display', {
-        isAdmin: this.currentUser().role() === 'admin',
-        user: this.storage.user,
-        tickets: this.storage.ticketsCounters,
-        fields: this.fieldsForCurrentUser()
-      });
+      this.showDisplay();
     },
 
     onClickExpandBar: function() {
@@ -169,9 +174,13 @@
     },
 
     onBackClick: function() {
+      this.showDisplay();
+    },
+
+    onSaveClick: function() {
       var that = this;
       var keys = this.$('input:checked').map(function() { return that.$(this).val(); });
-      this.$('input').prop('disabled', true);
+      this.$('input, button').prop('disabled', true);
       this.$('.waitSpin').show();
       this.ajax('saveSelectedFields', keys).always(this.onAppActivation.bind(this));
     },

@@ -10,6 +10,7 @@
   },
   "admin": {
     "title": "User Info admin panel",
+    "save": "Save and go back",
     "text": "Please select the user fields you would like to permanently display on the App"
   },
   "info": {
