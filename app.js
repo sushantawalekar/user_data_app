@@ -1,306 +1,109 @@
 (function() {
   return {
-    searchableTicketStatuses: ['', 'new', 'open','pending', 'hold'],
-    defaultState: 'list',
-    requests: {
-      fetchUser: function(id) {
-        return {
-          url: '/api/v2/users/' + id + '.json?include=organizations',
-          proxy_v2: true,
-          dataType: 'json'
-        };
-      },
 
-      fetchUserRequests: function(id){
-        return {
-          url: '/api/v2/users/' + id + '/requests.json',
-          proxy_v2: true,
-          dataType: 'json'
-        };
+    storage: {
+      user: null,
+      ticketsCounters: {
       },
-
-      updateUser: function(id, data){
-        return {
-          url: '/api/v2/users/' + id + '.json',
-          type: 'PUT',
-          proxy_v2: true,
-          dataType: 'json',
-          data: data
-        };
-      },
-
-      fetchTicketAudits: function(id){
-        return {
-          url: '/api/v2/tickets/' + id + '/audits.json',
-          proxy_v2: true,
-          dataType: 'json'
-        };
-      },
-
-      fetchLocale: function(id){
-        return {
-          url: '/api/v2/locales/' + id +'.json',
-          proxy_v2: true,
-          dataType: 'json'
-        };
-      },
-
-      searchTickets: function(condition){
-        return {
-          url: '/api/v2/search.json?query=type:ticket '+ condition,
-          proxy_v2: true,
-          dataType: 'json'
-        };
-      }
+      requestsCount: 0
     },
 
     events: {
-      /*
-       *  APP EVENTS
-       */
-      'app.activated'                   : 'onActivated',
-      'ticket.requester.id.changed'     : 'initializeIfReady',
-      'ticket.requester.email.changed'  : 'initializeIfReady',
-      /*
-       *  AJAX EVENTS
-       */
-      'fetchUser.done'                  : 'fetchUserDone',
-      'fetchTicketAudits.done'          : 'fetchTicketAuditsDone',
-      'fetchLocale.done'                : function(data){ this.renderUserLocale(data.locale); },
-      'updateUser.done'                 : function(){ services.notify(this.I18n.t("update_user_done")); },
-      'fetchUserRequests.done'          : function(data){ this.renderTicketCount('user',data.count); },
+      // App
+      'app.activated': 'onAppActivation',
 
-      'fetchTicketAudits.fail'          : 'genericAjaxFailure',
-      'fetchLocale.fail'                : 'genericAjaxFailure',
-      'updateUser.fail'                 : 'genericAjaxFailure',
-      'fetchUser.fail'                  : 'genericAjaxFailure',
-      'fetchUserRequests.fail'          : 'genericAjaxFailure',
-      /*
-       *  DOM EVENTS
-       */
-      'click header'                    : function(){ this.toggleApp(); },
-      'change,keyup,input,paste textarea.details_or_notes': 'detailsOrNotesChanged',
-      'click a.details_and_notes'       : function(){ this.toggleDetailsAndNotes(); },
-      'click a.organization'            : function(){ this.toggleOrganization(); }
+      // Requests
+      'getUser.done': 'onGetUserDone',
+
+      // Misc
+      'requestsFinished': 'onRequestsFinished'
     },
 
-    onActivated: function(data) {
-      this.doneLoading = false;
-      this.initializeIfReady();
-    },
+    requests: {
+      'getUser': function(id) {
+        return {
+          url: helpers.fmt("/api/v2/users/%@.json", id),
+          dataType: 'json',
+          proxy_v2: true
+        };
+      },
 
-    initializeIfReady: function(){
-      if (!this.isReady())
-        return;
-
-      this.initialize();
-      this.doneLoading = true;
-    },
-
-    isReady: function(){
-      return(!this.doneLoading &&
-             this.ticket() &&
-             this.ticket().requester());
-    },
-
-    initialize: function(){
-      this.ajax('fetchUser', this.ticket().requester().id());
-      if (this.ticket().id()) { this.ajax('fetchTicketAudits', this.ticket().id()); }
-
-      if (this.setting('unfolded_on_startup')){
-        this.$('section[data-main]').show();
-        services.appsTray().show();
+      'searchTickets': function(cond) {
+        return {
+          url: helpers.fmt("/api/v2/search.json?query=type:ticket %@", cond),
+          dataType: 'json',
+          proxy_v2: true
+        };
       }
     },
 
-    /*
-     * VIEW RENDERING
-     */
-    renderUserInHeader: function(user){
-      var html = user.name + ' <small>'+ (user.email || '') +'</small>';
+    // TOOLS ===================================================================
 
-      return this.$('h3 span').html(html);
-    },
-
-    renderUser: function(params){
-      this.renderUserInHeader(params.user);
-
-      this.$('section[data-user]')
-        .html(this.renderTemplate('user', params));
-
-      this.$('section[data-details-notes]')
-        .html(this.renderTemplate('details-notes', {
-          details: params.user.details,
-          notes: params.user.notes
-        }));
-    },
-
-    renderUserLocale: function(locale){
-      var locale_for_flag = locale.locale.split('-');
-      locale_for_flag = locale_for_flag[1] || locale_for_flag[0];
-
-      if(_.isEmpty(locale_for_flag))
-        return;
-
-      return this.$('section[data-user] i.locale')
-        .addClass('flag-' + locale_for_flag.toLowerCase())
-        .attr("title", locale.name + ' ('+locale.locale+')');
-    },
-
-    renderSpokeTicket: function(params){
-      return this.$('section[data-spoke-ticket]')
-        .html(this.renderTemplate('spoke-ticket', params));
-    },
-
-    renderTicketCount: function(entity, count, type){
-      var el = this.$('section[data-'+entity+']');
-      var selector = 'ticket-count';
-      var html = count;
-
-      if (type && !_.isEmpty(type))
-        selector =  selector + '-' + type;
-
-      if (el.find('span.' + selector).data('label'))
-        html = _.template('<strong><%= label %> (<%= count %>)</strong>',{
-          label: el.find('span.' + selector).data('label'),
-          count: count
-        });
-
-      return el.find('span.' + selector)
-        .html(html);
-    },
-
-    renderOrganization: function(params){
-      return this.$('section[data-organization]')
-        .html(this.renderTemplate('organization', params));
-    },
-
-    toggleApp: function(){
-      var app = this.$('section[data-main]');
-
-      if (app.is(':visible')){
-        app.hide();
-        this.$('h3 i').attr('class', 'icon-plus');
-      } else {
-        app.show();
-        this.$('h3 i').attr('class', 'icon-minus');
-      }
-    },
-
-    toggleDetailsAndNotes: function(){
-      return this.$('section[data-details-notes] .well').toggle();
-    },
-
-    toggleOrganization: function(){
-      return this.$('section[data-organization] .well').toggle();
-    },
-
-
-    /*
-     * RESPONSE TO EVENTS
-     */
-    fetchUserDone: function(data){
-      var user = data.user;
-      var organization = data.organizations[0];
-      var ticket =  { id: this.ticket().id() };
-
-      this.fetchUserMetrics(user);
-      this.ajax('fetchLocale', user.locale_id);
-
-      this.renderUser({
-        user: user,
-        ticket: ticket,
-        user_has_organization: !!organization
-      });
-
-      if (organization){
-        this.renderOrganization({
-          organization: organization,
-          ticket: ticket
-        });
-        this.fetchOrganizationMetrics(organization);
-      }
-    },
-
-    fetchTicketAuditsDone: function(data){
-      _.each(data.audits, function(audit){
-        _.each(audit.events, function(e){
-
-          if (this.auditEventIsSpoke(e)){
-            var spokeData = this.spokeData(e);
-
-            if (spokeData){
-              this.renderUserInHeader({
-                name: this.ticket().requester().name(),
-                email: spokeData.email
-              });
-
-              this.$('section[data-user] span.email')
-                .html(spokeData.email);
-              return this.renderSpokeTicket(spokeData);
-            }
-          }
-        }, this);
-      }, this);
-    },
-
-    auditEventIsSpoke: function(event){
-      return event.type === "Comment" &&
-        /spoke_id_/.test(event.body);
-    },
-
-    spokeData: function(event){
-      var data = /spoke_id_(.*)\nspoke_account_(.*)\nrequester_email_(.*)\nrequester_phone_(.*)/.exec(event.body);
-
-      if (_.isEmpty(data))
-        return false;
-
-      return {
-        id: data[1].trim(),
-        account: data[2].trim(),
-        email: data[3].trim(),
-        phone: data[4].trim()
+    // Implement the partial() method of underscorejs, because 1.3.3 doesn't
+    // include it.
+    partial: function(func) {
+      var args = Array.prototype.slice.call(arguments, 1);
+      return function() {
+        return func.apply(this,
+                          args.concat(Array.prototype.slice.call(arguments)));
       };
     },
 
-    genericAjaxFailure: function(data){
-      services.notify(this.I18n.t("ajax_error"), 'error');
+    fetchUserMetrics: function(email) {
+      var TICKET_STATUSES = ['new', 'open', 'pending', 'hold', 'closed', 'solved'];
+      _.each(TICKET_STATUSES, (function(status) {
+        var condition = helpers.fmt("status:%@ requester:%@", status, email);
+        this.countedAjax('searchTickets', condition)
+          .done(this.partial(this.onSearchResultDone, status));
+      }).bind(this));
     },
 
-    detailsOrNotesChanged: _.debounce(function(){
-      this.ajax('updateUser', this.ticket().requester().id(), {
-        user: {
-          details: this.$('.details').val(),
-          notes: this.$('.notes').val()
+    countedAjax: function() {
+      this.storage.requestsCount++;
+      return this.ajax.apply(this, arguments).always((function() {
+        _.defer((this.finishedAjax).bind(this));
+      }).bind(this));
+    },
+
+    finishedAjax: function() {
+      if (--this.storage.requestsCount === 0) {
+        this.trigger('requestsFinished');
+      }
+    },
+
+    // EVENTS ==================================================================
+
+    onAppActivation: function() {
+      _.defer((function() {
+        if (this.ticket().requester()) {
+          this.countedAjax('getUser', this.ticket().requester().id());
+        }
+      }).bind(this));
+    },
+
+    onRequestsFinished: function() {
+      _.each(this.storage.ticketsCounters, function(value, key, ticketCounters) {
+        if (!value) {
+          ticketCounters[key] = '-';
         }
       });
-    },400),
-
-    fetchUserMetrics: function(user){
-      if (_.isEmpty(user.email))
-        return;
-
-      _.each(this.searchableTicketStatuses, function(status){
-        var condition = (_.isEmpty(status) ? '' : 'status:' + status + ' ') +
-          'requester:' + user.email;
-
-        this.ajax('searchTickets', condition)
-          .done(function(data) {
-            this.renderTicketCount('user', data.count, status);
-          });
-      }, this);
+      this.switchTo('display', {
+        user: this.storage.user,
+        tickets: this.storage.ticketsCounters
+      });
     },
 
-    fetchOrganizationMetrics: function(organization){
-      _.each(this.searchableTicketStatuses, function(status){
-        var condition = (_.isEmpty(status) ? '' : 'status:' + status + ' ') +
-          'organization:"' + organization.name + '"';
+    // REQUESTS ================================================================
 
-        this.ajax('searchTickets', condition)
-          .done(function(data) {
-            this.renderTicketCount('organization', data.count, status);
-          });
-      }, this);
+    onGetUserDone: function(data) {
+      this.storage.user = data.user;
+      if (data.user.email) {
+        this.fetchUserMetrics(data.user.email);
+      }
+    },
+
+    onSearchResultDone: function(status, data) {
+      this.storage.ticketsCounters[status] = parseInt(data.count, 10);
     }
   };
 }());

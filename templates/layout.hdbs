@@ -1,6 +1,7 @@
 <header>
-  <span class="logo"/>
-  <a><h3><i class="icon-plus"></i> <span>{{setting "name"}}</span></h3></a>
+  <h3>{{setting "name"}}</h3>
 </header>
-<section data-main  style="display:none" />
 
+<div data-main>
+  {{spinner}}
+</div>
