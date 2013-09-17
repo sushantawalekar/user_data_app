@@ -49,12 +49,12 @@
         };
       },
 
-      'saveSelectedFields': function() {
+      'saveSelectedFields': function(keys) {
         var appId = this.installationId();
-        var selectedKeys = _.pluck(_.filter(this.storage.fields, function(field) {
-          return field.selected;
-        }), 'key');
-        var fieldsString = JSON.stringify(this.storage.fields);
+        var fieldsString = JSON.stringify(_.toArray(keys));
+        if (!appId) {
+          this.settings.selectedFields = fieldsString;
+        }
         return {
           type: 'PUT',
           url: helpers.fmt("/api/v2/apps/installations/%@.json", appId),
@@ -169,9 +169,11 @@
     },
 
     onBackClick: function() {
+      var that = this;
+      var keys = this.$('input:checked').map(function() { return that.$(this).val(); });
       this.$('input').prop('disabled', true);
       this.$('.waitSpin').show();
-      this.onAppActivation();
+      this.ajax('saveSelectedFields', keys).always(this.onAppActivation.bind(this));
     },
 
     // REQUESTS ================================================================
