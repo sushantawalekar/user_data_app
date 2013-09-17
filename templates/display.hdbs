@@ -44,6 +44,10 @@
     </div>
   </div>
 
+  <div class='additional hide'>
+
+  </div>
+
   <a class='expandBar'>
     <span class='ui-icon ui-icon-triangle-1-s'></a>
   </div>

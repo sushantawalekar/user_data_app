@@ -3,8 +3,18 @@
   border: 1px solid rgb(213, 213, 213);
   border-radius: 4px;
 
+  .hide {
+    display: none;
+  }
+
+  .additional {
+    padding-left: auto;
+    padding-right: auto;
+  }
+
   .card {
     padding: 15px;
+    padding-bottom: 0px;
     font-family: "Lucida Grande", serif;
 
     .avatar {
@@ -59,7 +69,7 @@
     padding-top: 4px;
     padding-bottom: 4px;
     display: block;
-    margin-top: 5px;
+    margin-top: 20px;
 
     &:hover {
       background: -webkit-linear-gradient(90deg, rgba(0, 0, 0, 0.11) 0%, rgba(245,245,245,0) 100%);

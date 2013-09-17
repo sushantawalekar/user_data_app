@@ -15,6 +15,9 @@
       // Requests
       'getUser.done': 'onGetUserDone',
 
+      // UI
+      'click .expandBar': 'onClickExpandBar',
+
       // Misc
       'requestsFinished': 'onRequestsFinished'
     },
@@ -91,6 +94,20 @@
         user: this.storage.user,
         tickets: this.storage.ticketsCounters
       });
+    },
+
+    onClickExpandBar: function() {
+      var additional = this.$('.additional');
+      var expandBar = this.$('.expandBar span');
+      expandBar.attr('class', 'ui-icon');
+      if (additional.is(':visible')) {
+        additional.slideUp();
+        expandBar.addClass('ui-icon-triangle-1-s');
+      }
+      else {
+        additional.slideDown();
+        expandBar.addClass('ui-icon-triangle-1-n');
+      }
     },
 
     // REQUESTS ================================================================
