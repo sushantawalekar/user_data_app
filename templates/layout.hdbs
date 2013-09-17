@@ -1,7 +1,3 @@
-<header>
-  <h3>{{setting "name"}}</h3>
-</header>
-
 <div data-main>
   {{spinner}}
 </div>
