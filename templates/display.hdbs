@@ -64,7 +64,7 @@
 
   <div class='additional hide'>
     {{#each fields}}
-      <div class='field'>
+      <div class='field' key='{{key}}'>
         <h4>{{title}}</h4>
         <p>{{value}}</p>
       </div>

@@ -85,6 +85,12 @@ div[data-main] {
       border-top: 1px solid #f0f0f0;
       padding-top: 10px;
 
+      &[key='##builtin_tags'] {
+        h4, p {
+          display: inline;
+        }
+      }
+
       h4 {
         font-size: 11px;
         color:  #999;

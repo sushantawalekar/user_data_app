@@ -140,6 +140,7 @@
         tickets: this.storage.ticketsCounters,
         fields: this.fieldsForCurrentUser()
       });
+      this.$('.field[key="##builtin_tags"] h4').html("<i class='icon-tag''/>");
     },
 
     // EVENTS ==================================================================
