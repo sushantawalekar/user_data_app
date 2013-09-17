@@ -1,7 +1,6 @@
 <div class='admin'>
   <a class='back'><i class='icon-circle-arrow-left'/></a>
   <h4>{{t "admin.title"}}</h4>
-  <div class='waitSpin hide'>{{spinner}}</div>
   <p>{{t "admin.text"}}</p>
 
   <ul>
@@ -17,4 +16,5 @@
   </ul>
 
   <button class='btn save'>{{t "admin.save"}}</button>
+  <div class='waitSpin hide'>{{spinner}}</div>
 </div>

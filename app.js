@@ -181,6 +181,7 @@
       var that = this;
       var keys = this.$('input:checked').map(function() { return that.$(this).val(); });
       this.$('input, button').prop('disabled', true);
+      this.$('.save').hide();
       this.$('.waitSpin').show();
       this.ajax('saveSelectedFields', keys).always(this.onAppActivation.bind(this));
     },
