@@ -31,7 +31,7 @@
     requests: {
       'getUser': function(id) {
         return {
-          url: helpers.fmt("/api/v2/users/%@.json?include=identities", id),
+          url: helpers.fmt("/api/v2/users/%@.json?include=identities,organizations", id),
           dataType: 'json',
           proxy_v2: true
         };
@@ -201,6 +201,7 @@
         }
         return ident;
       });
+      this.storage.user.organization = data.organizations[0];
       if (data.user.email) {
         this.fetchUserMetrics(data.user.email);
       }

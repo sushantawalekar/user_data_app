@@ -22,6 +22,9 @@
         <div class='name'>{{user.name}}</div>
         <div class='email'>{{user.email}}</div>
         <div class='phone'>{{user.phone}}</div>
+        {{#if user.organization}}
+          <div class='organization'>{{user.organization.name}}</div>
+        {{/if}}
       </div>
     </div>
 
