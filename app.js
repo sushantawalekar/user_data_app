@@ -179,13 +179,22 @@
     },
 
     onCogClick: function() {
-      this.switchTo('admin', {
+      var html = this.renderTemplate('admin', {
         fields: this.storage.fields
       });
+      this.$('.admin').html(html);
+      var height = _.max([this.$('.admin').height(),
+                          this.$('.whole').height()]) + 20;
+      this.$('div[data-main]').height(height);
+      this.$('div[data-main]').addClass('effect');
+      _.defer((function() {
+        this.$('div[data-main]').addClass('open');
+      }).bind(this));
     },
 
     onBackClick: function() {
-      this.showDisplay();
+      var height = this.$('.whole').height() + 25;
+      this.$('div[data-main]').removeClass('effect open').height(height);
     },
 
     onSaveClick: function() {
@@ -194,7 +203,9 @@
       this.$('input, button').prop('disabled', true);
       this.$('.save').hide();
       this.$('.waitSpin').show();
-      this.ajax('saveSelectedFields', keys).always(this.onAppActivation.bind(this));
+      this.ajax('saveSelectedFields', keys)
+        .always(this.onBackClick.bind(this))
+        .always(this.onAppActivation.bind(this));
     },
 
     // REQUESTS ================================================================

@@ -1,20 +1,18 @@
-<div class='admin'>
-  <a class='back'><i class='icon-circle-arrow-left'/></a>
-  <h4>{{t "admin.title"}}</h4>
-  <p>{{t "admin.text"}}</p>
+<a class='back'><i class='icon-circle-arrow-left'/></a>
+<h4>{{t "admin.title"}}</h4>
+<p>{{t "admin.text"}}</p>
 
-  <ul>
-    {{#each fields}}
-      <li>
-        <input type="checkbox"
-          value="{{key}}"
-          id="{{key}}"
-          {{#if selected}}checked{{/if}}/>
+<ul>
+  {{#each fields}}
+    <li>
+      <input type="checkbox"
+      value="{{key}}"
+      id="{{key}}"
+      {{#if selected}}checked{{/if}}/>
         <label for="{{key}}">{{title}}</label>
-      </li>
-    {{/each}}
-  </ul>
+    </li>
+  {{/each}}
+</ul>
 
-  <button class='btn save'>{{t "admin.save"}}</button>
-  <div class='waitSpin hide'>{{spinner}}</div>
-</div>
+<button class='btn save'>{{t "admin.save"}}</button>
+<div class='waitSpin hide'>{{spinner}}</div>
