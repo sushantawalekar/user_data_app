@@ -17,6 +17,7 @@
       // Requests
       'getUser.done': 'onGetUserDone',
       'getUserFields.done': 'onGetUserFieldsDone',
+      'getTickets.done': 'onGetTicketsDone',
 
       // UI
       'click .expandBar': 'onClickExpandBar',
@@ -46,6 +47,13 @@
         return {
           url: helpers.fmt("/api/v2/search.json?query=type:ticket %@", cond),
           dataType: 'json',
+          proxy_v2: true
+        };
+      },
+
+      'getTickets': function(userId) {
+        return {
+          url: helpers.fmt("/api/v2/users/%@/tickets/requested.json", userId),
           proxy_v2: true
         };
       },
@@ -80,13 +88,15 @@
       };
     },
 
-    fetchUserMetrics: function(email) {
-      var TICKET_STATUSES = ['new', 'open', 'pending', 'hold', 'closed', 'solved'];
-      _.each(TICKET_STATUSES, (function(status) {
-        var condition = helpers.fmt("status:%@ requester:%@", status, email);
-        this.countedAjax('searchTickets', condition)
-          .done(this.partial(this.onSearchResultDone, status));
-      }).bind(this));
+    // Implement the object() method of underscorejs, because 1.3.3 doesn't
+    // include it. Simplified for our use.
+    toObject: function(list) {
+      if (list == null) return {};
+      var result = {};
+      for (var i = 0, l = list.length; i < l; i++) {
+        result[list[i][0]] = list[i][1];
+      }
+      return result;
     },
 
     countedAjax: function() {
@@ -145,9 +155,10 @@
     },
 
     onRequestsFinished: function() {
-      _.each(this.storage.ticketsCounters, function(value, key, ticketCounters) {
-        if (!value) {
-          ticketCounters[key] = '-';
+      var ticketsCounters = this.storage.ticketsCounters;
+      _.each(['new', 'open', 'hold', 'pending', 'solved', 'closed'], function(key) {
+        if (!ticketsCounters[key]) {
+          ticketsCounters[key] = '-';
         }
       });
       this.showDisplay();
@@ -203,12 +214,16 @@
       });
       this.storage.user.organization = data.organizations[0];
       if (data.user.email) {
-        this.fetchUserMetrics(data.user.email);
+        this.countedAjax('getTickets', this.storage.user.id);
       }
     },
 
-    onSearchResultDone: function(status, data) {
-      this.storage.ticketsCounters[status] = parseInt(data.count, 10);
+    onGetTicketsDone: function(data) {
+      var grouped = _.groupBy(data.tickets, 'status');
+      var res = this.toObject(_.map(grouped, function(value, key) {
+        return [key, value.length];
+      }));
+      this.storage.ticketsCounters = res;
     },
 
     onGetUserFieldsDone: function(data) {
