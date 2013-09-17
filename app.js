@@ -134,6 +134,7 @@
 
     showDisplay: function() {
       this.switchTo('display', {
+        ticketId: this.ticket().id(),
         isAdmin: this.currentUser().role() === 'admin',
         user: this.storage.user,
         tickets: this.storage.ticketsCounters,

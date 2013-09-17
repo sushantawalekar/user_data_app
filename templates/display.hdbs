@@ -21,11 +21,13 @@
       {{/if}}
 
       <div class='contacts'>
-        <div class='name'>{{user.name}}</div>
+        <div class='name'><a href="#/tickets/{{ticketId}}/requester/tickets">{{user.name}}</a></div>
         <div class='email'>{{user.email}}</div>
         <div class='phone'>{{user.phone}}</div>
         {{#if user.organization}}
-          <div class='organization'>{{user.organization.name}}</div>
+          <div class='organization'>
+            <a href="#/tickets/{{ticketId}}/organization/tickets">{{user.organization.name}}</a>
+          </div>
         {{/if}}
       </div>
     </div>

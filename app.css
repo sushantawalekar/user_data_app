@@ -169,9 +169,26 @@ div[data-main] {
         &.name {
           font-size: 14px;
           line-height: 1.286;
-          color: #444;
           font-weight: bold;
           margin-bottom: 8px;
+
+          a {
+            color: #444;
+          }
+        }
+
+        &.organization {
+          a {
+            color: #999;
+          }
+        }
+
+        &.name, &.organization {
+          a {
+            &:hover {
+              color: #146eaa;
+            }
+          }
         }
       }
     }
