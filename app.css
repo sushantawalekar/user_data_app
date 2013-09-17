@@ -79,6 +79,10 @@
       height: 45px;
       float: left;
 
+      &.default {
+        background-image: app-asset-url("avatar.png");
+      }
+
       img {
         border-radius: 4px;
       }
