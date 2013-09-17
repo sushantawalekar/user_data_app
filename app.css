@@ -74,6 +74,37 @@
       }
     }
 
+    .social {
+      float: right;
+      position: relative;
+      margin-top: 28px;
+      left: 12px;
+
+      a {
+        display: block;
+        background-image: app-asset-url("ico-social-sprite.png");
+
+        &.facebook {
+          width: 5px;
+          height: 10px;
+
+          &:hover {
+            background-position: 0px -11px;
+          }
+        }
+
+        &.twitter {
+          width: 11px;
+          height: 10px;
+          background-position: -6px 0px;
+
+          &:hover {
+            background-position: -6px -11px;
+          }
+        }
+      }
+    }
+
     .avatar {
       width: 45px;
       height: 45px;

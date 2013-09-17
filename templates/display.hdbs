@@ -10,6 +10,14 @@
         <div class='avatar default'></div>
       {{/if}}
 
+      {{#if user.identities.length}}
+      <div class='social pull-right'>
+        {{#each user.identities}}
+          <a href="{{value}}" class="{{type}}"></a>
+        {{/each}}
+      </div>
+      {{/if}}
+
       <div class='contacts'>
         <div class='name'>{{user.name}}</div>
         <div class='email'>{{user.email}}</div>

@@ -31,7 +31,7 @@
     requests: {
       'getUser': function(id) {
         return {
-          url: helpers.fmt("/api/v2/users/%@.json", id),
+          url: helpers.fmt("/api/v2/users/%@.json?include=identities", id),
           dataType: 'json',
           proxy_v2: true
         };
@@ -190,6 +190,17 @@
 
     onGetUserDone: function(data) {
       this.storage.user = data.user;
+      var social = _.filter(data.identities, function(ident) {
+        return _.contains(['twitter', 'facebook'], ident.type);
+      });
+      this.storage.user.identities = _.map(social, function(ident) {
+        if (ident.type === 'twitter') {
+          ident.value = helpers.fmt("https://twitter.com/%@", ident.value);
+        } else if (ident.type === 'facebook') {
+          ident.value = helpers.fmt("https://facebook.com/%@", ident.value);
+        }
+        return ident;
+      });
       if (data.user.email) {
         this.fetchUserMetrics(data.user.email);
       }
