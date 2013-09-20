@@ -8,6 +8,11 @@
       }
     }
   },
+  "admin": {
+    "title": "User Info admin panel",
+    "save": "Save and go back",
+    "text": "Please select the user fields you would like to permanently display on the App"
+  },
   "info": {
     "no_tags": "No tags",
     "no_domain_names": "No domain names"
@@ -20,12 +25,15 @@
   "details_and_notes": "Details and Notes",
   "details": "Details",
   "notes": "Notes",
+  "tags": "Tags",
   "organization": "Organization",
   "ticket_status": {
-    "new": "new",
-    "open": "open",
-    "pending": "pending",
-    "hold": "on-hold"
+    "new": "n",
+    "open": "o",
+    "pending": "p",
+    "hold": "h",
+    "solved": "s",
+    "closed": "c"
   },
   "spoke-ticket": {
     "link": {

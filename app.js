@@ -1,300 +1,281 @@
 (function() {
   return {
-    searchableTicketStatuses: ['', 'new', 'open','pending', 'hold'],
-    defaultState: 'list',
-    requests: {
-      fetchUser: function(id) {
-        return {
-          url: '/api/v2/users/' + id + '.json?include=organizations',
-          dataType: 'json'
-        };
-      },
 
-      fetchUserRequests: function(id){
-        return {
-          url: '/api/v2/users/' + id + '/requests.json',
-          dataType: 'json'
-        };
+    storage: {
+      user: null,
+      ticketsCounters: {
       },
-
-      updateUser: function(id, data){
-        return {
-          url: '/api/v2/users/' + id + '.json',
-          type: 'PUT',
-          dataType: 'json',
-          data: data
-        };
-      },
-
-      fetchTicketAudits: function(id){
-        return {
-          url: '/api/v2/tickets/' + id + '/audits.json',
-          dataType: 'json'
-        };
-      },
-
-      fetchLocale: function(id){
-        return {
-          url: '/api/v2/locales/' + id +'.json',
-          dataType: 'json'
-        };
-      },
-
-      searchTickets: function(condition){
-        return {
-          url: '/api/v2/search.json?query=type:ticket '+ condition,
-          dataType: 'json'
-        };
-      }
+      requestsCount: 0,
+      fields: [],
+      selectedKeys: []
     },
 
     events: {
-      /*
-       *  APP EVENTS
-       */
-      'app.activated'                   : 'onActivated',
-      'ticket.requester.id.changed'     : 'initializeIfReady',
-      'ticket.requester.email.changed'  : 'initializeIfReady',
-      /*
-       *  AJAX EVENTS
-       */
-      'fetchUser.done'                  : 'fetchUserDone',
-      'fetchTicketAudits.done'          : 'fetchTicketAuditsDone',
-      'fetchLocale.done'                : function(data){ this.renderUserLocale(data.locale); },
-      'updateUser.done'                 : function(){ services.notify(this.I18n.t("update_user_done")); },
-      'fetchUserRequests.done'          : function(data){ this.renderTicketCount('user',data.count); },
+      // App
+      'app.activated': 'onAppActivation',
 
-      'fetchTicketAudits.fail'          : 'genericAjaxFailure',
-      'fetchLocale.fail'                : 'genericAjaxFailure',
-      'updateUser.fail'                 : 'genericAjaxFailure',
-      'fetchUser.fail'                  : 'genericAjaxFailure',
-      'fetchUserRequests.fail'          : 'genericAjaxFailure',
-      /*
-       *  DOM EVENTS
-       */
-      'click header'                    : function(){ this.toggleApp(); },
-      'change,keyup,input,paste textarea.details_or_notes': 'detailsOrNotesChanged',
-      'click a.details_and_notes'       : function(){ this.toggleDetailsAndNotes(); },
-      'click a.organization'            : function(){ this.toggleOrganization(); }
+      // Requests
+      'getUser.done': 'onGetUserDone',
+      'getUserFields.done': 'onGetUserFieldsDone',
+      'getTickets.done': 'onGetTicketsDone',
+
+      // UI
+      'click .expandBar': 'onClickExpandBar',
+      'click .cog': 'onCogClick',
+      'click .back': 'onBackClick',
+      'click .save': 'onSaveClick',
+
+      // Misc
+      'requestsFinished': 'onRequestsFinished'
     },
 
-    onActivated: function(data) {
-      this.doneLoading = false;
-      this.initializeIfReady();
-    },
+    requests: {
+      'getUser': function(id) {
+        return {
+          url: helpers.fmt("/api/v2/users/%@.json?include=identities,organizations", id),
+          dataType: 'json',
+          proxy_v2: true
+        };
+      },
 
-    initializeIfReady: function(){
-      if (!this.isReady())
-        return;
+      'getUserFields': {
+        url: '/api/v2/user_fields.json',
+        proxy_v2: true
+      },
 
-      this.initialize();
-      this.doneLoading = true;
-    },
+      'searchTickets': function(cond) {
+        return {
+          url: helpers.fmt("/api/v2/search.json?query=type:ticket %@", cond),
+          dataType: 'json',
+          proxy_v2: true
+        };
+      },
 
-    isReady: function(){
-      return(!this.doneLoading &&
-             this.ticket() &&
-             this.ticket().requester());
-    },
+      'getTickets': function(userId) {
+        return {
+          url: helpers.fmt("/api/v2/users/%@/tickets/requested.json", userId),
+          proxy_v2: true
+        };
+      },
 
-    initialize: function(){
-      this.ajax('fetchUser', this.ticket().requester().id());
-      if (this.ticket().id()) { this.ajax('fetchTicketAudits', this.ticket().id()); }
-
-      if (this.setting('unfolded_on_startup')){
-        this.$('section[data-main]').show();
-        services.appsTray().show();
-      }
-    },
-
-    /*
-     * VIEW RENDERING
-     */
-    renderUserInHeader: function(user){
-      var html = user.name + ' <small>'+ (user.email || '') +'</small>';
-
-      return this.$('h3 span').html(html);
-    },
-
-    renderUser: function(params){
-      this.renderUserInHeader(params.user);
-
-      this.$('section[data-user]')
-        .html(this.renderTemplate('user', params));
-
-      this.$('section[data-details-notes]')
-        .html(this.renderTemplate('details-notes', {
-          details: params.user.details,
-          notes: params.user.notes
-        }));
-    },
-
-    renderUserLocale: function(locale){
-      var locale_for_flag = locale.locale.split('-');
-      locale_for_flag = locale_for_flag[1] || locale_for_flag[0];
-
-      if(_.isEmpty(locale_for_flag))
-        return;
-
-      return this.$('section[data-user] i.locale')
-        .addClass('flag-' + locale_for_flag.toLowerCase())
-        .attr("title", locale.name + ' ('+locale.locale+')');
-    },
-
-    renderSpokeTicket: function(params){
-      return this.$('section[data-spoke-ticket]')
-        .html(this.renderTemplate('spoke-ticket', params));
-    },
-
-    renderTicketCount: function(entity, count, type){
-      var el = this.$('section[data-'+entity+']');
-      var selector = 'ticket-count';
-      var html = count;
-
-      if (type && !_.isEmpty(type))
-        selector =  selector + '-' + type;
-
-      if (el.find('span.' + selector).data('label'))
-        html = _.template('<strong><%= label %> (<%= count %>)</strong>',{
-          label: el.find('span.' + selector).data('label'),
-          count: count
-        });
-
-      return el.find('span.' + selector)
-        .html(html);
-    },
-
-    renderOrganization: function(params){
-      return this.$('section[data-organization]')
-        .html(this.renderTemplate('organization', params));
-    },
-
-    toggleApp: function(){
-      var app = this.$('section[data-main]');
-
-      if (app.is(':visible')){
-        app.hide();
-        this.$('h3 i').attr('class', 'icon-plus');
-      } else {
-        app.show();
-        this.$('h3 i').attr('class', 'icon-minus');
-      }
-    },
-
-    toggleDetailsAndNotes: function(){
-      return this.$('section[data-details-notes] .well').toggle();
-    },
-
-    toggleOrganization: function(){
-      return this.$('section[data-organization] .well').toggle();
-    },
-
-
-    /*
-     * RESPONSE TO EVENTS
-     */
-    fetchUserDone: function(data){
-      var user = data.user;
-      var organization = data.organizations[0];
-      var ticket =  { id: this.ticket().id() };
-
-      this.fetchUserMetrics(user);
-      this.ajax('fetchLocale', user.locale_id);
-
-      this.renderUser({
-        user: user,
-        ticket: ticket,
-        user_has_organization: !!organization
-      });
-
-      if (organization){
-        this.renderOrganization({
-          organization: organization,
-          ticket: ticket
-        });
-        this.fetchOrganizationMetrics(organization);
-      }
-    },
-
-    fetchTicketAuditsDone: function(data){
-      _.each(data.audits, function(audit){
-        _.each(audit.events, function(e){
-
-          if (this.auditEventIsSpoke(e)){
-            var spokeData = this.spokeData(e);
-
-            if (spokeData){
-              this.renderUserInHeader({
-                name: this.ticket().requester().name(),
-                email: spokeData.email
-              });
-
-              this.$('section[data-user] span.email')
-                .html(spokeData.email);
-              return this.renderSpokeTicket(spokeData);
-            }
+      'saveSelectedFields': function(keys) {
+        var appId = this.installationId();
+        var fieldsString = JSON.stringify(_.toArray(keys));
+        if (!appId) {
+          this.settings.selectedFields = fieldsString;
+        }
+        return {
+          type: 'PUT',
+          url: helpers.fmt("/api/v2/apps/installations/%@.json", appId),
+          dataType: 'json',
+          data: {
+            'settings': {'selectedFields': fieldsString},
+            'enabled': true
           }
-        }, this);
-      }, this);
+        };
+      }
     },
 
-    auditEventIsSpoke: function(event){
-      return event.type === "Comment" &&
-        /spoke_id_/.test(event.body);
-    },
+    // TOOLS ===================================================================
 
-    spokeData: function(event){
-      var data = /spoke_id_(.*)\nspoke_account_(.*)\nrequester_email_(.*)\nrequester_phone_(.*)/.exec(event.body);
-
-      if (_.isEmpty(data))
-        return false;
-
-      return {
-        id: data[1].trim(),
-        account: data[2].trim(),
-        email: data[3].trim(),
-        phone: data[4].trim()
+    // Implement the partial() method of underscorejs, because 1.3.3 doesn't
+    // include it.
+    partial: function(func) {
+      var args = Array.prototype.slice.call(arguments, 1);
+      return function() {
+        return func.apply(this,
+                          args.concat(Array.prototype.slice.call(arguments)));
       };
     },
 
-    genericAjaxFailure: function(data){
-      services.notify(this.I18n.t("ajax_error"), 'error');
+    // Implement the object() method of underscorejs, because 1.3.3 doesn't
+    // include it. Simplified for our use.
+    toObject: function(list) {
+      if (list == null) return {};
+      var result = {};
+      for (var i = 0, l = list.length; i < l; i++) {
+        result[list[i][0]] = list[i][1];
+      }
+      return result;
     },
 
-    detailsOrNotesChanged: _.debounce(function(){
-      this.ajax('updateUser', this.ticket().requester().id(), {
-        user: {
-          details: this.$('.details').val(),
-          notes: this.$('.notes').val()
+    countedAjax: function() {
+      this.storage.requestsCount++;
+      return this.ajax.apply(this, arguments).always((function() {
+        _.defer((this.finishedAjax).bind(this));
+      }).bind(this));
+    },
+
+    finishedAjax: function() {
+      if (--this.storage.requestsCount === 0) {
+        this.trigger('requestsFinished');
+      }
+    },
+
+    fieldsForCurrentUser: function() {
+      return _.map(this.storage.selectedKeys, (function(key) {
+        var result = { key: key };
+        if (key.indexOf('##builtin') === 0) {
+          var name = key.split('_')[1];
+          result.value = this.storage.user[name];
+          result.title = this.I18n.t(name);
+        }
+        else {
+          var field = _.find(this.storage.fields, function(field) {
+            return field.key === key;
+          });
+          result.title = field.title;
+          result.description = field.description;
+          result.value = this.storage.user.user_fields[key];
+        }
+        return result;
+      }).bind(this));
+    },
+
+    showDisplay: function() {
+      this.switchTo('display', {
+        ticketId: this.ticket().id(),
+        isAdmin: this.currentUser().role() === 'admin',
+        user: this.storage.user,
+        tickets: this.storage.ticketsCounters,
+        fields: this.fieldsForCurrentUser()
+      });
+      this.$('.field[key="##builtin_tags"] h4').html("<i class='icon-tag''/>");
+    },
+
+    // EVENTS ==================================================================
+
+    onAppActivation: function() {
+      _.defer((function() {
+        var defaultSelection = '["##builtin_tags", "##builtin_notes", "##builtin_details"]';
+        this.storage.selectedKeys = JSON.parse(this.setting('selectedFields') || defaultSelection);
+        if (this.ticket().requester()) {
+          this.countedAjax('getUser', this.ticket().requester().id());
+        }
+        this.countedAjax('getUserFields');
+      }).bind(this));
+    },
+
+    onRequestsFinished: function() {
+      var ticketsCounters = this.storage.ticketsCounters;
+      _.each(['new', 'open', 'hold', 'pending', 'solved', 'closed'], function(key) {
+        if (!ticketsCounters[key]) {
+          ticketsCounters[key] = '-';
         }
       });
-    },400),
-
-    fetchUserMetrics: function(user){
-      if (_.isEmpty(user.email))
-        return;
-
-      _.each(this.searchableTicketStatuses, function(status){
-        var condition = (_.isEmpty(status) ? '' : 'status:' + status) +
-          ' requester:' + encodeURIComponent(user.email);
-
-        this.ajax('searchTickets', condition)
-          .done(function(data) {
-            this.renderTicketCount('user', data.count, status);
-          });
-      }, this);
+      this.showDisplay();
     },
 
-    fetchOrganizationMetrics: function(organization){
-      _.each(this.searchableTicketStatuses, function(status){
-        var condition = (_.isEmpty(status) ? '' : 'status:' + status) +
-          ' organization:'+organization.name;
+    onClickExpandBar: function() {
+      var additional = this.$('.additional');
+      var expandBar = this.$('.expandBar span');
+      expandBar.attr('class', 'ui-icon');
+      if (additional.is(':visible')) {
+        additional.slideUp();
+        expandBar.addClass('ui-icon-triangle-1-s');
+      }
+      else {
+        additional.slideDown();
+        expandBar.addClass('ui-icon-triangle-1-n');
+      }
+    },
 
-        this.ajax('searchTickets', condition)
-          .done(function(data) {
-            this.renderTicketCount('organization', data.count, status);
-          });
-      }, this);
+    onCogClick: function() {
+      var html = this.renderTemplate('admin', {
+        fields: this.storage.fields
+      });
+      this.$('.admin').html(html);
+      var height = _.max([this.$('.admin').outerHeight(),
+                          this.$('.whole').outerHeight()]) + 50;
+      this.$('div[data-main]').height(height);
+      this.$('div[data-main]').addClass('effect');
+      _.defer((function() {
+        this.$('div[data-main]').addClass('open');
+      }).bind(this));
+    },
+
+    onBackClick: function() {
+      this.$('div[data-main]').height('auto').removeClass('effect open');
+    },
+
+    onSaveClick: function() {
+      var that = this;
+      var keys = this.$('input:checked').map(function() { return that.$(this).val(); });
+      this.$('input, button').prop('disabled', true);
+      this.$('.save').hide();
+      this.$('.waitSpin').show();
+      this.ajax('saveSelectedFields', keys)
+        .always(this.onBackClick.bind(this))
+        .always(this.onAppActivation.bind(this));
+    },
+
+    // REQUESTS ================================================================
+
+    onGetUserDone: function(data) {
+      this.storage.user = data.user;
+      var social = _.filter(data.identities, function(ident) {
+        return _.contains(['twitter', 'facebook'], ident.type);
+      });
+      this.storage.user.identities = _.map(social, function(ident) {
+        if (ident.type === 'twitter') {
+          ident.value = helpers.fmt("https://twitter.com/%@", ident.value);
+        } else if (ident.type === 'facebook') {
+          ident.value = helpers.fmt("https://facebook.com/%@", ident.value);
+        }
+        return ident;
+      });
+      this.storage.user.organization = data.organizations[0];
+      if (data.user.email) {
+        this.countedAjax('getTickets', this.storage.user.id);
+      }
+    },
+
+    onGetTicketsDone: function(data) {
+      var grouped = _.groupBy(data.tickets, 'status');
+      var res = this.toObject(_.map(grouped, function(value, key) {
+        return [key, value.length];
+      }));
+      this.storage.ticketsCounters = res;
+    },
+
+    onGetUserFieldsDone: function(data) {
+      var selectedFields = this.storage.selectedKeys;
+      var fields = [
+        {
+          key: "##builtin_tags",
+          title: this.I18n.t("tags"),
+          description: "",
+          position: 0,
+          active: true
+        },
+        {
+          key: "##builtin_notes",
+          title: this.I18n.t("notes"),
+          description: "",
+          position: Number.MAX_VALUE - 1,
+          active: true
+        },
+        {
+          key: "##builtin_details",
+          title: this.I18n.t("details"),
+          description: "",
+          position: Number.MAXVALUE,
+          active: true
+        }
+      ].concat(data.user_fields);
+      var activeFields = _.filter(fields, function(field) {
+        return field.active;
+      });
+      var restrictedFields = _.map(activeFields, function(field) {
+        return {
+          key: field.key,
+          title: field.title,
+          description: field.description,
+          position: field.position,
+          selected: _.contains(selectedFields, field.key)
+        };
+      });
+      this.storage.fields = _.sortBy(restrictedFields, 'position');
     }
   };
 }());

@@ -1,18 +1,19 @@
 {
-  "name": "User Data",
+  "name": "Zendesk User Data",
   "author": {
-    "name": "Pierre Nespo",
-    "email": "pierre.nespo@gmail.com"
+    "name": "Zendesk",
+    "email": "support@zendesk.com"
   },
   "parameters": [
     {
-      "name": "unfolded_on_startup",
-      "type": "checkbox"
+      "name": "selectedFields",
+      "type": "hidden",
+      "required": false
     }
   ],
   "defaultLocale": "en",
   "private": false,
   "singleInstall": true,
   "location": ["ticket_sidebar", "new_ticket_sidebar"],
-  "frameworkVersion": "0.5"
+  "frameworkVersion": "1.0"
 }
