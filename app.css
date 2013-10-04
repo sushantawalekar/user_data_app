@@ -67,8 +67,6 @@ div[data-main] {
   -webkit-transition: all 0.5s;
   transition: all 0.5s;
   background: #fff;
-  border: 1px solid rgb(213, 213, 213);
-  border-radius: 4px;
 
   .hide {
     display: none;
@@ -223,7 +221,7 @@ div[data-main] {
   }
 
   .expandBar {
-    background-color: rgb(251, 251, 251);
+    background-color: #fff;
     border-top: 1px solid rgb(213, 213, 213);
     padding-top: 4px;
     padding-bottom: 4px;
@@ -231,9 +229,7 @@ div[data-main] {
     margin-top: 20px;
 
     &:hover {
-      background: -webkit-linear-gradient(90deg, rgba(0, 0, 0, 0.11) 0%, rgba(245,245,245,0) 100%);
-      background:    -moz-linear-gradient(90deg, rgba(0, 0, 0, 0.11) 0%, rgba(245,245,245,0) 100%);
-      background:     -ms-linear-gradient(90deg, rgba(0, 0, 0, 0.11) 0%, rgba(245,245,245,0) 100%);
+      background: radial-gradient(40px circle at center top,#F5F5F5,#fff);
     }
 
     span {
