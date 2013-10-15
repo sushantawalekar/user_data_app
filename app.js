@@ -137,10 +137,26 @@
         ticketId: this.ticket().id(),
         isAdmin: this.currentUser().role() === 'admin',
         user: this.storage.user,
-        tickets: this.storage.ticketsCounters,
+        tickets: this.makeTicketsLinks(this.storage.ticketsCounters),
         fields: this.fieldsForCurrentUser()
       });
       this.$('.field[key="##builtin_tags"] h4').html("<i class='icon-tag''/>");
+    },
+
+    makeTicketsLinks: function(counters) {
+      var links = {};
+      var link = "#/tickets/%@/requester/tickets".fmt(this.ticket().id());
+      var tag = this.$('<div>').append(this.$('<a>').attr('href', link));
+      _.each(counters, function(value, key) {
+        if (value && value !== "-") {
+          tag.find('a').html(value);
+          links[key] = tag.html();
+        }
+        else {
+          links[key] = value;
+        }
+      }.bind(this));
+      return links;
     },
 
     // EVENTS ==================================================================

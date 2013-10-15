@@ -208,6 +208,10 @@ div[data-main] {
         width: 44px;
         line-height: 1.286;
 
+        a {
+          color: #999;
+        }
+
         .ticket_status_label {
           font-size: 11px;
           padding: 0;
