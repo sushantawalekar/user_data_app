@@ -286,6 +286,13 @@
           active: true
         },
         {
+          key: "##builtin_locale",
+          title: this.I18n.t("locale"),
+          description: "",
+          position: 1,
+          active: true
+        },
+        {
           key: "##builtin_notes",
           title: this.I18n.t("notes"),
           description: "",
