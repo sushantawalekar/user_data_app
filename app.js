@@ -139,6 +139,9 @@
         }
         else {
           result.value = this.storage.user.user_fields[key];
+          if (field.type === 'date') {
+            result.value = new Date(result.value).toLocaleString(undefined, {year: "numeric", month: "numeric", day: "numeric"});
+          }
         }
         return result;
       }).bind(this));
@@ -319,7 +322,8 @@
           description: field.description,
           position: field.position,
           selected: _.contains(selectedFields, field.key),
-          editable: field.editable
+          editable: field.editable,
+          type: field.type
         };
       });
       this.storage.fields = _.sortBy(restrictedFields, 'position');
