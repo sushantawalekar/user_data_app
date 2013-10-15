@@ -35,8 +35,7 @@
       'getUser': function(id) {
         return {
           url: helpers.fmt("/api/v2/users/%@.json?include=identities,organizations", id),
-          dataType: 'json',
-          proxy_v2: true
+          dataType: 'json'
         };
       },
 
@@ -50,22 +49,19 @@
       },
 
       'getUserFields': {
-        url: '/api/v2/user_fields.json',
-        proxy_v2: true
+        url: '/api/v2/user_fields.json'
       },
 
       'searchTickets': function(cond) {
         return {
           url: helpers.fmt("/api/v2/search.json?query=type:ticket %@", cond),
-          dataType: 'json',
-          proxy_v2: true
+          dataType: 'json'
         };
       },
 
       'getTickets': function(userId) {
         return {
-          url: helpers.fmt("/api/v2/users/%@/tickets/requested.json", userId),
-          proxy_v2: true
+          url: helpers.fmt("/api/v2/users/%@/tickets/requested.json", userId)
         };
       },
 
