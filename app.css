@@ -83,6 +83,13 @@ div[data-main] {
       border-top: 1px solid #f0f0f0;
       padding-top: 10px;
 
+      textarea {
+        width: 100%;
+        height: 50px;
+        box-sizing: border-box;
+        border: 0px;
+      }
+
       &[key='##builtin_tags'] {
         h4, p {
           display: inline;

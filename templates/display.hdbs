@@ -66,7 +66,11 @@
     {{#each fields}}
       <div class='field' key='{{key}}'>
         <h4>{{title}}</h4>
-        <p>{{value}}</p>
+        {{#if editable}}
+          <textarea class='notes_or_details'>{{value}}</textarea>
+        {{else}}
+          <p>{{value}}</p>
+        {{/if}}
       </div>
     {{/each}}
   </div>

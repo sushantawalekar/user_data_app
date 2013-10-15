@@ -18,12 +18,14 @@
       'getUser.done': 'onGetUserDone',
       'getUserFields.done': 'onGetUserFieldsDone',
       'getTickets.done': 'onGetTicketsDone',
+      'updateUser.done': 'onUpdateUserDone',
 
       // UI
       'click .expandBar': 'onClickExpandBar',
       'click .cog': 'onCogClick',
       'click .back': 'onBackClick',
       'click .save': 'onSaveClick',
+      'change,keyup,input,paste .notes_or_details': 'onNotesOrDetailsChanged',
 
       // Misc
       'requestsFinished': 'onRequestsFinished'
@@ -35,6 +37,15 @@
           url: helpers.fmt("/api/v2/users/%@.json?include=identities,organizations", id),
           dataType: 'json',
           proxy_v2: true
+        };
+      },
+
+      'updateUser': function(data) {
+        return {
+          url: helpers.fmt("/api/v2/users/%@.json", this.ticket().requester().id()),
+          type: 'PUT',
+          dataType: 'json',
+          data: { user: data }
         };
       },
 
@@ -114,18 +125,19 @@
 
     fieldsForCurrentUser: function() {
       return _.map(this.storage.selectedKeys, (function(key) {
-        var result = { key: key };
+        var field = _.find(this.storage.fields, function(field) {
+          return field.key === key;
+        });
+        var result = {
+          key: key,
+          description: field.description,
+          title: field.title,
+          editable: field.editable
+        };
         if (key.indexOf('##builtin') === 0) {
-          var name = key.split('_')[1];
-          result.value = this.storage.user[name];
-          result.title = this.I18n.t(name);
+          result.value = this.storage.user[key.split('_')[1]];
         }
         else {
-          var field = _.find(this.storage.fields, function(field) {
-            return field.key === key;
-          });
-          result.title = field.title;
-          result.description = field.description;
           result.value = this.storage.user.user_fields[key];
         }
         return result;
@@ -223,7 +235,18 @@
         .always(this.onAppActivation.bind(this));
     },
 
+    onNotesOrDetailsChanged: _.debounce(function() {
+      this.ajax('updateUser', {
+        notes: this.$('div[key="##builtin_notes"] textarea').val(),
+        details: this.$('div[key="##builtin_details"] textarea').val()
+      });
+    }, 1000),
+
     // REQUESTS ================================================================
+
+    onUpdateUserDone: function() {
+      services.notify(this.I18n.t("update_user_done"));
+    },
 
     onGetUserDone: function(data) {
       this.storage.user = data.user;
@@ -267,14 +290,16 @@
           title: this.I18n.t("notes"),
           description: "",
           position: Number.MAX_VALUE - 1,
-          active: true
+          active: true,
+          editable: true
         },
         {
           key: "##builtin_details",
           title: this.I18n.t("details"),
           description: "",
           position: Number.MAXVALUE,
-          active: true
+          active: true,
+          editable: true
         }
       ].concat(data.user_fields);
       var activeFields = _.filter(fields, function(field) {
@@ -286,7 +311,8 @@
           title: field.title,
           description: field.description,
           position: field.position,
-          selected: _.contains(selectedFields, field.key)
+          selected: _.contains(selectedFields, field.key),
+          editable: field.editable
         };
       });
       this.storage.fields = _.sortBy(restrictedFields, 'position');
