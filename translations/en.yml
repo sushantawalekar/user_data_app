@@ -57,7 +57,7 @@ parts:
       key: "txt.apps.user_data_app.notes"
       title: "notes box for this user"
       value: "Notes"
-  - translateion:
+  - translation:
       key: "txt.apps.user_data_app.locale"
       title: "language of this user"
       value: "User's language"
