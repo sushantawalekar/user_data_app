@@ -92,7 +92,38 @@ div[data-main] {
 
       &[key='##builtin_tags'] {
         h4, p {
-          display: inline;
+          float: left;
+          margin-top: 2px;
+        }
+
+        hr {
+          clear: both;
+          border: 0px;
+          margin-bottom: 0px;
+        }
+
+        li {
+          float: left;
+          margin-left: 3px;
+          margin-right: 3px;
+          padding: 3px 6px 4px 6px;
+          font-size: 11px;
+          line-height: 13px;
+          display: block;
+          background: #f4f4f4;
+          color: #333;
+          min-height: 13px;
+          -webkit-border-radius: 3px;
+          -moz-border-radius: 3px;
+          -ms-border-radius: 3px;
+          -o-border-radius: 3px;
+          border-radius: 3px;
+          border: 1px solid #ddd;
+          word-break: break-all;
+          white-space: pre-wrap;
+          white-space: -moz-pre-wrap;
+          word-wrap: break-word;
+          -ms-word-break: break-all;
         }
       }
 

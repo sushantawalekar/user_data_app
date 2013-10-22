@@ -131,7 +131,12 @@
           editable: field.editable
         };
         if (key.indexOf('##builtin') === 0) {
-          result.value = this.storage.user[key.split('_')[1]];
+          var subkey = key.split('_')[1];
+          result.value = this.storage.user[subkey];
+          if (subkey === 'tags') {
+            result.value = this.renderTemplate('tags', {tags: result.value});
+            result.html = true;
+          }
         }
         else {
           result.value = this.storage.user.user_fields[key];
