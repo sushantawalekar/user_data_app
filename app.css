@@ -90,7 +90,7 @@ div[data-main] {
         border: 0px;
       }
 
-      &[key='##builtin_tags'] {
+      &.builtin.tags {
         h4, p {
           float: left;
           margin-top: 2px;
