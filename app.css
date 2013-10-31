@@ -113,10 +113,6 @@ div[data-main] {
           background: #f4f4f4;
           color: #333;
           min-height: 13px;
-          -webkit-border-radius: 3px;
-          -moz-border-radius: 3px;
-          -ms-border-radius: 3px;
-          -o-border-radius: 3px;
           border-radius: 3px;
           border: 1px solid #ddd;
           word-break: break-all;
