@@ -141,11 +141,19 @@
         else {
           result.value = this.storage.user.user_fields[key];
           if (field.type === 'date') {
-            result.value = new Date(result.value).toLocaleString(undefined, {year: "numeric", month: "numeric", day: "numeric"});
+            result.value = this.toLocaleDate(result.value);
           }
         }
         return result;
       }).bind(this));
+    },
+
+    toLocaleDate: function(date) {
+      return new Date(date).toLocaleString(undefined, {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric"
+      });
     },
 
     showDisplay: function() {
