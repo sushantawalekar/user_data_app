@@ -133,12 +133,14 @@
         if (key.indexOf('##builtin') === 0) {
           var subkey = key.split('_')[1];
           result.value = this.storage.user[subkey];
+          result.simpleKey = ["builtin", subkey].join(' ');
           if (subkey === 'tags') {
             result.value = this.renderTemplate('tags', {tags: result.value});
             result.html = true;
           }
         }
         else {
+          result.simpleKey = ["custom", key].join(' ');
           result.value = this.storage.user.user_fields[key];
           if (field.type === 'date') {
             result.value = this.toLocaleDate(result.value);
@@ -164,7 +166,7 @@
         tickets: this.makeTicketsLinks(this.storage.ticketsCounters),
         fields: this.fieldsForCurrentUser()
       });
-      this.$('.field[key="##builtin_tags"] h4').html("<i class='icon-tag''/>");
+      this.$('.field.builtin.tags h4').html("<i class='icon-tag'/>");
     },
 
     makeTicketsLinks: function(counters) {
@@ -250,8 +252,8 @@
 
     onNotesOrDetailsChanged: _.debounce(function() {
       this.ajax('updateUser', {
-        notes: this.$('div[key="##builtin_notes"] textarea').val(),
-        details: this.$('div[key="##builtin_details"] textarea').val()
+        notes: this.$('div.builtin.notes textarea').val(),
+        details: this.$('div.builtin.details textarea').val()
       });
     }, 1000),
 

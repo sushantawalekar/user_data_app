@@ -64,7 +64,7 @@
 
   <div class='additional hide'>
     {{#each fields}}
-      <div class='field' key='{{key}}'>
+      <div class='field {{simpleKey}}' key='{{key}}'>
         <h4>{{title}}</h4>
         {{#if editable}}
           <textarea class='notes_or_details'>{{value}}</textarea>
