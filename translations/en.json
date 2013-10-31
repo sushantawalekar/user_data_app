@@ -1,15 +1,15 @@
 {
   "app": {
     "description": "Displays information about the ticket requester and requesters organization.",
-    "name": "User info App",
+    "name": "User Data App",
     "parameters": {
       "unfolded_on_startup": {
-        "label": "Unfolded on startup"
+        "label": "Apps tray opened by default"
       }
     }
   },
   "admin": {
-    "title": "User Info admin panel",
+    "title": "User Data Admin panel",
     "save": "Save and go back",
     "text": "Please select the user fields you would like to permanently display on the App"
   },
