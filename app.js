@@ -224,8 +224,9 @@
       var html = this.renderTemplate('admin', {
         fields: this.storage.fields
       });
+      var outerHeight = this.$('.whole').outerHeight();
       this.$('.admin').html(html);
-      this.$('div[data-main]').height(this.$('.whole').outerHeight())
+      this.$('div[data-main]').height(outerHeight)
                               .addClass('effect');
       _.defer((function() {
         this.$('div[data-main]').addClass('open');
