@@ -36,27 +36,27 @@
       <ul class='counts'>
         <li>
           <span class='ticket_status_label new'>{{t "ticket_status.new"}}</span>
-          <span class='count new'>{{tickets.new}}</span>
+          <span class='count new'>{{{tickets.new}}}</span>
         </li>
         <li>
           <span class='ticket_status_label open'>{{t "ticket_status.open"}}</span>
-          <span class='count open'>{{tickets.open}}</span>
+          <span class='count open'>{{{tickets.open}}}</span>
         </li>
         <li>
           <span class='ticket_status_label solved'>{{t "ticket_status.solved"}}</span>
-          <span class='count solved'>{{tickets.solved}}</span>
+          <span class='count solved'>{{{tickets.solved}}}</span>
         </li>
         <li>
           <span class='ticket_status_label pending'>{{t "ticket_status.pending"}}</span>
-          <span class='count pending'>{{tickets.pending}}</span>
+          <span class='count pending'>{{{tickets.pending}}}</span>
         </li>
         <li>
           <span class='ticket_status_label hold'>{{t "ticket_status.hold"}}</span>
-          <span class='count hold'>{{tickets.hold}}</span>
+          <span class='count hold'>{{{tickets.hold}}}</span>
         </li>
         <li>
           <span class='ticket_status_label closed'>{{t "ticket_status.closed"}}</span>
-          <span class='count closed'>{{tickets.closed}}</span>
+          <span class='count closed'>{{{tickets.closed}}}</span>
         </li>
       </ul>
     </div>
@@ -64,9 +64,13 @@
 
   <div class='additional hide'>
     {{#each fields}}
-      <div class='field' key='{{key}}'>
+      <div class='field {{simpleKey}}' key='{{key}}'>
         <h4>{{title}}</h4>
-        <p>{{value}}</p>
+        {{#if editable}}
+          <textarea class='notes_or_details'>{{value}}</textarea>
+        {{else}}
+          <p>{{#if html}}{{{value}}}{{else}}{{value}}{{/if}}</p>
+        {{/if}}
       </div>
     {{/each}}
   </div>

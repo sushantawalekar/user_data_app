@@ -26,6 +26,7 @@
   "details": "Details",
   "notes": "Notes",
   "tags": "Tags",
+  "locale": "User's language",
   "organization": "Organization",
   "ticket_status": {
     "new": "n",

@@ -70,6 +70,10 @@ parts:
       title: "Notes box after this will be an editable text box"
       value: "Notes"
   - translation:
+      key: "txt.apps.user_data_app.locale"
+      title: "language of this user"
+      value: "User's language"
+  - translation:
       key: "txt.apps.user_data_app.tags"
       title: "List of the tags of this user"
       value: "Tags"

@@ -18,12 +18,14 @@
       'getUser.done': 'onGetUserDone',
       'getUserFields.done': 'onGetUserFieldsDone',
       'getTickets.done': 'onGetTicketsDone',
+      'updateUser.done': 'onUpdateUserDone',
 
       // UI
       'click .expandBar': 'onClickExpandBar',
       'click .cog': 'onCogClick',
       'click .back': 'onBackClick',
       'click .save': 'onSaveClick',
+      'change,keyup,input,paste .notes_or_details': 'onNotesOrDetailsChanged',
 
       // Misc
       'requestsFinished': 'onRequestsFinished'
@@ -33,28 +35,33 @@
       'getUser': function(id) {
         return {
           url: helpers.fmt("/api/v2/users/%@.json?include=identities,organizations", id),
+          dataType: 'json'
+        };
+      },
+
+      'updateUser': function(data) {
+        return {
+          url: helpers.fmt("/api/v2/users/%@.json", this.ticket().requester().id()),
+          type: 'PUT',
           dataType: 'json',
-          proxy_v2: true
+          data: { user: data }
         };
       },
 
       'getUserFields': {
-        url: '/api/v2/user_fields.json',
-        proxy_v2: true
+        url: '/api/v2/user_fields.json'
       },
 
       'searchTickets': function(cond) {
         return {
           url: helpers.fmt("/api/v2/search.json?query=type:ticket %@", cond),
-          dataType: 'json',
-          proxy_v2: true
+          dataType: 'json'
         };
       },
 
       'getTickets': function(userId) {
         return {
-          url: helpers.fmt("/api/v2/users/%@/tickets/requested.json", userId),
-          proxy_v2: true
+          url: helpers.fmt("/api/v2/users/%@/tickets/requested.json", userId)
         };
       },
 
@@ -114,22 +121,41 @@
 
     fieldsForCurrentUser: function() {
       return _.map(this.storage.selectedKeys, (function(key) {
-        var result = { key: key };
+        var field = _.find(this.storage.fields, function(field) {
+          return field.key === key;
+        });
+        var result = {
+          key: key,
+          description: field.description,
+          title: field.title,
+          editable: field.editable
+        };
         if (key.indexOf('##builtin') === 0) {
-          var name = key.split('_')[1];
-          result.value = this.storage.user[name];
-          result.title = this.I18n.t(name);
+          var subkey = key.split('_')[1];
+          result.value = this.storage.user[subkey];
+          result.simpleKey = ["builtin", subkey].join(' ');
+          if (subkey === 'tags') {
+            result.value = this.renderTemplate('tags', {tags: result.value});
+            result.html = true;
+          }
         }
         else {
-          var field = _.find(this.storage.fields, function(field) {
-            return field.key === key;
-          });
-          result.title = field.title;
-          result.description = field.description;
+          result.simpleKey = ["custom", key].join(' ');
           result.value = this.storage.user.user_fields[key];
+          if (field.type === 'date') {
+            result.value = this.toLocaleDate(result.value);
+          }
         }
         return result;
       }).bind(this));
+    },
+
+    toLocaleDate: function(date) {
+      return new Date(date).toLocaleString(undefined, {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric"
+      });
     },
 
     showDisplay: function() {
@@ -137,10 +163,26 @@
         ticketId: this.ticket().id(),
         isAdmin: this.currentUser().role() === 'admin',
         user: this.storage.user,
-        tickets: this.storage.ticketsCounters,
+        tickets: this.makeTicketsLinks(this.storage.ticketsCounters),
         fields: this.fieldsForCurrentUser()
       });
-      this.$('.field[key="##builtin_tags"] h4').html("<i class='icon-tag''/>");
+      this.$('.field.builtin.tags h4').html("<i class='icon-tag'/>");
+    },
+
+    makeTicketsLinks: function(counters) {
+      var links = {};
+      var link = "#/tickets/%@/requester/tickets".fmt(this.ticket().id());
+      var tag = this.$('<div>').append(this.$('<a>').attr('href', link));
+      _.each(counters, function(value, key) {
+        if (value && value !== "-") {
+          tag.find('a').html(value);
+          links[key] = tag.html();
+        }
+        else {
+          links[key] = value;
+        }
+      }.bind(this));
+      return links;
     },
 
     // EVENTS ==================================================================
@@ -184,11 +226,10 @@
       var html = this.renderTemplate('admin', {
         fields: this.storage.fields
       });
+      var outerHeight = this.$('.whole').outerHeight();
       this.$('.admin').html(html);
-      var height = _.max([this.$('.admin').outerHeight(),
-                          this.$('.whole').outerHeight()]) + 50;
-      this.$('div[data-main]').height(height);
-      this.$('div[data-main]').addClass('effect');
+      this.$('div[data-main]').height(outerHeight)
+                              .addClass('effect');
       _.defer((function() {
         this.$('div[data-main]').addClass('open');
       }).bind(this));
@@ -209,7 +250,18 @@
         .always(this.onAppActivation.bind(this));
     },
 
+    onNotesOrDetailsChanged: _.debounce(function() {
+      this.ajax('updateUser', {
+        notes: this.$('div.builtin.notes textarea').val(),
+        details: this.$('div.builtin.details textarea').val()
+      });
+    }, 1000),
+
     // REQUESTS ================================================================
+
+    onUpdateUserDone: function() {
+      services.notify(this.I18n.t("update_user_done"));
+    },
 
     onGetUserDone: function(data) {
       this.storage.user = data.user;
@@ -249,18 +301,27 @@
           active: true
         },
         {
+          key: "##builtin_locale",
+          title: this.I18n.t("locale"),
+          description: "",
+          position: 1,
+          active: true
+        },
+        {
           key: "##builtin_notes",
           title: this.I18n.t("notes"),
           description: "",
           position: Number.MAX_VALUE - 1,
-          active: true
+          active: true,
+          editable: true
         },
         {
           key: "##builtin_details",
           title: this.I18n.t("details"),
           description: "",
           position: Number.MAXVALUE,
-          active: true
+          active: true,
+          editable: true
         }
       ].concat(data.user_fields);
       var activeFields = _.filter(fields, function(field) {
@@ -272,7 +333,9 @@
           title: field.title,
           description: field.description,
           position: field.position,
-          selected: _.contains(selectedFields, field.key)
+          selected: _.contains(selectedFields, field.key),
+          editable: field.editable,
+          type: field.type
         };
       });
       this.storage.fields = _.sortBy(restrictedFields, 'position');
