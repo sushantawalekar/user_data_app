@@ -277,12 +277,13 @@ div[data-main] {
   .expandBar {
     background-color: #fff;
     border-top: 1px solid #f0f0f0;
-    padding-top: 12px;
+    padding-top: 0px;
     padding-bottom: 15px;
     display: block;
     margin-top: 20px;
 
     .arrow {
+      margin-top: 12px;
       height: 6px;
       min-width: 11px;
       display: block;
@@ -305,7 +306,9 @@ div[data-main] {
     }
 
     &:hover {
-      background: radial-gradient(40px circle at center top,#F5F5F5,#fff);
+      background-image: app-asset-url("hover-bg.png");
+      background-repeat: no-repeat;
+      background-position: center top;
     }
 
     span {
