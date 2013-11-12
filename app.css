@@ -48,8 +48,14 @@ div[data-main] {
     margin-bottom: 1em;
   }
 
-  label {
-    display: inline;
+  .fields-list {
+    label {
+      display: inline;
+    }
+  }
+
+  .org-fields {
+    margin-top: 15px;
   }
 
   .back {
@@ -150,6 +156,12 @@ div[data-main] {
     padding: 0px;
     font-family: "Lucida Grande", serif;
 
+    &.org {
+      border-top: 1px solid #f0f0f0;
+      padding-top: 15px;
+      margin-top: 15px;
+    }
+
     .cog {
       float: right;
       position: relative;
@@ -205,6 +217,10 @@ div[data-main] {
         background-image: app-asset-url("avatar.png");
         background-size: cover;
         border-radius: 4px;
+
+        &.org {
+          background-image: app-asset-url("org.png");
+        }
       }
 
       img {
