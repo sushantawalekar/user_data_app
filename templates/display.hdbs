@@ -4,7 +4,7 @@
   <div class='card'>
     <div class='row-fluid'>
       {{#if isAdmin}}
-        <a class="cog"><i class='icon-cog'/></a>
+        <a class="cog"></a>
       {{/if}}
       {{#if user.photo}}
         <div class='avatar'><img src="{{user.photo.content_url}}"/></div>
@@ -75,7 +75,6 @@
     {{/each}}
   </div>
 
-  <a class='expandBar'>
-    <span class='ui-icon ui-icon-triangle-1-s'></a>
+  <a class='expandBar'><i class='arrow arrow-down'/></a>
   </div>
 </div>

@@ -166,7 +166,6 @@
         tickets: this.makeTicketsLinks(this.storage.ticketsCounters),
         fields: this.fieldsForCurrentUser()
       });
-      this.$('.field.builtin.tags h4').html("<i class='icon-tag'/>");
     },
 
     makeTicketsLinks: function(counters) {
@@ -210,16 +209,11 @@
 
     onClickExpandBar: function() {
       var additional = this.$('.additional');
-      var expandBar = this.$('.expandBar span');
-      expandBar.attr('class', 'ui-icon');
-      if (additional.is(':visible')) {
-        additional.slideUp();
-        expandBar.addClass('ui-icon-triangle-1-s');
-      }
-      else {
-        additional.slideDown();
-        expandBar.addClass('ui-icon-triangle-1-n');
-      }
+      var expandBar = this.$('.expandBar i');
+      expandBar.attr('class', 'arrow');
+      var visible = additional.is(':visible');
+      additional.slideToggle(!visible);
+      expandBar.addClass(visible ? 'arrow-down' : 'arrow-up');
     },
 
     onCogClick: function() {
