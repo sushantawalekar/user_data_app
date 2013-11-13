@@ -4,44 +4,8 @@
   color: #333;
 }
 
-div[data-main] {
-  position: relative;
-  overflow-x: hidden;
-
-  &.effect.open {
-    .whole {
-      -webkit-transform: translate3d(320px, 0, 0);
-      transform: translate3d(320px, 0, 0);
-      -webkit-transition: all 0.5s;
-      transition: all 0.5s;
-    }
-
-    .admin {
-      visibility: visible;
-      left: 0px;
-    }
-  }
-
-  &.effect .admin {
-    z-index: 1;
-    visibility: visible;
-    left: -250px;
-    -webkit-transition: all 0.5s;
-    transition: all 0.5s;
-  }
-}
-
 .admin {
-  position: absolute;
-  top: 0;
-  left: -320px;
-  z-index: 100;
-  width: 320px;
-  backgroud: #ccc;
-  -webkit-transition: all 0.5s;
-  transition: all 0.5s;
-  height: 100%;
-
+  margin-bottom: 15px;
   p {
     color: #999;
     margin-top: 1em;

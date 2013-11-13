@@ -280,18 +280,13 @@
         orgFields: this.storage.organizationFields,
         orgFieldsActivated: this.storage.orgFieldsActivated
       });
-      var outerHeight = this.$('.whole').outerHeight();
-      this.$('.admin').html(html);
-      this.$('div[data-main]').height(outerHeight)
-                              .addClass('effect');
-      _.defer((function() {
-        this.$('div[data-main]').addClass('open');
-        this.$('.org-fields-list').toggle(!!this.storage.orgFieldsActivated);
-      }).bind(this));
+      this.$('.admin').html(html).show();
+      this.$('.whole').hide();
     },
 
     onBackClick: function() {
-      this.$('div[data-main]').height('auto').removeClass('effect open');
+      this.$('.admin').hide();
+      this.$('.whole').show();
     },
 
     onSaveClick: function() {
