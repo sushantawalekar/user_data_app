@@ -3,8 +3,8 @@
 
     storage: {
       user: null,
-      ticketsCounters: {
-      },
+      ticketsCounters: {},
+      orgTicketsCounters: {},
       requestsCount: 0,
       fields: [],
       selectedKeys: [],
