@@ -17,7 +17,7 @@
     },
     {
       "name": "orgFieldsActivated",
-      "type": "checkbox",
+      "type": "hidden",
       "default": "false"
     }
   ],

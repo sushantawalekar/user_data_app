@@ -76,7 +76,7 @@
         var appId = this.installationId();
         var settings = {
           'selectedFields': JSON.stringify(_.toArray(keys)),
-          'orgFieldsActivated': this.storage.orgFieldsActivated,
+          'orgFieldsActivated': this.storage.orgFieldsActivated.toString(),
           'orgFields': JSON.stringify(_.toArray(orgKeys))
         };
         if (!appId) {
@@ -234,7 +234,8 @@
     // EVENTS ==================================================================
 
     onAppActivation: function() {
-      this.storage.orgFieldsActivated = this.setting('orgFieldsActivated');
+      console.log();
+      this.storage.orgFieldsActivated = (this.setting('orgFieldsActivated') == 'true');
       var defaultSelection = '["##builtin_tags", "##builtin_notes", "##builtin_details"]';
       this.storage.selectedKeys = JSON.parse(this.setting('selectedFields') || defaultSelection);
       var defaultOrgSelection = '[]';
