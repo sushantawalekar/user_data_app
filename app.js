@@ -129,6 +129,9 @@
     },
 
     fieldsForCurrentOrg: function() {
+      if (!this.storage.user.organization) {
+        return {};
+      }
       return _.map(this.storage.selectedOrgKeys, (function(key) {
         var field = _.find(this.storage.organizationFields, function(field) {
           return field.key === key;
@@ -157,7 +160,6 @@
         }
         return result;
       }).bind(this));
-
     },
 
     fieldsForCurrentUser: function() {
@@ -207,7 +209,7 @@
         tickets: this.makeTicketsLinks(this.storage.ticketsCounters),
         fields: this.fieldsForCurrentUser(),
         orgFields: this.fieldsForCurrentOrg(),
-        orgFieldsActivated: this.storage.orgFieldsActivated,
+        orgFieldsActivated: this.storage.orgFieldsActivated && this.storage.user.organization,
         org: this.storage.user.organization,
         orgTickets: this.makeTicketsLinks(this.storage.orgTicketsCounters)
       });
