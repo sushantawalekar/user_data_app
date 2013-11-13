@@ -79,9 +79,7 @@
           'orgFieldsActivated': this.storage.orgFieldsActivated.toString(),
           'orgFields': JSON.stringify(_.toArray(orgKeys))
         };
-        if (!appId) {
-          this.settings = _.extend(this.settings, settings);
-        }
+        this.settings = _.extend(this.settings, settings);
         return {
           type: 'PUT',
           url: helpers.fmt("/api/v2/apps/installations/%@.json", appId),
@@ -213,6 +211,9 @@
         org: this.storage.user.organization,
         orgTickets: this.makeTicketsLinks(this.storage.orgTicketsCounters)
       });
+      if (this.store('expanded')) {
+        this.onClickExpandBar(true);
+      }
     },
 
     makeTicketsLinks: function(counters) {
@@ -234,7 +235,6 @@
     // EVENTS ==================================================================
 
     onAppActivation: function() {
-      console.log();
       this.storage.orgFieldsActivated = (this.setting('orgFieldsActivated') == 'true');
       var defaultSelection = '["##builtin_tags", "##builtin_notes", "##builtin_details"]';
       this.storage.selectedKeys = JSON.parse(this.setting('selectedFields') || defaultSelection);
@@ -265,12 +265,18 @@
       this.showDisplay();
     },
 
-    onClickExpandBar: function() {
+    onClickExpandBar: function(event, immediate) {
       var additional = this.$('.moreInfo');
       var expandBar = this.$('.expandBar i');
       expandBar.attr('class', 'arrow');
       var visible = additional.is(':visible');
-      additional.slideToggle(!visible);
+      if (immediate) {
+        additional.toggle(!visible);
+      }
+      else {
+        additional.slideToggle(!visible);
+        this.store('expanded', !visible);
+      }
       expandBar.addClass(visible ? 'arrow-down' : 'arrow-up');
     },
 
@@ -297,7 +303,7 @@
       this.$('.save').hide();
       this.$('.waitSpin').show();
       this.ajax('saveSelectedFields', keys, orgKeys)
-        .always(this.onBackClick.bind(this))
+        //.always(this.onBackClick.bind(this))
         .always(this.onAppActivation.bind(this));
     },
 
