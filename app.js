@@ -23,6 +23,7 @@
       'getTickets.done': 'onGetTicketsDone',
       'getOrgTickets.done': 'onGetOrgTicketsDone',
       'updateUser.done': 'onUpdateUserDone',
+        'fetchTicketAudits.done': 'fetchTicketAuditsDone',
 
       // UI
       'click .expandBar': 'onClickExpandBar',
@@ -89,6 +90,13 @@
             'settings': settings,
             'enabled': true
           }
+        };
+      },
+
+      fetchTicketAudits: function(id){
+        return {
+          url: helpers.fmt('/api/v2/tickets/%@/audits.json', id),
+          dataType: 'json'
         };
       }
     },
@@ -214,6 +222,9 @@
         org: this.storage.user.organization,
         orgTickets: this.makeTicketsLinks(this.storage.orgTicketsCounters)
       });
+      if (this.storage.spokeData) {
+        this.displaySpoke();
+      }
       if (this.store('expanded')) {
         this.onClickExpandBar(true);
       }
@@ -352,6 +363,48 @@
       if (data.user.organization) {
         this.countedAjax('getOrgTickets', data.user.organization.id);
       }
+
+      this.ajax('fetchTicketAudits', this.ticket().id());
+    },
+
+    fetchTicketAuditsDone: function(data){
+      _.each(data.audits, function(audit){
+        _.each(audit.events, function(e){
+          if (this.auditEventIsSpoke(e)){
+            var spokeData = this.spokeData(e);
+
+            if (spokeData){
+              this.storage.spokeData = spokeData;
+              this.storage.user.email = spokeData.email;
+              this.displaySpoke();
+            }
+          }
+        }, this);
+      }, this);
+    },
+
+    displaySpoke: function() {
+      var html = this.renderTemplate('spoke', this.storage.spokeData);
+      this.$('.spoke').html(html);
+    },
+
+    auditEventIsSpoke: function(event){
+      return event.type === "Comment" &&
+        /spoke_id_/.test(event.body);
+    },
+
+    spokeData: function(event){
+      var data = /spoke_id_(.*)\nspoke_account_(.*)\nrequester_email_(.*)\nrequester_phone_(.*)/.exec(event.body);
+
+      if (_.isEmpty(data))
+        return false;
+
+      return {
+        id: data[1].trim(),
+        account: data[2].trim(),
+        email: data[3].trim(),
+        phone: data[4].trim()
+      };
     },
 
     onGetTicketsDone: function(data) {

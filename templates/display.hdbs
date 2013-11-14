@@ -6,6 +6,11 @@
       {{#if isAdmin}}
         <a class="cog"></a>
       {{/if}}
+
+
+      <div class='spoke'>
+      </div>
+
       {{#if user.photo}}
         <div class='avatar'><img src="{{user.photo.content_url}}"/></div>
         {{else}}
