@@ -14,6 +14,7 @@
     events: {
       // App
       'app.activated': 'onAppActivation',
+      'ticket.requester.email.changed': 'onAppActivation',
 
       // Requests
       'getUser.done': 'onGetUserDone',
@@ -245,9 +246,12 @@
       _.defer((function() {
         if (this.ticket().requester()) {
           this.countedAjax('getUser', this.ticket().requester().id());
+          this.countedAjax('getUserFields');
+          this.countedAjax('getOrganizationFields');
         }
-        this.countedAjax('getUserFields');
-        this.countedAjax('getOrganizationFields');
+        else {
+          this.switchTo('empty');
+        }
       }).bind(this));
     },
 
