@@ -30,6 +30,10 @@ parts:
       title: "Help text for the admin"
       value: "Please select the user fields you would like to permanently display on the App"
   - translation:
+      key: "txt.apps.user_data_app.admin.include_org_fields"
+      title: "Check box to display org fields"
+      value: "Display organization information"
+  - translation:
       key: "txt.apps.user_data_app.info.no_tags"
       title: "Placeholder when there are no tags"
       value: "No tags"

@@ -3,11 +3,12 @@
 
     storage: {
       user: null,
-      ticketsCounters: {
-      },
+      ticketsCounters: {},
+      orgTicketsCounters: {},
       requestsCount: 0,
       fields: [],
-      selectedKeys: []
+      selectedKeys: [],
+      orgFieldsActivated: false
     },
 
     events: {
@@ -17,7 +18,9 @@
       // Requests
       'getUser.done': 'onGetUserDone',
       'getUserFields.done': 'onGetUserFieldsDone',
+      'getOrganizationFields.done': 'onGetOrganizationFieldsDone',
       'getTickets.done': 'onGetTicketsDone',
+      'getOrgTickets.done': 'onGetOrgTicketsDone',
       'updateUser.done': 'onUpdateUserDone',
 
       // UI
@@ -25,6 +28,7 @@
       'click .cog': 'onCogClick',
       'click .back': 'onBackClick',
       'click .save': 'onSaveClick',
+      'change .activateOrgFields': 'onActivateOrgFieldsChange',
       'change,keyup,input,paste .notes_or_details': 'onNotesOrDetailsChanged',
 
       // Misc
@@ -52,11 +56,8 @@
         url: '/api/v2/user_fields.json'
       },
 
-      'searchTickets': function(cond) {
-        return {
-          url: helpers.fmt("/api/v2/search.json?query=type:ticket %@", cond),
-          dataType: 'json'
-        };
+      'getOrganizationFields': {
+        url: '/api/v2/organization_fields.json'
       },
 
       'getTickets': function(userId) {
@@ -65,18 +66,26 @@
         };
       },
 
-      'saveSelectedFields': function(keys) {
+      'getOrgTickets': function(orgId) {
+        return {
+          url: helpers.fmt("/api/v2/organizations/%@/tickets.json", orgId)
+        };
+      },
+
+      'saveSelectedFields': function(keys, orgKeys) {
         var appId = this.installationId();
-        var fieldsString = JSON.stringify(_.toArray(keys));
-        if (!appId) {
-          this.settings.selectedFields = fieldsString;
-        }
+        var settings = {
+          'selectedFields': JSON.stringify(_.toArray(keys)),
+          'orgFieldsActivated': this.storage.orgFieldsActivated.toString(),
+          'orgFields': JSON.stringify(_.toArray(orgKeys))
+        };
+        this.settings = _.extend(this.settings, settings);
         return {
           type: 'PUT',
           url: helpers.fmt("/api/v2/apps/installations/%@.json", appId),
           dataType: 'json',
           data: {
-            'settings': {'selectedFields': fieldsString},
+            'settings': settings,
             'enabled': true
           }
         };
@@ -117,6 +126,40 @@
       if (--this.storage.requestsCount === 0) {
         this.trigger('requestsFinished');
       }
+    },
+
+    fieldsForCurrentOrg: function() {
+      if (!this.storage.user.organization) {
+        return {};
+      }
+      return _.map(this.storage.selectedOrgKeys, (function(key) {
+        var field = _.find(this.storage.organizationFields, function(field) {
+          return field.key === key;
+        });
+        var result = {
+          key: key,
+          description: field.description,
+          title: field.title,
+          editable: field.editable
+        };
+        if (key.indexOf('##builtin') === 0) {
+          var subkey = key.split('_')[1];
+          result.value = this.storage.user.organization[subkey];
+          result.simpleKey = ["builtin", subkey].join(' ');
+          if (subkey === 'tags') {
+            result.value = this.renderTemplate('tags', {tags: result.value});
+            result.html = true;
+          }
+        }
+        else {
+          result.simpleKey = ["custom", key].join(' ');
+          result.value = this.storage.user.organization.organization_fields[key];
+          if (field.type === 'date') {
+            result.value = this.toLocaleDate(result.value);
+          }
+        }
+        return result;
+      }).bind(this));
     },
 
     fieldsForCurrentUser: function() {
@@ -164,9 +207,15 @@
         isAdmin: this.currentUser().role() === 'admin',
         user: this.storage.user,
         tickets: this.makeTicketsLinks(this.storage.ticketsCounters),
-        fields: this.fieldsForCurrentUser()
+        fields: this.fieldsForCurrentUser(),
+        orgFields: this.fieldsForCurrentOrg(),
+        orgFieldsActivated: this.storage.orgFieldsActivated && this.storage.user.organization,
+        org: this.storage.user.organization,
+        orgTickets: this.makeTicketsLinks(this.storage.orgTicketsCounters)
       });
-      this.$('.field.builtin.tags h4').html("<i class='icon-tag'/>");
+      if (this.store('expanded')) {
+        this.onClickExpandBar(true);
+      }
     },
 
     makeTicketsLinks: function(counters) {
@@ -188,13 +237,17 @@
     // EVENTS ==================================================================
 
     onAppActivation: function() {
+      this.storage.orgFieldsActivated = (this.setting('orgFieldsActivated') == 'true');
+      var defaultSelection = '["##builtin_tags", "##builtin_notes", "##builtin_details"]';
+      this.storage.selectedKeys = JSON.parse(this.setting('selectedFields') || defaultSelection);
+      var defaultOrgSelection = '[]';
+      this.storage.selectedOrgKeys = JSON.parse(this.setting('orgFields') || defaultOrgSelection);
       _.defer((function() {
-        var defaultSelection = '["##builtin_tags", "##builtin_notes", "##builtin_details"]';
-        this.storage.selectedKeys = JSON.parse(this.setting('selectedFields') || defaultSelection);
         if (this.ticket().requester()) {
           this.countedAjax('getUser', this.ticket().requester().id());
         }
         this.countedAjax('getUserFields');
+        this.countedAjax('getOrganizationFields');
       }).bind(this));
     },
 
@@ -205,48 +258,54 @@
           ticketsCounters[key] = '-';
         }
       });
+      ticketsCounters = this.storage.orgTicketsCounters;
+      _.each(['new', 'open', 'hold', 'pending', 'solved', 'closed'], function(key) {
+        if (!ticketsCounters[key]) {
+          ticketsCounters[key] = '-';
+        }
+      });
       this.showDisplay();
     },
 
-    onClickExpandBar: function() {
-      var additional = this.$('.additional');
-      var expandBar = this.$('.expandBar span');
-      expandBar.attr('class', 'ui-icon');
-      if (additional.is(':visible')) {
-        additional.slideUp();
-        expandBar.addClass('ui-icon-triangle-1-s');
+    onClickExpandBar: function(event, immediate) {
+      var additional = this.$('.moreInfo');
+      var expandBar = this.$('.expandBar i');
+      expandBar.attr('class', 'arrow');
+      var visible = additional.is(':visible');
+      if (immediate) {
+        additional.toggle(!visible);
       }
       else {
-        additional.slideDown();
-        expandBar.addClass('ui-icon-triangle-1-n');
+        additional.slideToggle(!visible);
+        this.store('expanded', !visible);
       }
+      expandBar.addClass(visible ? 'arrow-down' : 'arrow-up');
     },
 
     onCogClick: function() {
       var html = this.renderTemplate('admin', {
-        fields: this.storage.fields
+        fields: this.storage.fields,
+        orgFields: this.storage.organizationFields,
+        orgFieldsActivated: this.storage.orgFieldsActivated
       });
-      var outerHeight = this.$('.whole').outerHeight();
-      this.$('.admin').html(html);
-      this.$('div[data-main]').height(outerHeight)
-                              .addClass('effect');
-      _.defer((function() {
-        this.$('div[data-main]').addClass('open');
-      }).bind(this));
+      this.$('.admin').html(html).show();
+      this.$('.whole').hide();
     },
 
     onBackClick: function() {
-      this.$('div[data-main]').height('auto').removeClass('effect open');
+      this.$('.admin').hide();
+      this.$('.whole').show();
     },
 
     onSaveClick: function() {
       var that = this;
-      var keys = this.$('input:checked').map(function() { return that.$(this).val(); });
+      var keys = this.$('.fields-list input:checked').map(function() { return that.$(this).val(); });
+      var orgKeys = this.$('.org-fields-list input:checked').map(function() { return that.$(this).val(); });
       this.$('input, button').prop('disabled', true);
       this.$('.save').hide();
       this.$('.waitSpin').show();
-      this.ajax('saveSelectedFields', keys)
-        .always(this.onBackClick.bind(this))
+      this.ajax('saveSelectedFields', keys, orgKeys)
+        //.always(this.onBackClick.bind(this))
         .always(this.onAppActivation.bind(this));
     },
 
@@ -256,6 +315,12 @@
         details: this.$('div.builtin.details textarea').val()
       });
     }, 1000),
+
+    onActivateOrgFieldsChange: function(event) {
+      var activate = this.$(event.target).is(':checked');
+      this.storage.orgFieldsActivated = activate;
+      this.$('.org-fields-list').toggle(activate);
+    },
 
     // REQUESTS ================================================================
 
@@ -280,6 +345,9 @@
       if (data.user.email) {
         this.countedAjax('getTickets', this.storage.user.id);
       }
+      if (data.user.organization) {
+        this.countedAjax('getOrgTickets', data.user.organization.id);
+      }
     },
 
     onGetTicketsDone: function(data) {
@@ -288,6 +356,58 @@
         return [key, value.length];
       }));
       this.storage.ticketsCounters = res;
+    },
+
+    onGetOrgTicketsDone: function(data) {
+      var grouped = _.groupBy(data.tickets, 'status');
+      var res = this.toObject(_.map(grouped, function(value, key) {
+        return [key, value.length];
+      }));
+      this.storage.orgTicketsCounters = res;
+    },
+
+    onGetOrganizationFieldsDone: function(data) {
+      var selectedFields = this.storage.selectedOrgKeys;
+      var fields = [
+        {
+          key: "##builtin_tags",
+          title: this.I18n.t("tags"),
+          description: "",
+          position: 0,
+          active: true
+        },
+        {
+          key: "##builtin_notes",
+          title: this.I18n.t("notes"),
+          description: "",
+          position: Number.MAX_VALUE - 1,
+          active: true,
+          editable: true
+        },
+        {
+          key: "##builtin_details",
+          title: this.I18n.t("details"),
+          description: "",
+          position: Number.MAXVALUE,
+          active: true,
+          editable: true
+        }
+      ].concat(data.organization_fields);
+      var activeFields = _.filter(fields, function(field) {
+        return field.active;
+      });
+      var restrictedFields = _.map(activeFields, function(field) {
+        return {
+          key: field.key,
+          title: field.title,
+          description: field.description,
+          position: field.position,
+          selected: _.contains(selectedFields, field.key),
+          editable: field.editable,
+          type: field.type
+        };
+      });
+      this.storage.organizationFields = _.sortBy(restrictedFields, 'position');
     },
 
     onGetUserFieldsDone: function(data) {

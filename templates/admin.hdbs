@@ -2,7 +2,7 @@
 <h4>{{t "admin.title"}}</h4>
 <p>{{t "admin.text"}}</p>
 
-<ul>
+<ul class='fields-list'>
   {{#each fields}}
     <li>
       <input type="checkbox"
@@ -13,6 +13,26 @@
     </li>
   {{/each}}
 </ul>
+
+{{#if orgFields.length }}
+    <div class='org-fields'>
+        <label class='checkbox'>
+            <input type="checkbox" class='activateOrgFields' {{#if orgFieldsActivated}}checked{{/if}}>
+            {{t "admin.include_org_fields"}}
+        </label>
+
+        <ul class='org-fields-list' {{#unless orgFieldsActivated}}style="display: none"{{/unless}}>
+            {{#each orgFields}}
+                <li>
+                    <label class='checkbox'>
+                        <input type='checkbox' value="{{key}}" {{#if selected}}checked{{/if}}>
+                        {{title}}
+                    </label>
+                </li>
+            {{/each}}
+        </ul>
+    </div>
+{{/if}}
 
 <button class='btn save'>{{t "admin.save"}}</button>
 <div class='waitSpin hide'>{{spinner}}</div>

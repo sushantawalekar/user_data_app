@@ -9,6 +9,16 @@
       "name": "selectedFields",
       "type": "hidden",
       "required": false
+    },
+    {
+      "name": "orgFields",
+      "type": "hidden",
+      "required": false
+    },
+    {
+      "name": "orgFieldsActivated",
+      "type": "hidden",
+      "default": "false"
     }
   ],
   "defaultLocale": "en",
