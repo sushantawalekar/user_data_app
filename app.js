@@ -1,16 +1,5 @@
 (function() {
   return {
-
-    storage: {
-      user: null,
-      ticketsCounters: {},
-      orgTicketsCounters: {},
-      requestsCount: 0,
-      fields: [],
-      selectedKeys: [],
-      orgFieldsActivated: false
-    },
-
     events: {
       // App
       'app.activated': 'onAppActivation',
@@ -249,6 +238,16 @@
     // EVENTS ==================================================================
 
     onAppActivation: function() {
+      var defaultStorage = {
+        user: null,
+        ticketsCounters: {},
+        orgTicketsCounters: {},
+        requestsCount: 0,
+        fields: [],
+        selectedKeys: [],
+        orgFieldsActivated: false
+      };
+      this.storage = _.clone(defaultStorage); // not sure the clone is needed here
       this.storage.orgFieldsActivated = (this.setting('orgFieldsActivated') == 'true');
       var defaultSelection = '["##builtin_tags", "##builtin_notes", "##builtin_details"]';
       this.storage.selectedKeys = JSON.parse(this.setting('selectedFields') || defaultSelection);
