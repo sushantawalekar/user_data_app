@@ -153,7 +153,7 @@
           result.simpleKey = ["custom", key].join(' ');
           result.value = this.storage.user.organization.organization_fields[key];
           if (field.type === 'date') {
-            result.value = this.toLocaleDate(result.value);
+            result.value = (result.value ? this.toLocaleDate(result.value) : "");
           }
         }
         return result;
