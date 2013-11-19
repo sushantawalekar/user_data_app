@@ -7,6 +7,7 @@
 
       // Requests
       'getUser.done': 'onGetUserDone',
+      'getLocales.done': 'onGetLocalesDone',
       'getUserFields.done': 'onGetUserFieldsDone',
       'getOrganizationFields.done': 'onGetOrganizationFieldsDone',
       'getTickets.done': 'onGetTicketsDone',
@@ -27,6 +28,10 @@
     },
 
     requests: {
+      'getLocales': {
+        url: "/api/v2/locales.json"
+      },
+
       'getUser': function(id) {
         return {
           url: helpers.fmt("/api/v2/users/%@.json?include=identities,organizations", id),
@@ -126,14 +131,17 @@
       }
     },
 
-    fieldsForCurrentOrg: function() {
-      if (!this.storage.user.organization) {
+    fieldsForCurrent: function(target, fields, selected, values) {
+      if (!target) {
         return {};
       }
-      return _.map(this.storage.selectedOrgKeys, (function(key) {
-        var field = _.find(this.storage.organizationFields, function(field) {
+      return _.compact(_.map(selected, (function(key) {
+        var field = _.find(fields, function(field) {
           return field.key === key;
         });
+        if (!field) {
+          return null;
+        }
         var result = {
           key: key,
           description: field.description,
@@ -142,53 +150,39 @@
         };
         if (key.indexOf('##builtin') === 0) {
           var subkey = key.split('_')[1];
-          result.value = this.storage.user.organization[subkey];
+          result.value = target[subkey];
           result.simpleKey = ["builtin", subkey].join(' ');
           if (subkey === 'tags') {
             result.value = this.renderTemplate('tags', {tags: result.value});
             result.html = true;
           }
+          if (subkey === 'locale') {
+            result.value = this.storage.locales[result.value];
+          }
         }
         else {
           result.simpleKey = ["custom", key].join(' ');
-          result.value = this.storage.user.organization.organization_fields[key];
+          result.value = values[key];
           if (field.type === 'date') {
             result.value = (result.value ? this.toLocaleDate(result.value) : "");
           }
         }
         return result;
-      }).bind(this));
+      }).bind(this)));
+    },
+
+    fieldsForCurrentOrg: function() {
+      return this.fieldsForCurrent(this.storage.user.organization,
+                                   this.storage.organizationFields,
+                                   this.storage.selectedOrgKeys,
+                                   this.storage.user.organization.organization_fields);
     },
 
     fieldsForCurrentUser: function() {
-      return _.map(this.storage.selectedKeys, (function(key) {
-        var field = _.find(this.storage.fields, function(field) {
-          return field.key === key;
-        });
-        var result = {
-          key: key,
-          description: field.description,
-          title: field.title,
-          editable: field.editable
-        };
-        if (key.indexOf('##builtin') === 0) {
-          var subkey = key.split('_')[1];
-          result.value = this.storage.user[subkey];
-          result.simpleKey = ["builtin", subkey].join(' ');
-          if (subkey === 'tags') {
-            result.value = this.renderTemplate('tags', {tags: result.value});
-            result.html = true;
-          }
-        }
-        else {
-          result.simpleKey = ["custom", key].join(' ');
-          result.value = this.storage.user.user_fields[key];
-          if (field.type === 'date') {
-            result.value = this.toLocaleDate(result.value);
-          }
-        }
-        return result;
-      }).bind(this));
+      return this.fieldsForCurrent(this.storage.user,
+                                   this.storage.fields,
+                                   this.storage.selectedKeys,
+                                   this.storage.user.user_fields);
     },
 
     toLocaleDate: function(date) {
@@ -255,6 +249,9 @@
       this.storage.selectedOrgKeys = JSON.parse(this.setting('orgFields') || defaultOrgSelection);
       _.defer((function() {
         if (this.ticket().requester()) {
+          if (!this.storage.locales) {
+            this.countedAjax('getLocales');
+          }
           this.countedAjax('getUser', this.ticket().requester().id());
           this.countedAjax('getUserFields');
           this.countedAjax('getOrganizationFields');
@@ -340,6 +337,14 @@
 
     onUpdateUserDone: function() {
       services.notify(this.I18n.t("update_user_done"));
+    },
+
+    onGetLocalesDone: function(data) {
+      var locales = {};
+      _.each(data.locales, function(obj) {
+        locales[obj.locale] = obj.name;
+      });
+      this.storage.locales = locales;
     },
 
     onGetUserDone: function(data) {
