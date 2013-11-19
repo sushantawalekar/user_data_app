@@ -7,6 +7,7 @@
 
       // Requests
       'getUser.done': 'onGetUserDone',
+      'getLocales.done': 'onGetLocalesDone',
       'getUserFields.done': 'onGetUserFieldsDone',
       'getOrganizationFields.done': 'onGetOrganizationFieldsDone',
       'getTickets.done': 'onGetTicketsDone',
@@ -27,6 +28,10 @@
     },
 
     requests: {
+      'getLocales': {
+        url: "/api/v2/locales.json"
+      },
+
       'getUser': function(id) {
         return {
           url: helpers.fmt("/api/v2/users/%@.json?include=identities,organizations", id),
@@ -151,6 +156,9 @@
             result.value = this.renderTemplate('tags', {tags: result.value});
             result.html = true;
           }
+          if (subkey === 'locale') {
+            result.value = this.storage.locales[result.value];
+          }
         }
         else {
           result.simpleKey = ["custom", key].join(' ');
@@ -241,6 +249,9 @@
       this.storage.selectedOrgKeys = JSON.parse(this.setting('orgFields') || defaultOrgSelection);
       _.defer((function() {
         if (this.ticket().requester()) {
+          if (!this.storage.locales) {
+            this.countedAjax('getLocales');
+          }
           this.countedAjax('getUser', this.ticket().requester().id());
           this.countedAjax('getUserFields');
           this.countedAjax('getOrganizationFields');
@@ -326,6 +337,14 @@
 
     onUpdateUserDone: function() {
       services.notify(this.I18n.t("update_user_done"));
+    },
+
+    onGetLocalesDone: function(data) {
+      var locales = {};
+      _.each(data.locales, function(obj) {
+        locales[obj.locale] = obj.name;
+      });
+      this.storage.locales = locales;
     },
 
     onGetUserDone: function(data) {
