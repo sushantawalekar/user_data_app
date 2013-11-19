@@ -126,12 +126,12 @@
       }
     },
 
-    fieldsForCurrentOrg: function() {
-      if (!this.storage.user.organization) {
+    fieldsForCurrent: function(target, fields, selected, values) {
+      if (!target) {
         return {};
       }
-      return _.compact(_.map(this.storage.selectedOrgKeys, (function(key) {
-        var field = _.find(this.storage.organizationFields, function(field) {
+      return _.compact(_.map(selected, (function(key) {
+        var field = _.find(fields, function(field) {
           return field.key === key;
         });
         if (!field) {
@@ -145,7 +145,7 @@
         };
         if (key.indexOf('##builtin') === 0) {
           var subkey = key.split('_')[1];
-          result.value = this.storage.user.organization[subkey];
+          result.value = target[subkey];
           result.simpleKey = ["builtin", subkey].join(' ');
           if (subkey === 'tags') {
             result.value = this.renderTemplate('tags', {tags: result.value});
@@ -154,7 +154,7 @@
         }
         else {
           result.simpleKey = ["custom", key].join(' ');
-          result.value = this.storage.user.organization.organization_fields[key];
+          result.value = values[key];
           if (field.type === 'date') {
             result.value = (result.value ? this.toLocaleDate(result.value) : "");
           }
@@ -163,38 +163,18 @@
       }).bind(this)));
     },
 
+    fieldsForCurrentOrg: function() {
+      return this.fieldsForCurrent(this.storage.user.organization,
+                                   this.storage.organizationFields,
+                                   this.storage.selectedOrgKeys,
+                                   this.storage.user.organization.organization_fields);
+    },
+
     fieldsForCurrentUser: function() {
-      return _.compact(_.map(this.storage.selectedKeys, (function(key) {
-        var field = _.find(this.storage.fields, function(field) {
-          return field.key === key;
-        });
-        if (!field) {
-          return null;
-        }
-        var result = {
-          key: key,
-          description: field.description,
-          title: field.title,
-          editable: field.editable
-        };
-        if (key.indexOf('##builtin') === 0) {
-          var subkey = key.split('_')[1];
-          result.value = this.storage.user[subkey];
-          result.simpleKey = ["builtin", subkey].join(' ');
-          if (subkey === 'tags') {
-            result.value = this.renderTemplate('tags', {tags: result.value});
-            result.html = true;
-          }
-        }
-        else {
-          result.simpleKey = ["custom", key].join(' ');
-          result.value = this.storage.user.user_fields[key];
-          if (field.type === 'date') {
-            result.value = this.toLocaleDate(result.value);
-          }
-        }
-        return result;
-      }).bind(this)));
+      return this.fieldsForCurrent(this.storage.user,
+                                   this.storage.fields,
+                                   this.storage.selectedKeys,
+                                   this.storage.user.user_fields);
     },
 
     toLocaleDate: function(date) {
