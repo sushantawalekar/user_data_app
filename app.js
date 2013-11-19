@@ -130,10 +130,13 @@
       if (!this.storage.user.organization) {
         return {};
       }
-      return _.map(this.storage.selectedOrgKeys, (function(key) {
+      return _.compact(_.map(this.storage.selectedOrgKeys, (function(key) {
         var field = _.find(this.storage.organizationFields, function(field) {
           return field.key === key;
         });
+        if (!field) {
+          return null;
+        }
         var result = {
           key: key,
           description: field.description,
@@ -157,14 +160,17 @@
           }
         }
         return result;
-      }).bind(this));
+      }).bind(this)));
     },
 
     fieldsForCurrentUser: function() {
-      return _.map(this.storage.selectedKeys, (function(key) {
+      return _.compact(_.map(this.storage.selectedKeys, (function(key) {
         var field = _.find(this.storage.fields, function(field) {
           return field.key === key;
         });
+        if (!field) {
+          return null;
+        }
         var result = {
           key: key,
           description: field.description,
@@ -188,7 +194,7 @@
           }
         }
         return result;
-      }).bind(this));
+      }).bind(this)));
     },
 
     toLocaleDate: function(date) {
