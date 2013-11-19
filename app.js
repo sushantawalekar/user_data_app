@@ -132,9 +132,6 @@
     },
 
     fieldsForCurrent: function(target, fields, selected, values) {
-      if (!target) {
-        return {};
-      }
       return _.compact(_.map(selected, (function(key) {
         var field = _.find(fields, function(field) {
           return field.key === key;
@@ -172,6 +169,9 @@
     },
 
     fieldsForCurrentOrg: function() {
+      if (!this.storage.user.organization) {
+        return {};
+      }
       return this.fieldsForCurrent(this.storage.user.organization,
                                    this.storage.organizationFields,
                                    this.storage.selectedOrgKeys,
@@ -179,6 +179,9 @@
     },
 
     fieldsForCurrentUser: function() {
+      if (!this.storage.user) {
+        return {};
+      }
       return this.fieldsForCurrent(this.storage.user,
                                    this.storage.fields,
                                    this.storage.selectedKeys,
