@@ -13,7 +13,7 @@
       'getTickets.done': 'onGetTicketsDone',
       'getOrgTickets.done': 'onGetOrgTicketsDone',
       'updateUser.done': 'onUpdateUserDone',
-        'fetchTicketAudits.done': 'fetchTicketAuditsDone',
+      'fetchTicketAudits.done': 'fetchTicketAuditsDone',
 
       // UI
       'click .expandBar': 'onClickExpandBar',
@@ -249,12 +249,12 @@
       this.storage.selectedOrgKeys = JSON.parse(this.setting('orgFields') || defaultOrgSelection);
       _.defer((function() {
         if (this.ticket().requester()) {
-          if (!this.storage.locales) {
-            this.countedAjax('getLocales');
-          }
           this.countedAjax('getUser', this.ticket().requester().id());
           this.countedAjax('getUserFields');
           this.countedAjax('getOrganizationFields');
+          if (!this.storage.locales) {
+            this.countedAjax('getLocales');
+          }
         }
         else {
           this.switchTo('empty');
