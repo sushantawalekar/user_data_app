@@ -11,7 +11,8 @@
   "admin": {
     "title": "Benutzerdaten – Admin-Bedienfeld",
     "save": "Speichern und zurück",
-    "text": "Wählen Sie die Benutzerfelder aus, die permanent in der App angezeigt werden sollen."
+    "text": "Wählen Sie die Benutzerfelder aus, die permanent in der App angezeigt werden sollen.",
+    "include_org_fields": "Organisationsinformationen anzeigen"
   },
   "info": {
     "no_tags": "Keine Stichworte",

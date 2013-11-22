@@ -11,7 +11,8 @@
   "admin": {
     "title": "Admin-panel voor Gebruikersgegevens",
     "save": "Opslaan en terug gaan",
-    "text": "Selecteer de gebruikersvelden die u permanent in de app weergegeven wilt hebben"
+    "text": "Selecteer de gebruikersvelden die u permanent in de app weergegeven wilt hebben",
+    "include_org_fields": "Informatie over organisatie weergeven"
   },
   "info": {
     "no_tags": "Geen tags",

@@ -11,7 +11,8 @@
   "admin": {
     "title": "User Data Admin 패널",
     "save": "저장하고 돌아가기",
-    "text": "앱에 영구적으로 표시하고자 하는 사용자 필드를 선택하십시오"
+    "text": "앱에 영구적으로 표시하고자 하는 사용자 필드를 선택하십시오",
+    "include_org_fields": "조직 정보 표시"
   },
   "info": {
     "no_tags": "태그가 없습니다",

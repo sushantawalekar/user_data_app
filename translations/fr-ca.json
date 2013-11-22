@@ -11,7 +11,8 @@
   "admin": {
     "title": "Panneau d’administration Données utilisateur",
     "save": "Enregistrer et revenir en arrière",
-    "text": "Sélectionnez les champs utilisateur que vous voulez afficher de manière permanente dans l’application."
+    "text": "Sélectionnez les champs utilisateur que vous voulez afficher de manière permanente dans l’application.",
+    "include_org_fields": "Afficher les informations de l’organisation"
   },
   "info": {
     "no_tags": "Aucun marqueur",

@@ -11,7 +11,8 @@
   "admin": {
     "title": "Painel do administrador dos dados do usuário",
     "save": "Salvar e voltar",
-    "text": "Selecione os campos do usuário que gostaria de exibir permanentemente no aplicativo"
+    "text": "Selecione os campos do usuário que gostaria de exibir permanentemente no aplicativo",
+    "include_org_fields": "Exibir informações da organização"
   },
   "info": {
     "no_tags": "Nenhuma tag",

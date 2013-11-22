@@ -11,7 +11,8 @@
   "admin": {
     "title": "Pannello amministrazione Dati utente",
     "save": "Salva e torna indietro",
-    "text": "Selezionate i campi utente da visualizzare in maniera permanente nell’app"
+    "text": "Selezionate i campi utente da visualizzare in maniera permanente nell’app",
+    "include_org_fields": "Visualizza informazioni sull’organizzazione"
   },
   "info": {
     "no_tags": "Nessun tag",
