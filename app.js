@@ -381,7 +381,9 @@
         this.countedAjax('getOrgTickets', data.user.organization.id);
       }
 
-      this.ajax('fetchTicketAudits', this.ticket().id());
+      if (this.ticket().id()) {
+        this.ajax('fetchTicketAudits', this.ticket().id());
+      }
     },
 
     fetchTicketAuditsDone: function(data){
