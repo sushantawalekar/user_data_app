@@ -1,47 +1,47 @@
 {
   "app": {
-    "description": "Viser oplysninger om ticket-anmoderen og anmoderens organisation.",
-    "name": "App’en Brugerdata",
+    "description": "Displays information about the ticket requester and requesters organization.",
+    "name": "User Data App",
     "parameters": {
       "unfolded_on_startup": {
-        "label": "Bakken Apps åbner som standard"
+        "label": "Apps tray opened by default"
       }
     }
   },
   "admin": {
-    "title": "Panelet Brugerdataadmin",
-    "save": "Gem og gå tilbage",
-    "text": "Vælg de brugerfelter, du ønsker at vise permanent i app’en",
-    "include_org_fields": "Vis oplysninger om organisationen"
+    "title": "User Data Admin panel",
+    "save": "Save and go back",
+    "text": "Please select the user fields you would like to permanently display on the App",
+    "include_org_fields": "Display organization information"
   },
   "info": {
-    "no_tags": "Ingen tags",
-    "no_domain_names": "Ingen domænenavne"
+    "no_tags": "No tags",
+    "no_domain_names": "No domain names"
   },
-  "update_user_done": "Brugernotater og –detaljer opdateret.",
-  "ajax_error": "Der forekom en fejl. Prøv igen senere.",
+  "update_user_done": "User notes and details updated!",
+  "ajax_error": "An error occurred. Please try again later.",
   "tickets": "Tickets",
-  "toggle_details_notes": "Skift detaljer og noter",
-  "toggle_organization": "Skift organisation",
-  "details_and_notes": "Detaljer og noter",
-  "details": "Detaljer",
-  "notes": "Notater",
-  "locale": "Brugers sprog",
+  "toggle_details_notes": "Toggle Details and Notes",
+  "toggle_organization": "Toggle organization",
+  "details_and_notes": "Details and Notes",
+  "details": "Details",
+  "notes": "Notes",
+  "locale": "User's language",
   "tags": "Tags",
-  "organization": "Organisation",
+  "organization": "Organization",
   "ticket_status": {
     "new": "n",
-    "open": "å",
-    "pending": "v",
-    "hold": "b",
+    "open": "o",
+    "pending": "p",
+    "hold": "h",
     "solved": "s",
-    "closed": "l"
+    "closed": "c"
   },
   "spoke-ticket": {
     "link": {
-      "pre": "Denne ticket er fra spoke-kontoen:"
+      "pre": "This ticket is from the spoke account:"
     }
   },
-  "account": "Konto",
-  "spoke_ticket_id": "Spoke-ticket-id"
+  "account": "Account",
+  "spoke_ticket_id": "Spoke Ticket ID"
 }

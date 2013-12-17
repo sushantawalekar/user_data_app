@@ -9,7 +9,7 @@
     }
   },
   "admin": {
-    "title": "Panel Administrador de Datos de usuario",
+    "title": "Panel Administrador de datos de usuario",
     "save": "Guardar y regresar",
     "text": "Seleccione los campos de usuario que desee mostrar de forma permanente en la aplicación",
     "include_org_fields": "Mostrar información de la organización"
