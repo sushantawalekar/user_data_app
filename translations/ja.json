@@ -30,12 +30,12 @@
   "tags": "タグ",
   "organization": "組織",
   "ticket_status": {
-    "new": "n",
-    "open": "o",
-    "pending": "p",
-    "hold": "h",
-    "solved": "s",
-    "closed": "c"
+    "new": "新",
+    "open": "オ",
+    "pending": "保",
+    "hold": "待",
+    "solved": "済",
+    "closed": "終"
   },
   "spoke-ticket": {
     "link": {
