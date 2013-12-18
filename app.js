@@ -61,9 +61,12 @@
         url: '/api/v2/organization_fields.json'
       },
 
-      'getTickets': function(userId) {
+      'getTickets': function(userId, page) {
+        if (!page) {
+          page = 1;
+        }
         return {
-          url: helpers.fmt("/api/v2/users/%@/tickets/requested.json", userId)
+          url: helpers.fmt("/api/v2/users/%@/tickets/requested.json?page=%@", userId, page)
         };
       },
 
@@ -247,7 +250,8 @@
         requestsCount: 0,
         fields: [],
         selectedKeys: [],
-        orgFieldsActivated: false
+        orgFieldsActivated: false,
+        tickets: []
       };
       this.storage = _.clone(defaultStorage); // not sure the clone is needed here
       this.storage.orgFieldsActivated = (this.setting('orgFieldsActivated') == 'true');
@@ -427,11 +431,17 @@
     },
 
     onGetTicketsDone: function(data) {
-      var grouped = _.groupBy(data.tickets, 'status');
-      var res = this.toObject(_.map(grouped, function(value, key) {
-        return [key, value.length];
-      }));
-      this.storage.ticketsCounters = res;
+      this.storage.tickets = this.storage.tickets.concat(data.tickets);
+      if (data.next_page) {
+        this.countedAjax('getTickets', this.storage.user.id, data.next_page.match(/page=(\d+)/)[1]);
+      }
+      else {
+        var grouped = _.groupBy(this.storage.tickets, 'status');
+        var res = this.toObject(_.map(grouped, function(value, key) {
+          return [key, value.length];
+        }));
+        this.storage.ticketsCounters = res;
+      }
     },
 
     onGetOrgTicketsDone: function(data) {
