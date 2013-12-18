@@ -62,9 +62,7 @@
       },
 
       'getTickets': function(userId, page) {
-        if (!page) {
-          page = 1;
-        }
+        page = page || 1;
         return {
           url: helpers.fmt("/api/v2/users/%@/tickets/requested.json?page=%@", userId, page)
         };
@@ -433,7 +431,8 @@
     onGetTicketsDone: function(data) {
       this.storage.tickets = this.storage.tickets.concat(data.tickets);
       if (data.next_page) {
-        this.countedAjax('getTickets', this.storage.user.id, data.next_page.match(/page=(\d+)/)[1]);
+        var pageNumber = data.next_page.match(/page=(\d+)/)[1];
+        this.countedAjax('getTickets', this.storage.user.id, pageNumber);
       }
       else {
         var grouped = _.groupBy(this.storage.tickets, 'status');
