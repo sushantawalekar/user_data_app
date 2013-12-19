@@ -429,7 +429,7 @@
     },
 
     onGetTicketsDone: function(data) {
-      this.storage.tickets = this.storage.tickets.concat(data.tickets);
+      this.storage.tickets.push.apply(this.storage.tickets, data.tickets);
       if (data.next_page) {
         var pageNumber = data.next_page.match(/page=(\d+)/)[1];
         this.countedAjax('getTickets', this.storage.user.id, pageNumber);
