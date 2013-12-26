@@ -376,7 +376,7 @@
         return ident;
       });
       this.storage.user.organization = data.organizations[0];
-      if (data.user.email) {
+      if (data.user.email || data.user.phone) {
         this.countedAjax('getTickets', this.storage.user.id);
       }
       if (data.user.organization) {
