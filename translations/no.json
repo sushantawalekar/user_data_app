@@ -1,47 +1,47 @@
 {
   "app": {
-    "description": "Displays information about the ticket requester and requesters organization.",
-    "name": "User Data App",
+    "description": "Viser informasjon om saksanmoderen og organisasjonen til anmoderen.",
+    "name": "App for brukerdata",
     "parameters": {
       "unfolded_on_startup": {
-        "label": "Apps tray opened by default"
+        "label": "Appeskuffen åpnes som standard"
       }
     }
   },
   "admin": {
-    "title": "User Data Admin panel",
-    "save": "Save and go back",
-    "text": "Please select the user fields you would like to permanently display on the App",
-    "include_org_fields": "Display organization information"
+    "title": "Administratorpanel for brukerdata",
+    "save": "Lagre og gå tilbake",
+    "text": "Velg brukerfeltene som du vil at alltid skal vises i appen",
+    "include_org_fields": "Vis informasjon om organisasjonen"
   },
   "info": {
-    "no_tags": "No tags",
-    "no_domain_names": "No domain names"
+    "no_tags": "Ingen tagger",
+    "no_domain_names": "Ingen domenenavn"
   },
-  "update_user_done": "User notes and details updated!",
-  "ajax_error": "An error occurred. Please try again later.",
-  "tickets": "Tickets",
-  "toggle_details_notes": "Toggle Details and Notes",
-  "toggle_organization": "Toggle organization",
-  "details_and_notes": "Details and Notes",
-  "details": "Details",
-  "notes": "Notes",
-  "locale": "User's language",
-  "tags": "Tags",
-  "organization": "Organization",
+  "update_user_done": "Merknader og detaljer om bruker er oppdatert!",
+  "ajax_error": "Det oppstod en feil. Prøv på nytt senere.",
+  "tickets": "Saker",
+  "toggle_details_notes": "Bytt mellom detaljer og merknader",
+  "toggle_organization": "Aktiver/deaktiver organisasjon",
+  "details_and_notes": "Detaljer og merknader",
+  "details": "Detaljer",
+  "notes": "Merknader",
+  "locale": "Brukerens språk",
+  "tags": "Tagger",
+  "organization": "Organisasjon",
   "ticket_status": {
     "new": "n",
-    "open": "o",
+    "open": "å",
     "pending": "p",
-    "hold": "h",
+    "hold": "t",
     "solved": "s",
-    "closed": "c"
+    "closed": "u"
   },
   "spoke-ticket": {
     "link": {
-      "pre": "This ticket is from the spoke account:"
+      "pre": "Denne saken er fra eike-kontoen:"
     }
   },
-  "account": "Account",
-  "spoke_ticket_id": "Spoke Ticket ID"
+  "account": "Konto",
+  "spoke_ticket_id": "ID for eikesak"
 }

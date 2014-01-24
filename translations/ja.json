@@ -1,7 +1,7 @@
 {
   "app": {
     "description": "チケットのリクエスタおよびリクエスタの組織についての情報を表示します。",
-    "name": "User Dataアプリ",
+    "name": "ユーザー情報アプリ",
     "parameters": {
       "unfolded_on_startup": {
         "label": "デフォルトで開いているアプリのトレイ"
@@ -9,7 +9,7 @@
     }
   },
   "admin": {
-    "title": "ユーザーデータ管理パネル",
+    "title": "ユーザー情報管理パネル",
     "save": "保存して戻る",
     "text": "アプリに継続的に表示するユーザーフィールドを選択します",
     "include_org_fields": "組織情報を表示"
