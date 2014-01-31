@@ -1,47 +1,135 @@
 {
   "app": {
-    "description": "Displays information about the ticket requester and requesters organization.",
-    "name": "User Data App",
+    "description": {
+      "title": "App description",
+      "value": "Displays information about the ticket requester and requesters organization."
+    },
+    "name": {
+      "title": "Name of the App",
+      "value": "User Data App"
+    },
     "parameters": {
       "unfolded_on_startup": {
-        "label": "Apps tray opened by default"
+        "label": {
+          "title": "Check box option in the settings to allow the admin to choose to open the apps tray automatically when the ticket loads",
+          "value": "Apps tray opened by default"
+        }
       }
-    }
+    },
+    "package": "user_data_app"
   },
   "admin": {
-    "title": "User Data Admin panel",
-    "save": "Save and go back",
-    "text": "Please select the user fields you would like to permanently display on the App",
-    "include_org_fields": "Display organization information"
+    "title": {
+      "title": "Header or the page showing the user settings in the App",
+      "value": "User Data Admin panel"
+    },
+    "save": {
+      "title": "Button at the bottom of the user data admin panel page to save and go back",
+      "value": "Save and go back"
+    },
+    "text": {
+      "title": "Help text for the admin",
+      "value": "Please select the user fields you would like to permanently display on the App"
+    },
+    "include_org_fields": {
+      "title": "Check box to display org fields",
+      "value": "Display organization information"
+    }
   },
   "info": {
-    "no_tags": "No tags",
-    "no_domain_names": "No domain names"
+    "no_tags": {
+      "title": "Placeholder when there are no tags",
+      "value": "No tags"
+    },
+    "no_domain_names": {
+      "title": "Placeholder when there are no domain names",
+      "value": "No domain names"
+    }
   },
-  "update_user_done": "User notes and details updated!",
-  "ajax_error": "An error occurred. Please try again later.",
-  "tickets": "Tickets",
-  "toggle_details_notes": "Toggle Details and Notes",
-  "toggle_organization": "Toggle organization",
-  "details_and_notes": "Details and Notes",
-  "details": "Details",
-  "notes": "Notes",
-  "tags": "Tags",
-  "locale": "User's language",
-  "organization": "Organization",
+  "update_user_done": {
+    "title": "Growl notification to advise the admin the notes and details have been udpated",
+    "value": "User notes and details updated!"
+  },
+  "ajax_error": {
+    "title": "Error message notification",
+    "value": "An error occurred. Please try again later."
+  },
+  "tickets": {
+    "title": "Number of tickets for this user after this it will always be a number like 12 or 3",
+    "value": "Tickets"
+  },
+  "toggle_details_notes": {
+    "title": "Link to toggle open / close the details and notes box",
+    "value": "Toggle Details and Notes"
+  },
+  "toggle_organization": {
+    "title": "Link to toggle open / close the organization box",
+    "value": "Toggle organization"
+  },
+  "details_and_notes": {
+    "title": "Header/title for the details and notes box",
+    "value": "Details and Notes"
+  },
+  "details": {
+    "title": "Details box after this will be an editable text box",
+    "value": "Details"
+  },
+  "notes": {
+    "title": "Notes box after this will be an editable text box",
+    "value": "Notes"
+  },
+  "locale": {
+    "title": "language of this user",
+    "value": "User's language"
+  },
+  "tags": {
+    "title": "List of the tags of this user",
+    "value": "Tags"
+  },
+  "organization": {
+    "title": "Name of this user organization",
+    "value": "Organization"
+  },
   "ticket_status": {
-    "new": "n",
-    "open": "o",
-    "pending": "p",
-    "hold": "h",
-    "solved": "s",
-    "closed": "c"
+    "new": {
+      "title": "first letter of status new",
+      "value": "n"
+    },
+    "open": {
+      "title": "first letter of status open",
+      "value": "o"
+    },
+    "pending": {
+      "title": "first letter of status pending",
+      "value": "p"
+    },
+    "hold": {
+      "title": "first letter of status hold (on hold)",
+      "value": "h"
+    },
+    "solved": {
+      "title": "first letter of status solved",
+      "value": "s"
+    },
+    "closed": {
+      "title": "first letter of status closed",
+      "value": "c"
+    }
   },
   "spoke-ticket": {
     "link": {
-      "pre": "This ticket is from the spoke account:"
+      "pre": {
+        "title": "this is text displayed in the app to say which account does the ticket come from, it will say for instance this ticket is from the spoke account COMPANY. The only variable here is the word Company, the word spoke is added as a string after",
+        "value": "This ticket is from the spoke account:"
+      }
     }
   },
-  "account": "Account",
-  "spoke_ticket_id": "Spoke Ticket ID"
+  "account": {
+    "title": "This is the account from this user",
+    "value": "Account"
+  },
+  "spoke_ticket_id": {
+    "title": "this is the ticket ID from the spoke of that user",
+    "value": "Spoke Ticket ID"
+  }
 }
