@@ -175,7 +175,7 @@
     },
 
     fieldsForCurrentOrg: function() {
-      if (!this.storage.user.organization) {
+      if (!this.storage.user || !this.storage.user.organization) {
         return {};
       }
       return this.fieldsForCurrent(this.storage.user.organization,
@@ -210,8 +210,8 @@
         tickets: this.makeTicketsLinks(this.storage.ticketsCounters),
         fields: this.fieldsForCurrentUser(),
         orgFields: this.fieldsForCurrentOrg(),
-        orgFieldsActivated: this.storage.orgFieldsActivated && this.storage.user.organization,
-        org: this.storage.user.organization,
+        orgFieldsActivated: this.storage.user && this.storage.orgFieldsActivated && this.storage.user.organization,
+        org: this.storage.user && this.storage.user.organization,
         orgTickets: this.makeTicketsLinks(this.storage.orgTicketsCounters)
       });
       if (this.storage.spokeData) {
