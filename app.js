@@ -274,6 +274,7 @@
     },
 
     onRequestsFinished: function() {
+      if (!this.storage.user) return;
       var ticketsCounters = this.storage.ticketsCounters;
       _.each(['new', 'open', 'hold', 'pending', 'solved', 'closed'], function(key) {
         if (!ticketsCounters[key]) {
