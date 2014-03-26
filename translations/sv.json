@@ -1,47 +1,47 @@
 {
   "app": {
-    "description": "Displays information about the ticket requester and requesters organization.",
-    "name": "User Data App",
+    "description": "Visar information om ärendefrågeställaren och dennes organisation.",
+    "name": "Användaruppgifter",
     "parameters": {
       "unfolded_on_startup": {
-        "label": "Apps tray opened by default"
+        "label": "Appfältet öppnas som standard"
       }
     }
   },
   "admin": {
-    "title": "User Data Admin panel",
-    "save": "Save and go back",
-    "text": "Please select the user fields you would like to permanently display on the App",
-    "include_org_fields": "Display organization information"
+    "title": "Admin-panel för användaruppgifter",
+    "save": "Spara och gå tillbaka",
+    "text": "Välj de användarfält som du vill visa permanent i appen",
+    "include_org_fields": "Visa organisationsinformation"
   },
   "info": {
-    "no_tags": "No tags",
-    "no_domain_names": "No domain names"
+    "no_tags": "Inga taggar",
+    "no_domain_names": "Inget domännamn"
   },
-  "update_user_done": "User notes and details updated!",
-  "ajax_error": "An error occurred. Please try again later.",
-  "tickets": "Tickets",
-  "toggle_details_notes": "Toggle Details and Notes",
-  "toggle_organization": "Toggle organization",
-  "details_and_notes": "Details and Notes",
-  "details": "Details",
-  "notes": "Notes",
-  "locale": "User's language",
-  "tags": "Tags",
-  "organization": "Organization",
+  "update_user_done": "Användaranteckningar och -uppgifter uppdaterade.",
+  "ajax_error": "Ett fel inträffade. Försök igen senare.",
+  "tickets": "Ärenden",
+  "toggle_details_notes": "Visa/dölj detaljer och anteckningar",
+  "toggle_organization": "Visa/dölj organisation",
+  "details_and_notes": "Detaljer och anteckningar",
+  "details": "Detaljer",
+  "notes": "Anteckningar",
+  "locale": "Användarens språk",
+  "tags": "Taggar",
+  "organization": "Organisation",
   "ticket_status": {
     "new": "n",
-    "open": "o",
-    "pending": "p",
-    "hold": "h",
-    "solved": "s",
-    "closed": "c"
+    "open": "ö",
+    "pending": "v",
+    "hold": "p",
+    "solved": "l",
+    "closed": "s"
   },
   "spoke-ticket": {
     "link": {
-      "pre": "This ticket is from the spoke account:"
+      "pre": "Detta ärende kommer från satellitkontot:"
     }
   },
-  "account": "Account",
-  "spoke_ticket_id": "Spoke Ticket ID"
+  "account": "Konto",
+  "spoke_ticket_id": "Satellitärende-ID"
 }

@@ -1,34 +1,34 @@
 {
   "app": {
-    "description": "Displays information about the ticket requester and requesters organization.",
-    "name": "User Data App",
+    "description": "Kaydı talep eden kişi ve o kişinin kurumu hakkında bilgileri görüntüler.",
+    "name": "Kullanıcı Verileri Uygulaması",
     "parameters": {
       "unfolded_on_startup": {
-        "label": "Apps tray opened by default"
+        "label": "Varsayılan olarak açılan Uygulamalar tepsisi"
       }
     }
   },
   "admin": {
-    "title": "User Data Admin panel",
-    "save": "Save and go back",
-    "text": "Please select the user fields you would like to permanently display on the App",
-    "include_org_fields": "Display organization information"
+    "title": "Kullanıcı Verileri Yönetici paneli",
+    "save": "Kaydet ve geri git",
+    "text": "Lütfen uygulamada kalıcı olarak görüntülemek istediğiniz kullanıcı alanlarını seçin.",
+    "include_org_fields": "Kurum bilgilerini görüntüle"
   },
   "info": {
-    "no_tags": "No tags",
-    "no_domain_names": "No domain names"
+    "no_tags": "Etiket yok",
+    "no_domain_names": "Etki alanı adı yok"
   },
-  "update_user_done": "User notes and details updated!",
-  "ajax_error": "An error occurred. Please try again later.",
-  "tickets": "Tickets",
-  "toggle_details_notes": "Toggle Details and Notes",
-  "toggle_organization": "Toggle organization",
-  "details_and_notes": "Details and Notes",
-  "details": "Details",
-  "notes": "Notes",
-  "locale": "User's language",
-  "tags": "Tags",
-  "organization": "Organization",
+  "update_user_done": "Kullanıcı notları ve detayları güncellendi!",
+  "ajax_error": "Bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
+  "tickets": "Kayıtlar",
+  "toggle_details_notes": "Detayları ve Notları Değiştir",
+  "toggle_organization": "Kurumu değiştir",
+  "details_and_notes": "Detaylar ve Notlar",
+  "details": "Detaylar",
+  "notes": "Notlar",
+  "locale": "Kullanıcının dili",
+  "tags": "Etiketler",
+  "organization": "Kurum",
   "ticket_status": {
     "new": "n",
     "open": "o",
@@ -39,9 +39,9 @@
   },
   "spoke-ticket": {
     "link": {
-      "pre": "This ticket is from the spoke account:"
+      "pre": "Bu kayıt bağlı bileşen hesabındandır:"
     }
   },
-  "account": "Account",
-  "spoke_ticket_id": "Spoke Ticket ID"
+  "account": "Hesap",
+  "spoke_ticket_id": "Bağlı Bileşen Kayıt Kimliği"
 }

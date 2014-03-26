@@ -34,7 +34,7 @@
     "open": "a",
     "pending": "p",
     "hold": "e",
-    "solved": "s",
+    "solved": "r",
     "closed": "c"
   },
   "spoke-ticket": {
