@@ -3,7 +3,6 @@ title: "Zendesk User Data"
 packages:
   - default
   - app_user_data_app
-  - classic
 
 parts:
   - translation:
