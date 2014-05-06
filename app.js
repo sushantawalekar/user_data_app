@@ -271,7 +271,7 @@
           this.switchTo('empty');
         }
       }).bind(this));
-    }, 1000, {leading: false}),
+    }, 300, {leading: false}),
 
     onRequestsFinished: function() {
       if (!this.storage.user) return;
