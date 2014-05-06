@@ -240,7 +240,7 @@
 
     // EVENTS ==================================================================
 
-    onAppActivation: function() {
+    onAppActivation: _.throttle(function() {
       var defaultStorage = {
         user: null,
         ticketsCounters: {},
@@ -271,7 +271,7 @@
           this.switchTo('empty');
         }
       }).bind(this));
-    },
+    }, 1000, {leading: false}),
 
     onRequestsFinished: function() {
       if (!this.storage.user) return;
