@@ -125,12 +125,8 @@
     },
 
     countedAjax: function() {
-      var request = this.ajax.apply(this, arguments);
       this.storage.requestsCount++;
-      this.storage.outstandingRequests.push(request);
-      return request.always((function() {
-        var index = this.storage.outstandingRequests.indexOf(request);
-        this.storage.outstandingRequests.splice(index, 1);
+      return this.ajax.apply(this, arguments).always((function() {
         _.defer((this.finishedAjax).bind(this));
       }).bind(this));
     },
@@ -138,15 +134,6 @@
     finishedAjax: function() {
       if (--this.storage.requestsCount === 0) {
         this.trigger('requestsFinished');
-      }
-    },
-
-    cancelOutstandingRequests: function () {
-      if (this.storage && this.storage.outstandingRequests) {
-        this.storage.outstandingRequests.forEach(function(ajax) {
-          ajax.abort();
-        });
-        this.storage.outstandingRequests = [];
       }
     },
 
@@ -254,7 +241,6 @@
     // EVENTS ==================================================================
 
     onAppActivation: function() {
-      this.cancelOutstandingRequests();
       var defaultStorage = {
         user: null,
         ticketsCounters: {},
@@ -263,8 +249,7 @@
         fields: [],
         selectedKeys: [],
         orgFieldsActivated: false,
-        tickets: [],
-        outstandingRequests: []
+        tickets: []
       };
       this.storage = _.clone(defaultStorage); // not sure the clone is needed here
       this.storage.orgFieldsActivated = (this.setting('orgFieldsActivated') == 'true');
