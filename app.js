@@ -240,6 +240,7 @@
 
     // EVENTS ==================================================================
 
+    // we use throttle because of race conditions when this fires twice in quick succession
     onAppActivation: _.throttle(function() {
       var defaultStorage = {
         user: null,
