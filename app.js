@@ -417,7 +417,7 @@
     },
 
     spokeData: function(event){
-      var data = /spoke_id_(.*)\nspoke_account_(.*)\nrequester_email_(.*)\nrequester_phone_(.*)/.exec(event.body);
+      var data = /spoke_id_(.*) *\n *spoke_account_(.*) *\n *requester_email_(.*) *\n *requester_phone_(.*)/.exec(event.body);
 
       if (_.isEmpty(data))
         return false;
