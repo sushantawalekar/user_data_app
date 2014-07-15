@@ -117,8 +117,6 @@
   }
 
   .card {
-    padding: 0px;
-    font-family: "Lucida Grande", serif;
 
     &.org {
       border-top: 1px solid #f0f0f0;
@@ -243,12 +241,18 @@
         }
 
         .ticket_status_label {
-          font-size: 11px;
+          font-size: 9px;
+          line-height: 13px;
           padding: 0;
           padding-left: 4px;
           padding-right: 4px;
           height: 4px;
           display: inline-block;
+          vertical-align: middle;
+          box-sizing: border-box;
+          white-space: nowrap;
+          text-align: center;
+          opacity: 0.6;
         }
       }
     }
