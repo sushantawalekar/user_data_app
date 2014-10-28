@@ -11,9 +11,9 @@
       'getUserFields.done': 'onGetUserFieldsDone',
       'getOrganizationFields.done': 'onGetOrganizationFieldsDone',
       'getTickets.done': 'onGetTicketsDone',
-      'getOrgTickets.done': 'onGetOrgTicketsDone',
+      'getOrganizationTickets.done': 'onGetOrgTicketsDone',
       'updateUser.done': 'onUpdateUserDone',
-      'fetchTicketAudits.done': 'fetchTicketAuditsDone',
+      'getTicketAudits.done': 'getTicketAuditsDone',
       'getCurrentUserLocale.done': 'onGetCurrentUserLocaleDone',
 
       // UI
@@ -37,28 +37,21 @@
         url: '/api/v2/locales.json'
       },
 
-      getUser: function(id) {
-        return {
-          url: helpers.fmt('/api/v2/users/%@.json?include=identities,organizations', id),
-          dataType: 'json'
-        };
-      },
-
-      updateUser: function(data) {
-        return {
-          url: helpers.fmt('/api/v2/users/%@.json', this.ticket().requester().id()),
-          type: 'PUT',
-          dataType: 'json',
-          data: { user: data }
-        };
-      },
-
-      getUserFields: {
-        url: '/api/v2/user_fields.json'
-      },
-
       getOrganizationFields: {
         url: '/api/v2/organization_fields.json'
+      },
+
+      getOrganizationTickets: function(orgId) {
+        return {
+          url: helpers.fmt('/api/v2/organizations/%@/tickets.json', orgId)
+        };
+      },
+
+      getTicketAudits: function(id){
+        return {
+          url: helpers.fmt('/api/v2/tickets/%@/audits.json', id),
+          dataType: 'json'
+        };
       },
 
       getTickets: function(userId, page) {
@@ -68,10 +61,15 @@
         };
       },
 
-      getOrgTickets: function(orgId) {
+      getUser: function(id) {
         return {
-          url: helpers.fmt('/api/v2/organizations/%@/tickets.json', orgId)
+          url: helpers.fmt('/api/v2/users/%@.json?include=identities,organizations', id),
+          dataType: 'json'
         };
+      },
+
+      getUserFields: {
+        url: '/api/v2/user_fields.json'
       },
 
       saveSelectedFields: function(keys, orgKeys) {
@@ -93,10 +91,12 @@
         };
       },
 
-      fetchTicketAudits: function(id){
+      updateUser: function(data) {
         return {
-          url: helpers.fmt('/api/v2/tickets/%@/audits.json', id),
-          dataType: 'json'
+          url: helpers.fmt('/api/v2/users/%@.json', this.ticket().requester().id()),
+          type: 'PUT',
+          dataType: 'json',
+          data: { user: data }
         };
       }
     },
@@ -382,15 +382,15 @@
         this.countedAjax('getTickets', this.storage.user.id);
       }
       if (data.user.organization) {
-        this.countedAjax('getOrgTickets', data.user.organization.id);
+        this.countedAjax('getOrganizationTickets', data.user.organization.id);
       }
 
       if (this.ticket().id()) {
-        this.ajax('fetchTicketAudits', this.ticket().id());
+        this.ajax('getTicketAudits', this.ticket().id());
       }
     },
 
-    fetchTicketAuditsDone: function(data){
+    getTicketAuditsDone: function(data){
       _.each(data.audits, function(audit){
         _.each(audit.events, function(e){
           if (this.auditEventIsSpoke(e)){
