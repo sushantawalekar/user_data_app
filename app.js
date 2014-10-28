@@ -29,22 +29,22 @@
     },
 
     requests: {
-      'getCurrentUserLocale': {
+      getCurrentUserLocale: {
         url: '/api/v2/users/me.json'
       },
 
-      'getLocales': {
+      getLocales: {
         url: "/api/v2/locales.json"
       },
 
-      'getUser': function(id) {
+      getUser: function(id) {
         return {
           url: helpers.fmt("/api/v2/users/%@.json?include=identities,organizations", id),
           dataType: 'json'
         };
       },
 
-      'updateUser': function(data) {
+      updateUser: function(data) {
         return {
           url: helpers.fmt("/api/v2/users/%@.json", this.ticket().requester().id()),
           type: 'PUT',
@@ -53,28 +53,28 @@
         };
       },
 
-      'getUserFields': {
+      getUserFields: {
         url: '/api/v2/user_fields.json'
       },
 
-      'getOrganizationFields': {
+      getOrganizationFields: {
         url: '/api/v2/organization_fields.json'
       },
 
-      'getTickets': function(userId, page) {
+      getTickets: function(userId, page) {
         page = page || 1;
         return {
           url: helpers.fmt("/api/v2/users/%@/tickets/requested.json?page=%@", userId, page)
         };
       },
 
-      'getOrgTickets': function(orgId) {
+      getOrgTickets: function(orgId) {
         return {
           url: helpers.fmt("/api/v2/organizations/%@/tickets.json", orgId)
         };
       },
 
-      'saveSelectedFields': function(keys, orgKeys) {
+      saveSelectedFields: function(keys, orgKeys) {
         var appId = this.installationId();
         var settings = {
           'selectedFields': JSON.stringify(_.toArray(keys)),
