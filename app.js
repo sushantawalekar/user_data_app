@@ -329,7 +329,6 @@
       this.$('.save').hide();
       this.$('.waitSpin').show();
       this.ajax('saveSelectedFields', keys, orgKeys)
-        //.always(this.onBackClick.bind(this))
         .always(this.onAppActivation.bind(this));
     },
 
