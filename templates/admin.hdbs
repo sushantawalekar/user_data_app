@@ -14,7 +14,7 @@
 {{#if orgFields.length }}
   <div class="org-fields">
     <label class="checkbox">
-      <input type="checkbox" class="activateOrgFields" {{#if orgFieldsActivated}}checked{{/if}}>
+      <input type="checkbox" class="org-fields-activate" {{#if orgFieldsActivated}}checked{{/if}}>
       {{t "admin.include_org_fields"}}
     </label>
 
@@ -32,4 +32,4 @@
 {{/if}}
 
 <button class="btn save">{{t "admin.save"}}</button>
-<div class="waitSpin hide">{{spinner}}</div>
+<div class="wait-spin hide">{{spinner}}</div>

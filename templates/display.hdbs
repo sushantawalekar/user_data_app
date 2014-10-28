@@ -65,13 +65,13 @@
     </div>
   </div>
 
-  <div class="moreInfo hide" data-additional-type="user">
+  <div class="more-info hide" data-additional-type="user">
     <div class="additional">
       {{#each fields}}
         <div class="field {{simpleKey}}" key="{{key}}">
           <h4>{{title}}</h4>
           {{#if editable}}
-            <textarea class="notes_or_details">{{value}}</textarea>
+            <textarea class="notes-or-details">{{value}}</textarea>
           {{else}}
             <p>{{#if html}}{{{value}}}{{else}}{{value}}{{/if}}</p>
           {{/if}}
@@ -130,7 +130,7 @@
           <div class="field {{simpleKey}}" key="{{key}}">
             <h4>{{title}}</h4>
             {{#if editable}}
-              <textarea class="notes_or_details">{{value}}</textarea>
+              <textarea class="notes-or-details">{{value}}</textarea>
             {{else}}
               <p>{{#if html}}{{{value}}}{{else}}{{value}}{{/if}}</p>
             {{/if}}
@@ -141,5 +141,5 @@
     <!-- end org -->
   </div>
 
-  <a class="expandBar"><i class="arrow arrow-down"/></a>
+  <a class="expand-bar"><i class="arrow arrow-down"/></a>
 </div>

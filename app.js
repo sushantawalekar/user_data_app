@@ -17,12 +17,12 @@
       'getCurrentUserLocale.done': 'onGetCurrentUserLocaleDone',
 
       // UI
-      'click .expandBar': 'onClickExpandBar',
+      'click .expand-bar': 'onClickExpandBar',
       'click .cog': 'onCogClick',
       'click .back': 'onBackClick',
       'click .save': 'onSaveClick',
-      'change .activateOrgFields': 'onActivateOrgFieldsChange',
-      'change,keyup,input,paste .notes_or_details': 'onNotesOrDetailsChanged',
+      'change .org-fields-activate': 'onActivateOrgFieldsChange',
+      'change,keyup,input,paste .notes-or-details': 'onNotesOrDetailsChanged',
 
       // Misc
       'requestsFinished': 'onRequestsFinished'
@@ -292,8 +292,8 @@
     },
 
     onClickExpandBar: function(event, immediate) {
-      var additional = this.$('.moreInfo');
-      var expandBar = this.$('.expandBar i');
+      var additional = this.$('.more-info');
+      var expandBar = this.$('.expand-bar i');
       expandBar.attr('class', 'arrow');
       var visible = additional.is(':visible');
       if (immediate) {
@@ -327,7 +327,7 @@
       var orgKeys = this.$('.org-fields-list input:checked').map(function() { return that.$(this).val(); });
       this.$('input, button').prop('disabled', true);
       this.$('.save').hide();
-      this.$('.waitSpin').show();
+      this.$('.wait-spin').show();
       this.ajax('saveSelectedFields', keys, orgKeys)
         .always(this.onAppActivation.bind(this));
     },
