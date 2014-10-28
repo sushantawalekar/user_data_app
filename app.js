@@ -34,19 +34,19 @@
       },
 
       getLocales: {
-        url: "/api/v2/locales.json"
+        url: '/api/v2/locales.json'
       },
 
       getUser: function(id) {
         return {
-          url: helpers.fmt("/api/v2/users/%@.json?include=identities,organizations", id),
+          url: helpers.fmt('/api/v2/users/%@.json?include=identities,organizations', id),
           dataType: 'json'
         };
       },
 
       updateUser: function(data) {
         return {
-          url: helpers.fmt("/api/v2/users/%@.json", this.ticket().requester().id()),
+          url: helpers.fmt('/api/v2/users/%@.json', this.ticket().requester().id()),
           type: 'PUT',
           dataType: 'json',
           data: { user: data }
@@ -64,13 +64,13 @@
       getTickets: function(userId, page) {
         page = page || 1;
         return {
-          url: helpers.fmt("/api/v2/users/%@/tickets/requested.json?page=%@", userId, page)
+          url: helpers.fmt('/api/v2/users/%@/tickets/requested.json?page=%@', userId, page)
         };
       },
 
       getOrgTickets: function(orgId) {
         return {
-          url: helpers.fmt("/api/v2/organizations/%@/tickets.json", orgId)
+          url: helpers.fmt('/api/v2/organizations/%@/tickets.json', orgId)
         };
       },
 
@@ -84,7 +84,7 @@
         this.settings = _.extend(this.settings, settings);
         return {
           type: 'PUT',
-          url: helpers.fmt("/api/v2/apps/installations/%@.json", appId),
+          url: helpers.fmt('/api/v2/apps/installations/%@.json', appId),
           dataType: 'json',
           data: {
             'settings': settings,
@@ -154,7 +154,7 @@
         if (key.indexOf('##builtin') === 0) {
           var subkey = key.split('_')[1];
           result.value = target[subkey];
-          result.simpleKey = ["builtin", subkey].join(' ');
+          result.simpleKey = ['builtin', subkey].join(' ');
           if (subkey === 'tags') {
             result.value = this.renderTemplate('tags', {tags: result.value});
             result.html = true;
@@ -164,10 +164,10 @@
           }
         }
         else {
-          result.simpleKey = ["custom", key].join(' ');
+          result.simpleKey = ['custom', key].join(' ');
           result.value = values[key];
           if (field.type === 'date') {
-            result.value = (result.value ? this.toLocaleDate(result.value) : "");
+            result.value = (result.value ? this.toLocaleDate(result.value) : '');
           }
         }
         return result;
@@ -196,9 +196,9 @@
 
     toLocaleDate: function(date) {
       return new Date(date).toLocaleString(this.locale, {
-        year: "numeric",
-        month: "numeric",
-        day: "numeric"
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric'
       });
     },
 
@@ -224,10 +224,10 @@
 
     makeTicketsLinks: function(counters) {
       var links = {};
-      var link = "#/tickets/%@/requester/tickets".fmt(this.ticket().id());
+      var link = '#/tickets/%@/requester/tickets'.fmt(this.ticket().id());
       var tag = this.$('<div>').append(this.$('<a>').attr('href', link));
       _.each(counters, function(value, key) {
-        if (value && value !== "-") {
+        if (value && value !== '-') {
           tag.find('a').html(value);
           links[key] = tag.html();
         }
@@ -353,7 +353,7 @@
     },
 
     onUpdateUserDone: function() {
-      services.notify(this.I18n.t("update_user_done"));
+      services.notify(this.I18n.t('update_user_done'));
     },
 
     onGetLocalesDone: function(data) {
@@ -371,9 +371,9 @@
       });
       this.storage.user.identities = _.map(social, function(ident) {
         if (ident.type === 'twitter') {
-          ident.value = helpers.fmt("https://twitter.com/%@", ident.value);
+          ident.value = helpers.fmt('https://twitter.com/%@', ident.value);
         } else if (ident.type === 'facebook') {
-          ident.value = helpers.fmt("https://facebook.com/%@", ident.value);
+          ident.value = helpers.fmt('https://facebook.com/%@', ident.value);
         }
         return ident;
       });
@@ -412,7 +412,7 @@
     },
 
     auditEventIsSpoke: function(event){
-      return event.type === "Comment" &&
+      return event.type === 'Comment' &&
         /spoke_id_/.test(event.body);
     },
 
@@ -457,24 +457,24 @@
       var selectedFields = this.storage.selectedOrgKeys;
       var fields = [
         {
-          key: "##builtin_tags",
-          title: this.I18n.t("tags"),
-          description: "",
+          key: '##builtin_tags',
+          title: this.I18n.t('tags'),
+          description: '',
           position: 0,
           active: true
         },
         {
-          key: "##builtin_notes",
-          title: this.I18n.t("notes"),
-          description: "",
+          key: '##builtin_notes',
+          title: this.I18n.t('notes'),
+          description: '',
           position: Number.MAX_VALUE - 1,
           active: true,
           editable: true
         },
         {
-          key: "##builtin_details",
-          title: this.I18n.t("details"),
-          description: "",
+          key: '##builtin_details',
+          title: this.I18n.t('details'),
+          description: '',
           position: Number.MAXVALUE,
           active: true,
           editable: true
@@ -501,31 +501,31 @@
       var selectedFields = this.storage.selectedKeys;
       var fields = [
         {
-          key: "##builtin_tags",
-          title: this.I18n.t("tags"),
-          description: "",
+          key: '##builtin_tags',
+          title: this.I18n.t('tags'),
+          description: '',
           position: 0,
           active: true
         },
         {
-          key: "##builtin_locale",
-          title: this.I18n.t("locale"),
-          description: "",
+          key: '##builtin_locale',
+          title: this.I18n.t('locale'),
+          description: '',
           position: 1,
           active: true
         },
         {
-          key: "##builtin_notes",
-          title: this.I18n.t("notes"),
-          description: "",
+          key: '##builtin_notes',
+          title: this.I18n.t('notes'),
+          description: '',
           position: Number.MAX_VALUE - 1,
           active: true,
           editable: true
         },
         {
-          key: "##builtin_details",
-          title: this.I18n.t("details"),
-          description: "",
+          key: '##builtin_details',
+          title: this.I18n.t('details'),
+          description: '',
           position: Number.MAXVALUE,
           active: true,
           editable: true
