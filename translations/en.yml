@@ -42,8 +42,12 @@ parts:
       title: "Placeholder when there are no domain names"
       value: "No domain names"
   - translation:
+      key: "txt.apps.user_data_app.update_organization_done"
+      title: "Growl notification to advise the admin the notes and details have been updated"
+      value: "Organization notes and details updated."
+  - translation:
       key: "txt.apps.user_data_app.update_user_done"
-      title: "Growl notification to advise the admin the notes and details have been udpated"
+      title: "Growl notification to advise the admin the notes and details have been updated"
       value: "User notes and details updated."
   - translation:
       key: "txt.apps.user_data_app.ajax_error"
