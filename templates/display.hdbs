@@ -127,7 +127,7 @@
 
       <div class="additional">
         {{#each orgFields}}
-          <div class="field {{simpleKey}}" key="{{key}}">
+          <div class="field {{simpleKey}}" key="{{key}}" data-editable="{{editable}}">
             <h4>{{title}}</h4>
             {{#if editable}}
               <textarea class="notes-or-details" data-field-name="{{name}}" data-field-type="organizations">{{value}}</textarea>
