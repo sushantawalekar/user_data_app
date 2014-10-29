@@ -65,13 +65,13 @@
     </div>
   </div>
 
-  <div class="more-info hide" data-additional-type="user">
+  <div class="more-info hide">
     <div class="additional">
       {{#each fields}}
-        <div class="field {{simpleKey}}" key="{{key}}">
+        <div class="field {{simpleKey}}" key="{{key}}" data-editable="{{editable}}">
           <h4>{{title}}</h4>
           {{#if editable}}
-            <textarea class="notes-or-details">{{value}}</textarea>
+            <textarea class="notes-or-details" data-field-name="{{name}}" data-field-type="users">{{value}}</textarea>
           {{else}}
             <p>{{#if html}}{{{value}}}{{else}}{{value}}{{/if}}</p>
           {{/if}}
@@ -125,12 +125,12 @@
         </div>
       </div>
 
-      <div class="additional" data-additional-type="organization">
+      <div class="additional">
         {{#each orgFields}}
           <div class="field {{simpleKey}}" key="{{key}}">
             <h4>{{title}}</h4>
             {{#if editable}}
-              <textarea class="notes-or-details">{{value}}</textarea>
+              <textarea class="notes-or-details" data-field-name="{{name}}" data-field-type="organizations">{{value}}</textarea>
             {{else}}
               <p>{{#if html}}{{{value}}}{{else}}{{value}}{{/if}}</p>
             {{/if}}

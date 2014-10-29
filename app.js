@@ -12,7 +12,7 @@
       'getOrganizationFields.done': 'onGetOrganizationFieldsDone',
       'getTickets.done': 'onGetTicketsDone',
       'getOrganizationTickets.done': 'onGetOrgTicketsDone',
-      'updateUser.done': 'onUpdateUserDone',
+      'updateNotesOrDetails.done': 'onUpdateUserDone',
       'getTicketAudits.done': 'getTicketAuditsDone',
       'getCurrentUserLocale.done': 'onGetCurrentUserLocaleDone',
 
@@ -91,12 +91,12 @@
         };
       },
 
-      updateUser: function(data) {
+      updateNotesOrDetails: function(type, id, data) {
         return {
-          url: helpers.fmt('/api/v2/users/%@.json', this.ticket().requester().id()),
+          url: helpers.fmt('/api/v2/%@/%@.json', type, id),
           type: 'PUT',
           dataType: 'json',
-          data: { user: data }
+          data: data
         };
       }
     },
@@ -153,6 +153,7 @@
         };
         if (key.indexOf('##builtin') === 0) {
           var subkey = key.split('_')[1];
+          result.name = subkey;
           result.value = target[subkey];
           result.simpleKey = ['builtin', subkey].join(' ');
           if (subkey === 'tags') {
@@ -332,11 +333,25 @@
         .always(this.onAppActivation.bind(this));
     },
 
-    onNotesOrDetailsChanged: _.debounce(function() {
-      this.ajax('updateUser', {
-        notes: this.$('div.builtin.notes textarea').val(),
-        details: this.$('div.builtin.details textarea').val()
-      });
+    onNotesOrDetailsChanged: _.debounce(function(e) {
+      var $textarea    = this.$(e.currentTarget),
+          $textareas   = $textarea.parent().siblings('[data-editable=true]').andSelf().find('textarea'),
+          type         = $textarea.data('fieldType'),
+          typeSingular = type.slice(0, -1),
+          data         = {},
+          id           = type === 'organizations' ? this.storage.organization.id : this.ticket().requester().id();
+
+      // Build the data object, with the valid resource name and data
+      data[typeSingular] = {};
+      $textareas.each(function(index, element) {
+        var $element  = this.$(element),
+            fieldName = $element.data('fieldName');
+
+        data[typeSingular][fieldName] = $element.val();
+      }.bind(this));
+
+      // Execute request
+      this.ajax('updateNotesOrDetails', type, id, data);
     }, 1000),
 
     onActivateOrgFieldsChange: function(event) {
@@ -381,7 +396,10 @@
         this.countedAjax('getTickets', this.storage.user.id);
       }
       if (data.user.organization) {
-        this.countedAjax('getOrganizationTickets', data.user.organization.id);
+        this.storage.organization = {
+          id: data.user.organization.id
+        };
+        this.countedAjax('getOrganizationTickets', this.storage.organization.id);
       }
 
       if (this.ticket().id()) {
