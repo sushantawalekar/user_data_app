@@ -11,8 +11,8 @@
       'getUserFields.done': 'onGetUserFieldsDone',
       'getOrganizationFields.done': 'onGetOrganizationFieldsDone',
       'getTickets.done': 'onGetTicketsDone',
-      'getOrganizationTickets.done': 'onGetOrgTicketsDone',
-      'updateNotesOrDetails.done': 'onUpdateUserDone',
+      'getOrganizationTickets.done': 'onGetOrganizationTicketsDone',
+      'updateNotesOrDetails.done': 'onUpdateNotesOrDetailsDone',
       'getTicketAudits.done': 'getTicketAuditsDone',
       'getCurrentUserLocale.done': 'onGetCurrentUserLocaleDone',
 
@@ -366,7 +366,7 @@
       this.locale = data.user.locale;
     },
 
-    onUpdateUserDone: function() {
+    onUpdateNotesOrDetailsDone: function() {
       services.notify(this.I18n.t('update_user_done'));
     },
 
@@ -462,7 +462,7 @@
       }
     },
 
-    onGetOrgTicketsDone: function(data) {
+    onGetOrganizationTicketsDone: function(data) {
       var grouped = _.groupBy(data.tickets, 'status');
       var res = this.toObject(_.map(grouped, function(value, key) {
         return [key, value.length];
