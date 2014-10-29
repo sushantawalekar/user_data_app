@@ -11,70 +11,67 @@
       'getUserFields.done': 'onGetUserFieldsDone',
       'getOrganizationFields.done': 'onGetOrganizationFieldsDone',
       'getTickets.done': 'onGetTicketsDone',
-      'getOrgTickets.done': 'onGetOrgTicketsDone',
-      'updateUser.done': 'onUpdateUserDone',
-      'fetchTicketAudits.done': 'fetchTicketAuditsDone',
+      'getOrganizationTickets.done': 'onGetOrganizationTicketsDone',
+      'getTicketAudits.done': 'getTicketAuditsDone',
       'getCurrentUserLocale.done': 'onGetCurrentUserLocaleDone',
 
       // UI
-      'click .expandBar': 'onClickExpandBar',
+      'click .expand-bar': 'onClickExpandBar',
       'click .cog': 'onCogClick',
       'click .back': 'onBackClick',
       'click .save': 'onSaveClick',
-      'change .activateOrgFields': 'onActivateOrgFieldsChange',
-      'change,keyup,input,paste .notes_or_details': 'onNotesOrDetailsChanged',
+      'change .org-fields-activate': 'onActivateOrgFieldsChange',
+      'change,keyup,input,paste .notes-or-details': 'onNotesOrDetailsChanged',
 
       // Misc
       'requestsFinished': 'onRequestsFinished'
     },
 
     requests: {
-      'getCurrentUserLocale': {
+      getCurrentUserLocale: {
         url: '/api/v2/users/me.json'
       },
 
-      'getLocales': {
-        url: "/api/v2/locales.json"
+      getLocales: {
+        url: '/api/v2/locales.json'
       },
 
-      'getUser': function(id) {
+      getOrganizationFields: {
+        url: '/api/v2/organization_fields.json'
+      },
+
+      getOrganizationTickets: function(orgId) {
         return {
-          url: helpers.fmt("/api/v2/users/%@.json?include=identities,organizations", id),
+          url: helpers.fmt('/api/v2/organizations/%@/tickets.json', orgId)
+        };
+      },
+
+      getTicketAudits: function(id){
+        return {
+          url: helpers.fmt('/api/v2/tickets/%@/audits.json', id),
           dataType: 'json'
         };
       },
 
-      'updateUser': function(data) {
+      getTickets: function(userId, page) {
+        page = page || 1;
         return {
-          url: helpers.fmt("/api/v2/users/%@.json", this.ticket().requester().id()),
-          type: 'PUT',
-          dataType: 'json',
-          data: { user: data }
+          url: helpers.fmt('/api/v2/users/%@/tickets/requested.json?page=%@', userId, page)
         };
       },
 
-      'getUserFields': {
+      getUser: function(userId) {
+        return {
+          url: helpers.fmt('/api/v2/users/%@.json?include=identities,organizations', userId),
+          dataType: 'json'
+        };
+      },
+
+      getUserFields: {
         url: '/api/v2/user_fields.json'
       },
 
-      'getOrganizationFields': {
-        url: '/api/v2/organization_fields.json'
-      },
-
-      'getTickets': function(userId, page) {
-        page = page || 1;
-        return {
-          url: helpers.fmt("/api/v2/users/%@/tickets/requested.json?page=%@", userId, page)
-        };
-      },
-
-      'getOrgTickets': function(orgId) {
-        return {
-          url: helpers.fmt("/api/v2/organizations/%@/tickets.json", orgId)
-        };
-      },
-
-      'saveSelectedFields': function(keys, orgKeys) {
+      saveSelectedFields: function(keys, orgKeys) {
         var appId = this.installationId();
         var settings = {
           'selectedFields': JSON.stringify(_.toArray(keys)),
@@ -84,7 +81,7 @@
         this.settings = _.extend(this.settings, settings);
         return {
           type: 'PUT',
-          url: helpers.fmt("/api/v2/apps/installations/%@.json", appId),
+          url: helpers.fmt('/api/v2/apps/installations/%@.json', appId),
           dataType: 'json',
           data: {
             'settings': settings,
@@ -93,10 +90,12 @@
         };
       },
 
-      fetchTicketAudits: function(id){
+      updateNotesOrDetails: function(type, id, data) {
         return {
-          url: helpers.fmt('/api/v2/tickets/%@/audits.json', id),
-          dataType: 'json'
+          url: helpers.fmt('/api/v2/%@/%@.json', type, id),
+          type: 'PUT',
+          dataType: 'json',
+          data: data
         };
       }
     },
@@ -153,8 +152,9 @@
         };
         if (key.indexOf('##builtin') === 0) {
           var subkey = key.split('_')[1];
+          result.name = subkey;
           result.value = target[subkey];
-          result.simpleKey = ["builtin", subkey].join(' ');
+          result.simpleKey = ['builtin', subkey].join(' ');
           if (subkey === 'tags') {
             result.value = this.renderTemplate('tags', {tags: result.value});
             result.html = true;
@@ -164,10 +164,10 @@
           }
         }
         else {
-          result.simpleKey = ["custom", key].join(' ');
+          result.simpleKey = ['custom', key].join(' ');
           result.value = values[key];
           if (field.type === 'date') {
-            result.value = (result.value ? this.toLocaleDate(result.value) : "");
+            result.value = (result.value ? this.toLocaleDate(result.value) : '');
           }
         }
         return result;
@@ -196,9 +196,9 @@
 
     toLocaleDate: function(date) {
       return new Date(date).toLocaleString(this.locale, {
-        year: "numeric",
-        month: "numeric",
-        day: "numeric"
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric'
       });
     },
 
@@ -224,10 +224,10 @@
 
     makeTicketsLinks: function(counters) {
       var links = {};
-      var link = "#/tickets/%@/requester/tickets".fmt(this.ticket().id());
+      var link = '#/tickets/%@/requester/tickets'.fmt(this.ticket().id());
       var tag = this.$('<div>').append(this.$('<a>').attr('href', link));
       _.each(counters, function(value, key) {
-        if (value && value !== "-") {
+        if (value && value !== '-') {
           tag.find('a').html(value);
           links[key] = tag.html();
         }
@@ -292,8 +292,8 @@
     },
 
     onClickExpandBar: function(event, immediate) {
-      var additional = this.$('.moreInfo');
-      var expandBar = this.$('.expandBar i');
+      var additional = this.$('.more-info');
+      var expandBar = this.$('.expand-bar i');
       expandBar.attr('class', 'arrow');
       var visible = additional.is(':visible');
       if (immediate) {
@@ -327,17 +327,32 @@
       var orgKeys = this.$('.org-fields-list input:checked').map(function() { return that.$(this).val(); });
       this.$('input, button').prop('disabled', true);
       this.$('.save').hide();
-      this.$('.waitSpin').show();
+      this.$('.wait-spin').show();
       this.ajax('saveSelectedFields', keys, orgKeys)
-        //.always(this.onBackClick.bind(this))
         .always(this.onAppActivation.bind(this));
     },
 
-    onNotesOrDetailsChanged: _.debounce(function() {
-      this.ajax('updateUser', {
-        notes: this.$('div.builtin.notes textarea').val(),
-        details: this.$('div.builtin.details textarea').val()
-      });
+    onNotesOrDetailsChanged: _.debounce(function(e) {
+      var $textarea    = this.$(e.currentTarget),
+          $textareas   = $textarea.parent().siblings('[data-editable=true]').andSelf().find('textarea'),
+          type         = $textarea.data('fieldType'),
+          typeSingular = type.slice(0, -1),
+          data         = {},
+          id           = type === 'organizations' ? this.storage.organization.id : this.ticket().requester().id();
+
+      // Build the data object, with the valid resource name and data
+      data[typeSingular] = {};
+      $textareas.each(function(index, element) {
+        var $element  = this.$(element),
+            fieldName = $element.data('fieldName');
+
+        data[typeSingular][fieldName] = $element.val();
+      }.bind(this));
+
+      // Execute request
+      this.ajax('updateNotesOrDetails', type, id, data).then(function() {
+        services.notify(this.I18n.t('update_' + typeSingular + '_done'));
+      }.bind(this));
     }, 1000),
 
     onActivateOrgFieldsChange: function(event) {
@@ -350,10 +365,6 @@
 
     onGetCurrentUserLocaleDone: function(data) {
       this.locale = data.user.locale;
-    },
-
-    onUpdateUserDone: function() {
-      services.notify(this.I18n.t("update_user_done"));
     },
 
     onGetLocalesDone: function(data) {
@@ -371,9 +382,9 @@
       });
       this.storage.user.identities = _.map(social, function(ident) {
         if (ident.type === 'twitter') {
-          ident.value = helpers.fmt("https://twitter.com/%@", ident.value);
+          ident.value = helpers.fmt('https://twitter.com/%@', ident.value);
         } else if (ident.type === 'facebook') {
-          ident.value = helpers.fmt("https://facebook.com/%@", ident.value);
+          ident.value = helpers.fmt('https://facebook.com/%@', ident.value);
         }
         return ident;
       });
@@ -382,15 +393,18 @@
         this.countedAjax('getTickets', this.storage.user.id);
       }
       if (data.user.organization) {
-        this.countedAjax('getOrgTickets', data.user.organization.id);
+        this.storage.organization = {
+          id: data.user.organization.id
+        };
+        this.countedAjax('getOrganizationTickets', this.storage.organization.id);
       }
 
       if (this.ticket().id()) {
-        this.ajax('fetchTicketAudits', this.ticket().id());
+        this.ajax('getTicketAudits', this.ticket().id());
       }
     },
 
-    fetchTicketAuditsDone: function(data){
+    getTicketAuditsDone: function(data){
       _.each(data.audits, function(audit){
         _.each(audit.events, function(e){
           if (this.auditEventIsSpoke(e)){
@@ -412,7 +426,7 @@
     },
 
     auditEventIsSpoke: function(event){
-      return event.type === "Comment" &&
+      return event.type === 'Comment' &&
         /spoke_id_/.test(event.body);
     },
 
@@ -445,7 +459,7 @@
       }
     },
 
-    onGetOrgTicketsDone: function(data) {
+    onGetOrganizationTicketsDone: function(data) {
       var grouped = _.groupBy(data.tickets, 'status');
       var res = this.toObject(_.map(grouped, function(value, key) {
         return [key, value.length];
@@ -457,24 +471,24 @@
       var selectedFields = this.storage.selectedOrgKeys;
       var fields = [
         {
-          key: "##builtin_tags",
-          title: this.I18n.t("tags"),
-          description: "",
+          key: '##builtin_tags',
+          title: this.I18n.t('tags'),
+          description: '',
           position: 0,
           active: true
         },
         {
-          key: "##builtin_notes",
-          title: this.I18n.t("notes"),
-          description: "",
+          key: '##builtin_notes',
+          title: this.I18n.t('notes'),
+          description: '',
           position: Number.MAX_VALUE - 1,
           active: true,
           editable: true
         },
         {
-          key: "##builtin_details",
-          title: this.I18n.t("details"),
-          description: "",
+          key: '##builtin_details',
+          title: this.I18n.t('details'),
+          description: '',
           position: Number.MAXVALUE,
           active: true,
           editable: true
@@ -501,31 +515,31 @@
       var selectedFields = this.storage.selectedKeys;
       var fields = [
         {
-          key: "##builtin_tags",
-          title: this.I18n.t("tags"),
-          description: "",
+          key: '##builtin_tags',
+          title: this.I18n.t('tags'),
+          description: '',
           position: 0,
           active: true
         },
         {
-          key: "##builtin_locale",
-          title: this.I18n.t("locale"),
-          description: "",
+          key: '##builtin_locale',
+          title: this.I18n.t('locale'),
+          description: '',
           position: 1,
           active: true
         },
         {
-          key: "##builtin_notes",
-          title: this.I18n.t("notes"),
-          description: "",
+          key: '##builtin_notes',
+          title: this.I18n.t('notes'),
+          description: '',
           position: Number.MAX_VALUE - 1,
           active: true,
           editable: true
         },
         {
-          key: "##builtin_details",
-          title: this.I18n.t("details"),
-          description: "",
+          key: '##builtin_details',
+          title: this.I18n.t('details'),
+          description: '',
           position: Number.MAXVALUE,
           active: true,
           editable: true
