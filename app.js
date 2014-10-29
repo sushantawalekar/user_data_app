@@ -60,9 +60,9 @@
         };
       },
 
-      getUser: function(id) {
+      getUser: function(userId) {
         return {
-          url: helpers.fmt('/api/v2/users/%@.json?include=identities,organizations', id),
+          url: helpers.fmt('/api/v2/users/%@.json?include=identities,organizations', userId),
           dataType: 'json'
         };
       },
