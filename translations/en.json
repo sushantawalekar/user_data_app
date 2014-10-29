@@ -48,11 +48,11 @@
   },
   "update_organization_done": {
     "title": "Growl notification to advise the admin the notes and details have been updated",
-    "value": "Organization notes and details updated!"
+    "value": "Organization notes and details updated."
   },
   "update_user_done": {
     "title": "Growl notification to advise the admin the notes and details have been updated",
-    "value": "User notes and details updated!"
+    "value": "User notes and details updated."
   },
   "ajax_error": {
     "title": "Error message notification",
