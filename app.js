@@ -12,7 +12,6 @@
       'getOrganizationFields.done': 'onGetOrganizationFieldsDone',
       'getTickets.done': 'onGetTicketsDone',
       'getOrganizationTickets.done': 'onGetOrganizationTicketsDone',
-      'updateNotesOrDetails.done': 'onUpdateNotesOrDetailsDone',
       'getTicketAudits.done': 'getTicketAuditsDone',
       'getCurrentUserLocale.done': 'onGetCurrentUserLocaleDone',
 
@@ -351,7 +350,9 @@
       }.bind(this));
 
       // Execute request
-      this.ajax('updateNotesOrDetails', type, id, data);
+      this.ajax('updateNotesOrDetails', type, id, data).then(function() {
+        services.notify(this.I18n.t('update_' + typeSingular + '_done'));
+      }.bind(this));
     }, 1000),
 
     onActivateOrgFieldsChange: function(event) {
@@ -364,10 +365,6 @@
 
     onGetCurrentUserLocaleDone: function(data) {
       this.locale = data.user.locale;
-    },
-
-    onUpdateNotesOrDetailsDone: function() {
-      services.notify(this.I18n.t('update_user_done'));
     },
 
     onGetLocalesDone: function(data) {
