@@ -44,7 +44,7 @@ parts:
   - translation:
       key: "txt.apps.user_data_app.update_organization_done"
       title: "Growl notification to advise the admin the notes and details have been updated"
-      value: "Organization notes and details updated."
+      value: "Organization notes and details updated"
   - translation:
       key: "txt.apps.user_data_app.update_user_done"
       title: "Growl notification to advise the admin the notes and details have been updated"
