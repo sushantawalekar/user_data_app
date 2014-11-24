@@ -272,7 +272,7 @@
           this.switchTo('empty');
         }
       }).bind(this));
-    }, 300, {leading: false}),
+    }, 1000, {leading: false}),
 
     onRequestsFinished: function() {
       if (!this.storage.user) return;
