@@ -224,7 +224,7 @@
 
     makeTicketsLinks: function(counters) {
       var links = {};
-      var link = '#/tickets/%@/requester/tickets'.fmt(this.ticket().id());
+      var link = '#/tickets/%@/requester/requested_tickets'.fmt(this.ticket().id());
       var tag = this.$('<div>').append(this.$('<a>').attr('href', link));
       _.each(counters, function(value, key) {
         if (value && value !== '-') {
