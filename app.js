@@ -169,8 +169,8 @@
           if (field.type === 'date') {
             result.value = (result.value ? this.toLocaleDate(result.value) : '');
           }
-          else if(field.type === 'textarea') {
-            result.value = values[key].replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+          else if(field.type === 'textarea' && values[key] != null) {
+            result.value = _.escape(values[key]).replace(/\n/g,'<br>');
             result.html = true;
           }
         }
