@@ -202,7 +202,8 @@
       return new Date(date).toLocaleString(this.locale, {
         year: 'numeric',
         month: 'numeric',
-        day: 'numeric'
+        day: 'numeric',
+        timeZone: 'UTC'
       });
     },
 
