@@ -2,7 +2,7 @@
   return {
     events: {
       // App
-      'app.activated': 'onAppActivation',
+      'app.created': 'onAppActivation',
       'ticket.requester.email.changed': 'onAppActivation',
 
       // Requests
