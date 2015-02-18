@@ -24,7 +24,10 @@
   "defaultLocale": "en",
   "private": false,
   "singleInstall": true,
-  "location": ["ticket_sidebar", "new_ticket_sidebar"],
+  "location": [
+    "ticket_sidebar",
+    "new_ticket_sidebar"
+  ],
   "frameworkVersion": "1.0",
-  "version": "1.0.3"
+  "version": "1.0.4"
 }
