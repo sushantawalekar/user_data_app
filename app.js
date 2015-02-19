@@ -280,10 +280,9 @@
     },
 
     onRequesterEmailChanged: function(event, email) {
-      if (!email || this.requesterEmail == email) {
-        return;
+      if (email && this.requesterEmail != email) {
+        this.init();
       }
-      this.init();
     },
 
     onRequestsFinished: function() {
