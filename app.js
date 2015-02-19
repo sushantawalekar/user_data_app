@@ -2,8 +2,8 @@
   return {
     events: {
       // App
-      'app.created': 'onAppActivation',
-      'ticket.requester.email.changed': 'onAppActivation',
+      'app.created': 'init',
+      'ticket.requester.email.changed': 'onRequesterEmailChanged',
 
       // Requests
       'getUser.done': 'onGetUserDone',
@@ -245,8 +245,7 @@
 
     // EVENTS ==================================================================
 
-    // we use throttle because of race conditions when this fires twice in quick succession
-    onAppActivation: _.throttle(function() {
+    init: function() {
       var defaultStorage = {
         user: null,
         ticketsCounters: {},
@@ -264,7 +263,7 @@
       var defaultOrgSelection = '[]';
       this.storage.selectedOrgKeys = JSON.parse(this.setting('orgFields') || defaultOrgSelection);
       if (!this.locale) { this.countedAjax('getCurrentUserLocale'); }
-      _.defer((function() {
+      _.defer(function() {
         if (this.ticket().requester()) {
           this.countedAjax('getUser', this.ticket().requester().id());
           this.countedAjax('getUserFields');
@@ -276,8 +275,15 @@
         else {
           this.switchTo('empty');
         }
-      }).bind(this));
-    }, 1000, {leading: false}),
+      }.bind(this));
+      this.requesterEmail = this.ticket().requester().email();
+    },
+
+    onRequesterEmailChanged: function(event, email) {
+      if (email && this.requesterEmail != email) {
+        this.init();
+      }
+    },
 
     onRequestsFinished: function() {
       if (!this.storage.user) return;
@@ -334,7 +340,7 @@
       this.$('.save').hide();
       this.$('.wait-spin').show();
       this.ajax('saveSelectedFields', keys, orgKeys)
-        .always(this.onAppActivation.bind(this));
+        .always(this.init.bind(this));
     },
 
     onNotesOrDetailsChanged: _.debounce(function(e) {
