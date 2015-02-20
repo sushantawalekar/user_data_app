@@ -263,20 +263,17 @@
       var defaultOrgSelection = '[]';
       this.storage.selectedOrgKeys = JSON.parse(this.setting('orgFields') || defaultOrgSelection);
       if (!this.locale) { this.countedAjax('getCurrentUserLocale'); }
-      _.defer(function() {
-        if (this.ticket().requester()) {
-          this.countedAjax('getUser', this.ticket().requester().id());
-          this.countedAjax('getUserFields');
-          this.countedAjax('getOrganizationFields');
-          if (!this.storage.locales) {
-            this.countedAjax('getLocales');
-          }
+      if (this.ticket().requester()) {
+        this.requesterEmail = this.ticket().requester().email();
+        this.countedAjax('getUser', this.ticket().requester().id());
+        this.countedAjax('getUserFields');
+        this.countedAjax('getOrganizationFields');
+        if (!this.storage.locales) {
+          this.countedAjax('getLocales');
         }
-        else {
-          this.switchTo('empty');
-        }
-      }.bind(this));
-      this.requesterEmail = this.ticket().requester().email();
+      } else {
+        this.switchTo('empty');
+      }
     },
 
     onRequesterEmailChanged: function(event, email) {
