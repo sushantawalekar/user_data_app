@@ -394,6 +394,13 @@
         return ident;
       });
       this.storage.user.organization = data.organizations[0];
+      var ticketOrg = this.ticket().organization();
+      if (ticketOrg) {
+        this.storage.user.organization = _.reduce(['id', 'name', 'tags'], function(memo, name) {
+          memo[name] = ticketOrg[name]();
+          return memo;
+        }, {});
+      }
       if (data.user && data.user.id) {
         this.countedAjax('getTickets', this.storage.user.id);
       }
