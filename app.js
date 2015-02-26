@@ -268,7 +268,6 @@
         if (this.ticket().requester()) {
           this.countedAjax('getUser', this.ticket().requester().id());
           this.countedAjax('getUserFields');
-          this.countedAjax('getOrganizationFields');
           if (!this.storage.locales) {
             this.countedAjax('getLocales');
           }
@@ -396,11 +395,11 @@
       this.storage.user.organization = data.organizations[0];
       var ticketOrg = this.ticket().organization();
       if (ticketOrg) {
-        this.storage.user.organization = _.reduce(['id', 'name', 'tags'], function(memo, name) {
-          memo[name] = ticketOrg[name]();
-          return memo;
-        }, {});
+        this.storage.user.organization = _.find(data.organizations, function(org) {
+          return org.id === ticketOrg.id();
+        });
       }
+      this.countedAjax('getOrganizationFields');
       if (data.user && data.user.id) {
         this.countedAjax('getTickets', this.storage.user.id);
       }
