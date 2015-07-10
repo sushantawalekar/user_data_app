@@ -13,7 +13,6 @@
       'getTickets.done': 'onGetTicketsDone',
       'getOrganizationTickets.done': 'onGetOrganizationTicketsDone',
       'getTicketAudits.done': 'getTicketAuditsDone',
-      'getCurrentUserLocale.done': 'onGetCurrentUserLocaleDone',
 
       // UI
       'click .expand-bar': 'onClickExpandBar',
@@ -28,10 +27,6 @@
     },
 
     requests: {
-      getCurrentUserLocale: {
-        url: '/api/v2/users/me.json'
-      },
-
       getLocales: {
         url: '/api/v2/locales.json'
       },
@@ -262,7 +257,7 @@
       this.storage.selectedKeys = JSON.parse(this.setting('selectedFields') || defaultSelection);
       var defaultOrgSelection = '[]';
       this.storage.selectedOrgKeys = JSON.parse(this.setting('orgFields') || defaultOrgSelection);
-      if (!this.locale) { this.countedAjax('getCurrentUserLocale'); }
+      if (!this.locale) { this.locale = this.currentUser().locale(); }
       if (this.ticket().requester()) {
         this.requesterEmail = this.ticket().requester().email();
         this.countedAjax('getUser', this.ticket().requester().id());
@@ -370,10 +365,6 @@
     },
 
     // REQUESTS ================================================================
-
-    onGetCurrentUserLocaleDone: function(data) {
-      this.locale = data.user.locale;
-    },
 
     onGetLocalesDone: function(data) {
       var locales = {};
