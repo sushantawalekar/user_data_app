@@ -400,6 +400,9 @@
         return role.id == this.currentUser().role();
       }, this);
       this.orgEditable = role.configuration.organization_editing;
+      _.each(this.storage.organizationFields, function(field) {
+        field.editable = field.editable !== undefined ? this.orgEditable : undefined;
+      }, this);
     },
 
     onGetLocalesDone: function(data) {
@@ -524,14 +527,16 @@
           title: this.I18n.t('notes'),
           description: '',
           position: Number.MAX_VALUE - 1,
-          active: true
+          active: true,
+          editable: this.orgEditable
         },
         {
           key: '##builtin_details',
           title: this.I18n.t('details'),
           description: '',
           position: Number.MAXVALUE,
-          active: true
+          active: true,
+          editable: this.orgEditable
         }
       ].concat(data.organization_fields);
       var activeFields = _.filter(fields, function(field) {
