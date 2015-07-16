@@ -13,7 +13,7 @@
       'getTickets.done': 'onGetTicketsDone',
       'getOrganizationTickets.done': 'onGetOrganizationTicketsDone',
       'getTicketAudits.done': 'getTicketAuditsDone',
-      'getCurrentUserLocale.done': 'onGetCurrentUserLocaleDone',
+      'getCustomRoles.done': 'onGetCustomRolesDone',
 
       // UI
       'click .expand-bar': 'onClickExpandBar',
@@ -28,10 +28,6 @@
     },
 
     requests: {
-      getCurrentUserLocale: {
-        url: '/api/v2/users/me.json'
-      },
-
       getLocales: {
         url: '/api/v2/locales.json'
       },
@@ -65,6 +61,11 @@
           url: helpers.fmt('/api/v2/users/%@.json?include=identities,organizations', userId),
           dataType: 'json'
         };
+      },
+
+      getCustomRoles: {
+        url: '/api/v2/custom_roles.json',
+        dataType: 'json'
       },
 
       getUserFields: {
@@ -217,7 +218,8 @@
         orgFields: this.fieldsForCurrentOrg(),
         orgFieldsActivated: this.storage.user && this.storage.orgFieldsActivated && this.storage.user.organization,
         org: this.storage.user && this.storage.user.organization,
-        orgTickets: this.makeTicketsLinks(this.storage.orgTicketsCounters)
+        orgTickets: this.makeTicketsLinks(this.storage.orgTicketsCounters),
+        orgEditable: this.orgEditable
       });
       if (this.storage.spokeData) {
         this.displaySpoke();
@@ -243,6 +245,19 @@
       return links;
     },
 
+    setOrgEditable: function() {
+      if (this.orgEditable !== undefined) {
+        return;
+      }
+      var role = this.currentUser().role();
+      this.orgEditable = false;
+      if (role == "admin") {
+        this.orgEditable = true;
+      } else if (role != "agent") {
+        this.countedAjax('getCustomRoles');
+      }
+    },
+
     // EVENTS ==================================================================
 
     init: function() {
@@ -262,7 +277,12 @@
       this.storage.selectedKeys = JSON.parse(this.setting('selectedFields') || defaultSelection);
       var defaultOrgSelection = '[]';
       this.storage.selectedOrgKeys = JSON.parse(this.setting('orgFields') || defaultOrgSelection);
-      if (!this.locale) { this.countedAjax('getCurrentUserLocale'); }
+      if (!this.locale) {
+        this.locale = this.currentUser().locale();
+      }
+      if (this.storage.selectedOrgKeys.length > 0) {
+        this.setOrgEditable();
+      }
       if (this.ticket().requester()) {
         this.requesterEmail = this.ticket().requester().email();
         this.countedAjax('getUser', this.ticket().requester().id());
@@ -367,12 +387,22 @@
       var activate = this.$(event.target).is(':checked');
       this.storage.orgFieldsActivated = activate;
       this.$('.org-fields-list').toggle(activate);
+      if (activate) {
+        this.setOrgEditable();
+      }
     },
 
     // REQUESTS ================================================================
 
-    onGetCurrentUserLocaleDone: function(data) {
-      this.locale = data.user.locale;
+    onGetCustomRolesDone: function(data) {
+      var roles = data.custom_roles;
+      var role = _.find(roles, function(role) {
+        return role.id == this.currentUser().role();
+      }, this);
+      this.orgEditable = role.configuration.organization_editing;
+      _.each(this.storage.organizationFields, function(field) {
+        field.editable = field.editable !== undefined ? this.orgEditable : undefined;
+      }, this);
     },
 
     onGetLocalesDone: function(data) {
@@ -498,7 +528,7 @@
           description: '',
           position: Number.MAX_VALUE - 1,
           active: true,
-          editable: true
+          editable: this.orgEditable
         },
         {
           key: '##builtin_details',
@@ -506,7 +536,7 @@
           description: '',
           position: Number.MAXVALUE,
           active: true,
-          editable: true
+          editable: this.orgEditable
         }
       ].concat(data.organization_fields);
       var activeFields = _.filter(fields, function(field) {
