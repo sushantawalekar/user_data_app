@@ -218,8 +218,7 @@
         orgFields: this.fieldsForCurrentOrg(),
         orgFieldsActivated: this.storage.user && this.storage.orgFieldsActivated && this.storage.user.organization,
         org: this.storage.user && this.storage.user.organization,
-        orgTickets: this.makeTicketsLinks(this.storage.orgTicketsCounters),
-        orgEditable: this.orgEditable
+        orgTickets: this.makeTicketsLinks(this.storage.orgTicketsCounters)
       });
       if (this.storage.spokeData) {
         this.displaySpoke();
@@ -245,14 +244,13 @@
       return links;
     },
 
-    setOrgEditable: function() {
-      if (this.orgEditable !== undefined) {
-        return;
-      }
+    setEditable: function() {
       var role = this.currentUser().role();
-      this.orgEditable = { general: false, notes: false };
+      this.orgEditable = { general: false, notes: true };
+      this.userEditable = false;
       if (role == "admin") {
         this.orgEditable = { general: true, notes: true };
+        this.userEditable = true;
       } else if (role != "agent") {
         this.countedAjax('getCustomRoles');
       }
@@ -273,14 +271,14 @@
       };
       this.storage = _.clone(defaultStorage); // not sure the clone is needed here
       this.storage.orgFieldsActivated = (this.setting('orgFieldsActivated') == 'true');
-      var defaultSelection = '["##builtin_tags", "##builtin_notes", "##builtin_details"]';
+      var defaultSelection = '["##builtin_tags", "##builtin_details", "##builtin_notes"]';
       this.storage.selectedKeys = JSON.parse(this.setting('selectedFields') || defaultSelection);
       var defaultOrgSelection = '[]';
       this.storage.selectedOrgKeys = JSON.parse(this.setting('orgFields') || defaultOrgSelection);
       if (!this.locale) {
         this.locale = this.currentUser().locale();
       }
-      this.setOrgEditable();
+      this.setEditable();
       if (this.ticket().requester()) {
         this.requesterEmail = this.ticket().requester().email();
         this.countedAjax('getUser', this.ticket().requester().id());
@@ -385,9 +383,6 @@
       var activate = this.$(event.target).is(':checked');
       this.storage.orgFieldsActivated = activate;
       this.$('.org-fields-list').toggle(activate);
-      if (activate) {
-        this.setOrgEditable();
-      }
     },
 
     // REQUESTS ================================================================
@@ -399,6 +394,7 @@
       }, this);
       this.orgEditable.general = role.configuration.organization_editing;
       this.orgEditable.notes = role.configuration.organization_notes_editing;
+      this.userEditable = role.configuration.end_user_profile_access == "full";
       _.each(this.storage.organizationFields, function(field) {
         if (field.key === '##builtin_tags') {
           return;
@@ -528,20 +524,20 @@
           active: true
         },
         {
-          key: '##builtin_notes',
-          title: this.I18n.t('notes'),
-          description: '',
-          position: Number.MAX_VALUE - 1,
-          active: true,
-          editable: this.orgEditable.notes
-        },
-        {
           key: '##builtin_details',
           title: this.I18n.t('details'),
           description: '',
-          position: Number.MAXVALUE,
+          position: Number.MAX_SAFE_INTEGER - 1,
           active: true,
           editable: this.orgEditable.general
+        },
+        {
+          key: '##builtin_notes',
+          title: this.I18n.t('notes'),
+          description: '',
+          position: Number.MAX_SAFE_INTEGER,
+          active: true,
+          editable: this.orgEditable.notes
         }
       ].concat(data.organization_fields);
       var activeFields = _.filter(fields, function(field) {
@@ -579,20 +575,20 @@
           active: true
         },
         {
-          key: '##builtin_notes',
-          title: this.I18n.t('notes'),
-          description: '',
-          position: Number.MAX_VALUE - 1,
-          active: true,
-          editable: true
-        },
-        {
           key: '##builtin_details',
           title: this.I18n.t('details'),
           description: '',
-          position: Number.MAXVALUE,
+          position: Number.MAX_SAFE_INTEGER - 1,
           active: true,
-          editable: true
+          editable: this.userEditable
+        },
+        {
+          key: '##builtin_notes',
+          title: this.I18n.t('notes'),
+          description: '',
+          position: Number.MAX_SAFE_INTEGER,
+          active: true,
+          editable: this.userEditable
         }
       ].concat(data.user_fields);
       var activeFields = _.filter(fields, function(field) {
