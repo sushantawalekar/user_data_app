@@ -250,9 +250,9 @@
         return;
       }
       var role = this.currentUser().role();
-      this.orgEditable = false;
+      this.orgEditable = { general: false, notes: false };
       if (role == "admin") {
-        this.orgEditable = true;
+        this.orgEditable = { general: true, notes: true };
       } else if (role != "agent") {
         this.countedAjax('getCustomRoles');
       }
@@ -280,9 +280,7 @@
       if (!this.locale) {
         this.locale = this.currentUser().locale();
       }
-      if (this.storage.selectedOrgKeys.length > 0) {
-        this.setOrgEditable();
-      }
+      this.setOrgEditable();
       if (this.ticket().requester()) {
         this.requesterEmail = this.ticket().requester().email();
         this.countedAjax('getUser', this.ticket().requester().id());
@@ -399,9 +397,16 @@
       var role = _.find(roles, function(role) {
         return role.id == this.currentUser().role();
       }, this);
-      this.orgEditable = role.configuration.organization_editing;
+      this.orgEditable.general = role.configuration.organization_editing;
+      this.orgEditable.notes = role.configuration.organization_notes_editing;
       _.each(this.storage.organizationFields, function(field) {
-        field.editable = field.editable !== undefined ? this.orgEditable : undefined;
+        if (field.key === '##builtin_tags') {
+          return;
+        } else if (field.key === '##builtin_notes') {
+          field.editable = this.orgEditable.notes;
+        } else {
+          field.editable = this.orgEditable.general;
+        }
       }, this);
     },
 
@@ -528,7 +533,7 @@
           description: '',
           position: Number.MAX_VALUE - 1,
           active: true,
-          editable: this.orgEditable
+          editable: this.orgEditable.notes
         },
         {
           key: '##builtin_details',
@@ -536,7 +541,7 @@
           description: '',
           position: Number.MAXVALUE,
           active: true,
-          editable: this.orgEditable
+          editable: this.orgEditable.general
         }
       ].concat(data.organization_fields);
       var activeFields = _.filter(fields, function(field) {
