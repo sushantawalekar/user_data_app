@@ -247,10 +247,9 @@
     setEditable: function() {
       var role = this.currentUser().role();
       this.orgEditable = { general: false, notes: true };
-      this.userEditable = false;
+      this.userEditable = true;
       if (role == "admin") {
         this.orgEditable = { general: true, notes: true };
-        this.userEditable = true;
       } else if (role != "agent") {
         this.countedAjax('getCustomRoles');
       }
