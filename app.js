@@ -1,5 +1,8 @@
 (function() {
   return {
+
+    TICKET_STATUSES: ['new', 'open', 'solved', 'pending', 'hold', 'closed'],
+
     events: {
       // App
       'app.created': 'init',
@@ -11,6 +14,7 @@
       'getUserFields.done': 'onGetUserFieldsDone',
       'getOrganizationFields.done': 'onGetOrganizationFieldsDone',
       'getTickets.done': 'onGetTicketsDone',
+      'searchTickets.done': 'onSearchTicketsDone',
       'getOrganizationTickets.done': 'onGetOrganizationTicketsDone',
       'getTicketAudits.done': 'getTicketAuditsDone',
       'getCustomRoles.done': 'onGetCustomRolesDone',
@@ -53,6 +57,14 @@
         page = page || 1;
         return {
           url: helpers.fmt('/api/v2/users/%@/tickets/requested.json?page=%@', userId, page)
+        };
+      },
+
+      searchTickets: function(userId, statusIndex) {
+        var status = this.TICKET_STATUSES[statusIndex];
+        return {
+          url: helpers.fmt('/api/v2/search.json?query=type:ticket requester:%@ status:%@', userId, status),
+          dataType: 'json'
         };
       },
 
@@ -489,9 +501,24 @@
       };
     },
 
+    onSearchTicketsDone: function(data) {
+      var status = this.TICKET_STATUSES[this.ticketSearchStatus];
+      this.storage.ticketsCounters = this.storage.ticketsCounters || {};
+      this.storage.ticketsCounters[status] = data.count;
+      if (this.ticketSearchStatus === this.TICKET_STATUSES.length - 1) {
+        return;
+      }
+      this.countedAjax('searchTickets', this.storage.user.id, ++this.ticketSearchStatus);
+    },
+
     onGetTicketsDone: function(data) {
       this.storage.tickets.push.apply(this.storage.tickets, data.tickets);
       if (data.next_page) {
+        if (data.count / data.tickets.length - 1 > this.TICKET_STATUSES.length) {
+          this.ticketSearchStatus = 0;
+          this.countedAjax('searchTickets', this.storage.user.id, this.ticketSearchStatus);
+          return;
+        }
         var pageNumber = data.next_page.match(/page=(\d+)/)[1];
         this.countedAjax('getTickets', this.storage.user.id, pageNumber);
       }
