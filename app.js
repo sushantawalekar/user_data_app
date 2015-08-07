@@ -60,8 +60,7 @@
         };
       },
 
-      searchTickets: function(userId, statusIndex) {
-        var status = this.TICKET_STATUSES[statusIndex];
+      searchTickets: function(userId, status) {
         return {
           url: helpers.fmt('/api/v2/search.json?query=type:ticket requester:%@ status:%@', userId, status),
           dataType: 'json'
@@ -508,7 +507,7 @@
       if (this.ticketSearchStatus === this.TICKET_STATUSES.length - 1) {
         return;
       }
-      this.countedAjax('searchTickets', this.storage.user.id, ++this.ticketSearchStatus);
+      this.countedAjax('searchTickets', this.storage.user.id, this.TICKET_STATUSES[++this.ticketSearchStatus]);
     },
 
     onGetTicketsDone: function(data) {
@@ -516,7 +515,7 @@
       if (data.next_page) {
         if (data.count / data.tickets.length - 1 > this.TICKET_STATUSES.length) {
           this.ticketSearchStatus = 0;
-          this.countedAjax('searchTickets', this.storage.user.id, this.ticketSearchStatus);
+          this.countedAjax('searchTickets', this.storage.user.id, this.TICKET_STATUSES[this.ticketSearchStatus]);
           return;
         }
         var pageNumber = data.next_page.match(/page=(\d+)/)[1];
