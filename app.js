@@ -513,6 +513,7 @@
     onGetTicketsDone: function(data) {
       this.storage.tickets.push.apply(this.storage.tickets, data.tickets);
       if (data.next_page) {
+        // determine if it is fewer API hits to search or to continue loading all the tickets
         if (data.count / data.tickets.length - 1 > this.TICKET_STATUSES.length) {
           this.ticketSearchStatus = 0;
           this.countedAjax('searchTickets', this.storage.user.id, this.TICKET_STATUSES[this.ticketSearchStatus]);
