@@ -18,6 +18,7 @@
     "no_tags": "無標籤",
     "no_domain_names": "無網域名稱"
   },
+  "update_organization_done": "已更新組織備註和詳情",
   "update_user_done": "已更新使用者備註和詳情！",
   "ajax_error": "發生錯誤。請稍後重試。",
   "tickets": "工單",

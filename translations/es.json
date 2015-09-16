@@ -18,6 +18,7 @@
     "no_tags": "No hay etiquetas",
     "no_domain_names": "No hay nombres de dominio"
   },
+  "update_organization_done": "Notas y detalles de la organización actualizados",
   "update_user_done": "Notas y detalles del usuario actualizados.",
   "ajax_error": "Se ha producido un error. Vuelva a intentarlo más tarde.",
   "tickets": "Tickets",

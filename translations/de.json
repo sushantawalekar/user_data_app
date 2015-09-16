@@ -18,6 +18,7 @@
     "no_tags": "Keine Stichworte",
     "no_domain_names": "Keine Domänennamen"
   },
+  "update_organization_done": "Organisationsnotizen und -details aktualisiert",
   "update_user_done": "Benutzernotizen und –details aktualisiert!",
   "ajax_error": "Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
   "tickets": "Tickets",

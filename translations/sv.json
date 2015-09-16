@@ -18,6 +18,7 @@
     "no_tags": "Inga taggar",
     "no_domain_names": "Inget domännamn"
   },
+  "update_organization_done": "Organisationsanteckningar och -uppgifter uppdaterade",
   "update_user_done": "Användaranteckningar och -uppgifter uppdaterade.",
   "ajax_error": "Ett fel inträffade. Försök igen senare.",
   "tickets": "Ärenden",

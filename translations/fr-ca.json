@@ -18,6 +18,7 @@
     "no_tags": "Aucun marqueur",
     "no_domain_names": "Aucun nom de domaine"
   },
+  "update_organization_done": "Notes et détails de l’organisation mis à jour",
   "update_user_done": "Notes et détails de l’utilisateur mis à jour !",
   "ajax_error": "Une erreur est survenue. Réessayez plus tard.",
   "tickets": "Billets",

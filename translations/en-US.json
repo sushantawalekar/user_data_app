@@ -18,7 +18,8 @@
     "no_tags": "No tags",
     "no_domain_names": "No domain names"
   },
-  "update_user_done": "User notes and details updated!",
+  "update_organization_done": "Organization notes and details updated",
+  "update_user_done": "User notes and details updated.",
   "ajax_error": "An error occurred. Please try again later.",
   "tickets": "Tickets",
   "toggle_details_notes": "Toggle Details and Notes",

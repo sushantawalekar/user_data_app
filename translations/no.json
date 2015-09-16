@@ -18,6 +18,7 @@
     "no_tags": "Ingen tagger",
     "no_domain_names": "Ingen domenenavn"
   },
+  "update_organization_done": "Organisasjonsmerknader og -detaljer ble oppdatert",
   "update_user_done": "Merknader og detaljer om bruker er oppdatert!",
   "ajax_error": "Det oppstod en feil. Prøv på nytt senere.",
   "tickets": "Saker",
@@ -39,9 +40,9 @@
   },
   "spoke-ticket": {
     "link": {
-      "pre": "Denne saken er fra eike-kontoen:"
+      "pre": "Denne saken er fra satelittkontoen:"
     }
   },
   "account": "Konto",
-  "spoke_ticket_id": "ID for eikesak"
+  "spoke_ticket_id": "ID for satelittsak"
 }
