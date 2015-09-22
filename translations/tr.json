@@ -1,6 +1,6 @@
 {
   "app": {
-    "description": "Kaydı talep eden kişi ve o kişinin kurumu hakkında bilgileri görüntüler.",
+    "description": "Kaydı talep eden kişi ve o kişinin organizasyon birimi hakkında bilgileri görüntüler.",
     "name": "Kullanıcı Verileri Uygulaması",
     "parameters": {
       "unfolded_on_startup": {
@@ -12,30 +12,31 @@
     "title": "Kullanıcı Verileri Yönetici paneli",
     "save": "Kaydet ve geri git",
     "text": "Lütfen uygulamada kalıcı olarak görüntülemek istediğiniz kullanıcı alanlarını seçin.",
-    "include_org_fields": "Kurum bilgilerini görüntüle"
+    "include_org_fields": "Organizasyon birimi bilgilerini görüntüle"
   },
   "info": {
     "no_tags": "Etiket yok",
     "no_domain_names": "Etki alanı adı yok"
   },
+  "update_organization_done": "Organizasyon notları ve ayrıntıları güncellendi",
   "update_user_done": "Kullanıcı notları ve detayları güncellendi!",
   "ajax_error": "Bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
   "tickets": "Kayıtlar",
   "toggle_details_notes": "Detayları ve Notları Değiştir",
-  "toggle_organization": "Kurumu değiştir",
+  "toggle_organization": "Organizasyon birimini değiştir",
   "details_and_notes": "Detaylar ve Notlar",
   "details": "Detaylar",
   "notes": "Notlar",
   "locale": "Kullanıcının dili",
   "tags": "Etiketler",
-  "organization": "Kurum",
+  "organization": "Organizasyon birimi",
   "ticket_status": {
-    "new": "n",
-    "open": "o",
-    "pending": "p",
-    "hold": "h",
-    "solved": "s",
-    "closed": "c"
+    "new": "y",
+    "open": "a",
+    "pending": "b",
+    "hold": "as",
+    "solved": "ç",
+    "closed": "k"
   },
   "spoke-ticket": {
     "link": {
@@ -43,5 +44,5 @@
     }
   },
   "account": "Hesap",
-  "spoke_ticket_id": "Bağlı Bileşen Kayıt Kimliği"
+  "spoke_ticket_id": "Bağlı Bileşen Kayıt Numarası"
 }

@@ -18,6 +18,7 @@
     "no_tags": "Geen tags",
     "no_domain_names": "Geen domeinnamen"
   },
+  "update_organization_done": "Organisatienotities en details bijgewerkt!",
   "update_user_done": "Gebruikersnotities en details bijgewerkt!",
   "ajax_error": "Er is een fout opgetreden. Probeer het later opnieuw.",
   "tickets": "Tickets",
@@ -32,7 +33,7 @@
   "ticket_status": {
     "new": "n",
     "open": "o",
-    "pending": "a",
+    "pending": "w",
     "hold": "p",
     "solved": "s",
     "closed": "g"

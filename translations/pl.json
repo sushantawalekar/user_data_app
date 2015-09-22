@@ -1,7 +1,7 @@
 {
   "app": {
     "description": "Wyświetla informacje o osobie zlecającej zgłoszenie oraz jej organizacji.",
-    "name": "Aplikacja User Data",
+    "name": "Aplikacja Dane użytkownika",
     "parameters": {
       "unfolded_on_startup": {
         "label": "Zasobnik Aplikacje otwarty domyślnie"
@@ -9,7 +9,7 @@
     }
   },
   "admin": {
-    "title": "User Data — panel administracyjny",
+    "title": "Dane użytkownika — panel administracyjny",
     "save": "Zapisz i wróć",
     "text": "Wybierz pola użytkownika, które mają być stale wyświetlane w aplikacji",
     "include_org_fields": "Wyświetl informacje o organizacji"
@@ -18,6 +18,7 @@
     "no_tags": "Brak tagów",
     "no_domain_names": "Brak nazw domen"
   },
+  "update_organization_done": "Notatki dotyczące organizacji i szczegóły zostały zaktualizowane",
   "update_user_done": "Notatki użytkownika i szczegóły zostały zaktualizowane.",
   "ajax_error": "Wystąpił błąd. Spróbuj ponownie później.",
   "tickets": "Zgłoszenia",

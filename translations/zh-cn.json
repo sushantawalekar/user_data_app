@@ -18,6 +18,7 @@
     "no_tags": "没有标签",
     "no_domain_names": "没有域名"
   },
+  "update_organization_done": "组织注释和详情已更新",
   "update_user_done": "用户注释和详情已更新！",
   "ajax_error": "发生错误。请稍后重试。",
   "tickets": "工单",
@@ -32,7 +33,7 @@
   "ticket_status": {
     "new": "新",
     "open": "开",
-    "pending": "未",
+    "pending": "待",
     "hold": "停",
     "solved": "解",
     "closed": "闭"

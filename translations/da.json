@@ -18,12 +18,13 @@
     "no_tags": "Ingen tags",
     "no_domain_names": "Ingen domænenavne"
   },
-  "update_user_done": "Brugernotater og –detaljer opdateret.",
+  "update_organization_done": "Organisationsnotater og -detaljer er opdateret",
+  "update_user_done": "Brugernotater og -detaljer opdateret.",
   "ajax_error": "Der forekom en fejl. Prøv igen senere.",
   "tickets": "Tickets",
-  "toggle_details_notes": "Skift detaljer og noter",
+  "toggle_details_notes": "Skift detaljer og notater",
   "toggle_organization": "Skift organisation",
-  "details_and_notes": "Detaljer og noter",
+  "details_and_notes": "Detaljer og notater",
   "details": "Detaljer",
   "notes": "Notater",
   "locale": "Brugers sprog",
@@ -34,7 +35,7 @@
     "open": "å",
     "pending": "v",
     "hold": "b",
-    "solved": "s",
+    "solved": "ø",
     "closed": "l"
   },
   "spoke-ticket": {
