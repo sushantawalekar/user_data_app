@@ -170,9 +170,11 @@
           if (subkey === 'tags') {
             result.value = this.renderTemplate('tags', {tags: result.value});
             result.html = true;
-          }
-          if (subkey === 'locale') {
+          } else if (subkey === 'locale') {
             result.value = this.storage.locales[result.value];
+          } else if (!result.editable) {
+            result.value = _.escape(result.value).replace(/\n/g,'<br>');
+            result.html = true;
           }
         }
         else {
@@ -180,8 +182,7 @@
           result.value = values[key];
           if (field.type === 'date') {
             result.value = (result.value ? this.toLocaleDate(result.value) : '');
-          }
-          else if(field.type === 'textarea' && values[key] != null) {
+          } else if(!result.editable && values[key]) {
             result.value = _.escape(values[key]).replace(/\n/g,'<br>');
             result.html = true;
           }
