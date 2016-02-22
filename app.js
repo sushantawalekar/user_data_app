@@ -212,12 +212,7 @@
     },
 
     toLocaleDate: function(date) {
-      return new Date(date).toLocaleString(this.locale, {
-        year: 'numeric',
-        month: 'numeric',
-        day: 'numeric',
-        timeZone: 'UTC'
-      });
+      return moment(date).utc().format('l');      
     },
 
     showDisplay: function() {
