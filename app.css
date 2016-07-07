@@ -197,14 +197,11 @@
       div {
         color: #999;
         font-size: 14px;
-        /*margin-bottom: 3px;*/
         word-wrap: break-word;
 
         &.name {
           font-size: 16px;
-          /*line-height: 1.286;*/
           font-weight: 600;
-          /*margin-bottom: 4px;*/
 
           a {
             color: #555;
