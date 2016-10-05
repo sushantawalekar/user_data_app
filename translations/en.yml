@@ -28,7 +28,7 @@ parts:
   - translation:
       key: "txt.apps.user_data_app.admin.text"
       title: "Help text for the admin"
-      value: "Please select the user fields you would like to permanently display on the App"
+      value: "Please select the user fields you would like to permanently display on the app"
   - translation:
       key: "txt.apps.user_data_app.admin.include_org_fields"
       title: "Check box to display org fields"
@@ -60,7 +60,7 @@ parts:
   - translation:
       key: "txt.apps.user_data_app.toggle_details_notes"
       title: "Link to toggle open / close the details and notes box"
-      value: "Toggle Details and Notes"
+      value: "Toggle details and notes"
   - translation:
       key: "txt.apps.user_data_app.toggle_organization"
       title: "Link to toggle open / close the organization box"
@@ -68,7 +68,7 @@ parts:
   - translation:
       key: "txt.apps.user_data_app.details_and_notes"
       title: "Header/title for the details and notes box"
-      value: "Details and Notes"
+      value: "Details and notes"
   - translation:
       key: "txt.apps.user_data_app.details"
       title: "Details box after this will be an editable text box"
@@ -124,5 +124,5 @@ parts:
   - translation:
       key: "txt.apps.user_data_app.spoke_ticket_id"
       title: "this is the ticket ID from the spoke of that user"
-      value: "Spoke Ticket ID"
+      value: "Spoke ticket ID"
 
