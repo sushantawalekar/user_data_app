@@ -19,7 +19,7 @@
     "no_domain_names": "Nessun nome di dominio"
   },
   "update_organization_done": "Aggiornamento dettagli e note organizzazione completato.",
-  "update_user_done": "Aggiornamento dettagli e note utenti completato.",
+  "update_user_done": "Aggiornamento dettagli e note utente completato.",
   "ajax_error": "Si è verificato un errore. Riprova più tardi.",
   "tickets": "Ticket",
   "toggle_details_notes": "Attiva/disattiva dettagli e note",

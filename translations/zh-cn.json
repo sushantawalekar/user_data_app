@@ -1,17 +1,17 @@
 {
   "app": {
     "description": "显示关于工单请求者和请求者组织的信息。",
-    "name": "用户数据 App",
+    "name": "用户数据应用",
     "parameters": {
       "unfolded_on_startup": {
-        "label": "默认打开 App 栏"
+        "label": "默认打开应用栏"
       }
     }
   },
   "admin": {
     "title": "用户数据管理员面板",
     "save": "保存并返回",
-    "text": "请选择您要在 App 上永久显示的用户字段",
+    "text": "请选择您要在应用上永久显示的用户字段",
     "include_org_fields": "显示组织信息"
   },
   "info": {

@@ -1,7 +1,7 @@
 {
   "app": {
     "description": "Viser oplysninger om ticket-anmoderen og anmoderens organisation.",
-    "name": "App’en Brugerdata",
+    "name": "appen Brugerdata",
     "parameters": {
       "unfolded_on_startup": {
         "label": "Bakken Apps åbner som standard"
@@ -11,7 +11,7 @@
   "admin": {
     "title": "Panelet Brugerdataadmin",
     "save": "Gem og gå tilbage",
-    "text": "Vælg de brugerfelter, du ønsker at vise permanent i app’en",
+    "text": "Vælg de brugerfelter, du ønsker at vise permanent i appen",
     "include_org_fields": "Vis oplysninger om organisationen"
   },
   "info": {

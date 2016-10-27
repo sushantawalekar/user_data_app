@@ -22,9 +22,9 @@
   "update_user_done": "Kullanıcı notları ve detayları güncellendi!",
   "ajax_error": "Bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
   "tickets": "Kayıtlar",
-  "toggle_details_notes": "Detayları ve Notları Değiştir",
+  "toggle_details_notes": "Ayrıntıları ve notları değiştir",
   "toggle_organization": "Organizasyon birimini değiştir",
-  "details_and_notes": "Detaylar ve Notlar",
+  "details_and_notes": "Ayrıntılar ve Notlar",
   "details": "Detaylar",
   "notes": "Notlar",
   "locale": "Kullanıcının dili",
@@ -44,5 +44,5 @@
     }
   },
   "account": "Hesap",
-  "spoke_ticket_id": "Bağlı Bileşen Kayıt Numarası"
+  "spoke_ticket_id": "Bağlı bileşen kayıt numarası"
 }

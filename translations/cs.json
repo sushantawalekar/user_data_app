@@ -11,7 +11,7 @@
   "admin": {
     "title": "Panel Správa dat uživatelů",
     "save": "Uložit a vrátit se zpět",
-    "text": "Vyberte prosím pole uživatelů, která chcete v aplikaci trvale zobrazit",
+    "text": "Vyberte prosím pole uživatelů, která chcete v aplikaci trvale zobrazovat",
     "include_org_fields": "Zobrazit informace o organizaci"
   },
   "info": {
