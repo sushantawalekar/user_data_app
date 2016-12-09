@@ -48,8 +48,7 @@
 
       getTicketAudits: function(id){
         return {
-          url: helpers.fmt('/api/v2/tickets/%@/audits.json', id),
-          dataType: 'json'
+          url: helpers.fmt('/api/v2/tickets/%@/audits.json', id)
         };
       },
 
@@ -62,21 +61,18 @@
 
       searchTickets: function(userId, status) {
         return {
-          url: helpers.fmt('/api/v2/search.json?query=type:ticket requester:%@ status:%@', userId, status),
-          dataType: 'json'
+          url: helpers.fmt('/api/v2/search.json?query=type:ticket requester:%@ status:%@', userId, status)
         };
       },
 
       getUser: function(userId) {
         return {
-          url: helpers.fmt('/api/v2/users/%@.json?include=identities,organizations', userId),
-          dataType: 'json'
+          url: helpers.fmt('/api/v2/users/%@.json?include=identities,organizations', userId)
         };
       },
 
       getCustomRoles: {
-        url: '/api/v2/custom_roles.json',
-        dataType: 'json'
+        url: '/api/v2/custom_roles.json'
       },
 
       getUserFields: {
