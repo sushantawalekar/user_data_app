@@ -452,7 +452,7 @@
       }
 
       if (this.ticket().id()) {
-        this.ajax('getTicketAudits', this.ticket().id());
+        this.countedAjax('getTicketAudits', this.ticket().id());
       }
     },
 
