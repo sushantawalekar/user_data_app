@@ -302,18 +302,21 @@
 
     onRequestsFinished: function() {
       if (!this.storage.user) return;
+
       var ticketsCounters = this.storage.ticketsCounters;
       _.each(this.TICKET_STATUSES, function(key) {
         if (!ticketsCounters[key]) {
           ticketsCounters[key] = '-';
         }
       });
-      ticketsCounters = this.storage.orgTicketsCounters;
-        if (!ticketsCounters[key]) {
-          ticketsCounters[key] = '-';
+
+      var orgTicketsCounters = this.storage.orgTicketsCounters;
       _.each(this.TICKET_STATUSES, function(key) {
+        if (!orgTicketsCounters[key]) {
+          orgTicketsCounters[key] = '-';
         }
       });
+
       this.showDisplay();
     },
 
