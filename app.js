@@ -382,7 +382,7 @@
       this.ajax('updateNotesOrDetails', type, id, data).then(function() {
         services.notify(this.I18n.t('update_' + typeSingular + '_done'));
       }.bind(this));
-    }, 1000),
+    }, 1500),
 
     onActivateOrgFieldsChange: function(event) {
       var activate = this.$(event.target).is(':checked');
