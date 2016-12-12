@@ -303,15 +303,15 @@
     onRequestsFinished: function() {
       if (!this.storage.user) return;
       var ticketsCounters = this.storage.ticketsCounters;
-      _.each(['new', 'open', 'hold', 'pending', 'solved', 'closed'], function(key) {
+      _.each(this.TICKET_STATUSES, function(key) {
         if (!ticketsCounters[key]) {
           ticketsCounters[key] = '-';
         }
       });
       ticketsCounters = this.storage.orgTicketsCounters;
-      _.each(['new', 'open', 'hold', 'pending', 'solved', 'closed'], function(key) {
         if (!ticketsCounters[key]) {
           ticketsCounters[key] = '-';
+      _.each(this.TICKET_STATUSES, function(key) {
         }
       });
       this.showDisplay();
