@@ -439,7 +439,6 @@
           return org.id === ticketOrg.id();
         });
       }
-      this.countedAjax('getOrganizationFields');
       if (data.user && data.user.id) {
         this.countedAjax('getTickets', this.storage.user.id);
       }
