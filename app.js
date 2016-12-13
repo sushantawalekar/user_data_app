@@ -110,27 +110,6 @@
 
     // TOOLS ===================================================================
 
-    // Implement the partial() method of underscorejs, because 1.3.3 doesn't
-    // include it.
-    partial: function(func) {
-      var args = Array.prototype.slice.call(arguments, 1);
-      return function() {
-        return func.apply(this,
-                          args.concat(Array.prototype.slice.call(arguments)));
-      };
-    },
-
-    // Implement the object() method of underscorejs, because 1.3.3 doesn't
-    // include it. Simplified for our use.
-    toObject: function(list) {
-      if (list == null) return {};
-      var result = {};
-      for (var i = 0, l = list.length; i < l; i++) {
-        result[list[i][0]] = list[i][1];
-      }
-      return result;
-    },
-
     countedAjax: function() {
       this.storage.requestsCount++;
       return this.ajax.apply(this, arguments).always((function() {
@@ -208,7 +187,7 @@
     },
 
     toLocaleDate: function(date) {
-      return moment(date).utc().format('l');      
+      return moment(date).utc().format('l');
     },
 
     showDisplay: function() {
@@ -518,7 +497,7 @@
       }
       else {
         var grouped = _.groupBy(this.storage.tickets, 'status');
-        var res = this.toObject(_.map(grouped, function(value, key) {
+        var res = _.object(_.map(grouped, function(value, key) {
           return [key, value.length];
         }));
         this.storage.ticketsCounters = res;
@@ -527,7 +506,7 @@
 
     onGetOrganizationTicketsDone: function(data) {
       var grouped = _.groupBy(data.tickets, 'status');
-      var res = this.toObject(_.map(grouped, function(value, key) {
+      var res = _.object(_.map(grouped, function(value, key) {
         return [key, value.length];
       }));
       this.storage.orgTicketsCounters = res;
