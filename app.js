@@ -46,7 +46,6 @@
     // TOOLS ===================================================================
 
     countedAjax: function() {
-      console.log('requesting fahran', arguments);
       this.storage.requestsCount++;
       return this.ajax.apply(this, arguments).always((function() {
         _.defer((this.finishedAjax).bind(this));
@@ -192,8 +191,6 @@
     // EVENTS ==================================================================
 
     init: function() {
-      console.log('fahran inited!');
-
       var defaultSelection = '["##builtin_tags", "##builtin_details", "##builtin_notes"]';
       var defaultOrgSelection = '[]';
 
