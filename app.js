@@ -31,86 +31,22 @@
       'requestsFinished': 'onRequestsFinished'
     },
 
-    requests: {
-      getLocales: {
-        url: '/api/v2/locales.json'
-      },
+    requests: require('requests'),
 
-      getOrganizationFields: {
-        url: '/api/v2/organization_fields.json'
-      },
+    globalStorage: {
+      locales: null,
+      organizationFields: null,
+      userFields: null,
 
-      getOrganizationTickets: function(orgId) {
-        return {
-          url: helpers.fmt('/api/v2/organizations/%@/tickets.json', orgId)
-        };
-      },
+      orgEditable: null,
 
-      getTicketAudits: function(id){
-        return {
-          url: helpers.fmt('/api/v2/tickets/%@/audits.json', id)
-        };
-      },
-
-      getTickets: function(userId, page) {
-        page = page || 1;
-        return {
-          url: helpers.fmt('/api/v2/users/%@/tickets/requested.json?page=%@', userId, page)
-        };
-      },
-
-      searchTickets: function(userId, status) {
-        return {
-          url: helpers.fmt('/api/v2/search.json?query=type:ticket requester:%@ status:%@', userId, status)
-        };
-      },
-
-      getUser: function(userId) {
-        return {
-          url: helpers.fmt('/api/v2/users/%@.json?include=identities,organizations', userId)
-        };
-      },
-
-      getCustomRoles: {
-        url: '/api/v2/custom_roles.json'
-      },
-
-      getUserFields: {
-        url: '/api/v2/user_fields.json'
-      },
-
-      saveSelectedFields: function(keys, orgKeys) {
-        var appId = this.installationId();
-        var settings = {
-          'selectedFields': JSON.stringify(_.toArray(keys)),
-          'orgFieldsActivated': this.storage.orgFieldsActivated.toString(),
-          'orgFields': JSON.stringify(_.toArray(orgKeys))
-        };
-        this.settings = _.extend(this.settings, settings);
-        return {
-          type: 'PUT',
-          url: helpers.fmt('/api/v2/apps/installations/%@.json', appId),
-          dataType: 'json',
-          data: {
-            'settings': settings,
-            'enabled': true
-          }
-        };
-      },
-
-      updateNotesOrDetails: function(type, id, data) {
-        return {
-          url: helpers.fmt('/api/v2/%@/%@.json', type, id),
-          type: 'PUT',
-          dataType: 'json',
-          data: data
-        };
-      }
+      userEditable: false
     },
 
     // TOOLS ===================================================================
 
     countedAjax: function() {
+      console.log('requesting fahran', arguments);
       this.storage.requestsCount++;
       return this.ajax.apply(this, arguments).always((function() {
         _.defer((this.finishedAjax).bind(this));
@@ -128,35 +64,43 @@
         var field = _.find(fields, function(field) {
           return field.key === key;
         });
+
         if (!field) {
           return null;
         }
+
         var result = {
           key: key,
           description: field.description,
           title: field.title,
           editable: field.editable
         };
+
         if (key.indexOf('##builtin') === 0) {
           var subkey = key.split('_')[1];
           result.name = subkey;
           result.value = target[subkey];
           result.simpleKey = ['builtin', subkey].join(' ');
+
           if (subkey === 'tags') {
             result.value = this.renderTemplate('tags', {tags: result.value});
             result.html = true;
+
           } else if (subkey === 'locale') {
             result.value = this.storage.locales[result.value];
+
           } else if (!result.editable) {
             result.value = _.escape(result.value).replace(/\n/g,'<br>');
             result.html = true;
           }
-        }
-        else {
+
+        } else {
           result.simpleKey = ['custom', key].join(' ');
           result.value = values[key];
+
           if (field.type === 'date') {
             result.value = (result.value ? this.toLocaleDate(result.value) : '');
+
           } else if(!result.editable && values[key]) {
             result.value = _.escape(values[key]).replace(/\n/g,'<br>');
             result.html = true;
@@ -181,7 +125,7 @@
         return {};
       }
       return this.fieldsForCurrent(this.storage.user,
-                                   this.storage.fields,
+                                   this.globalStorage.userFields,
                                    this.storage.selectedKeys,
                                    this.storage.user.user_fields);
     },
@@ -228,46 +172,55 @@
 
     setEditable: function() {
       var role = this.currentUser().role();
-      this.orgEditable = { general: false, notes: true };
-      this.userEditable = true;
-      if (role == "admin") {
-        this.orgEditable = { general: true, notes: true };
-      } else if (role != "agent") {
+
+      this.globalStorage.orgEditable = {
+        general: role === "admin",
+        notes: true
+      };
+
+      if (role !== "admin" && role !== "agent") {
         this.countedAjax('getCustomRoles');
       }
+    },
+
+    setGlobalStorage: function() {
+      this.globalStorage.locales || this.countedAjax('getLocales');
+      this.globalStorage.organizationFields || this.countedAjax('getOrganizationFields');
+      this.globalStorage.userFields || this.countedAjax('getUserFields');
     },
 
     // EVENTS ==================================================================
 
     init: function() {
-      var defaultStorage = {
+      console.log('fahran inited!');
+
+      var defaultSelection = '["##builtin_tags", "##builtin_details", "##builtin_notes"]';
+      var defaultOrgSelection = '[]';
+
+      this.storage = {
         user: null,
         ticketsCounters: {},
         orgTicketsCounters: {},
         requestsCount: 0,
         fields: [],
-        selectedKeys: [],
-        orgFieldsActivated: false,
+        selectedKeys: JSON.parse(this.setting('selectedFields') || defaultSelection),
+        selectedOrgKeys: JSON.parse(this.setting('orgFields') || defaultOrgSelection),
+        orgFieldsActivated: this.setting('orgFieldsActivated') === 'true',
         tickets: []
       };
-      this.storage = _.clone(defaultStorage); // not sure the clone is needed here
-      this.storage.orgFieldsActivated = (this.setting('orgFieldsActivated') == 'true');
-      var defaultSelection = '["##builtin_tags", "##builtin_details", "##builtin_notes"]';
-      this.storage.selectedKeys = JSON.parse(this.setting('selectedFields') || defaultSelection);
-      var defaultOrgSelection = '[]';
-      this.storage.selectedOrgKeys = JSON.parse(this.setting('orgFields') || defaultOrgSelection);
-      if (!this.locale) {
-        this.locale = this.currentUser().locale();
+
+      this.locale = this.locale || this.currentUser().locale();
+
+      if (!this.globalStorage.orgEditable) {
+        this.setEditable();
       }
-      this.setEditable();
+
+      this.setGlobalStorage();
+
       if (this.ticket().requester()) {
         this.requesterEmail = this.ticket().requester().email();
         this.countedAjax('getUser', this.ticket().requester().id());
-        this.countedAjax('getUserFields');
-        this.countedAjax('getOrganizationFields');
-        if (!this.storage.locales) {
-          this.countedAjax('getLocales');
-        }
+
       } else {
         this.switchTo('empty');
       }
@@ -316,8 +269,8 @@
 
     onCogClick: function() {
       var html = this.renderTemplate('admin', {
-        fields: this.storage.fields,
-        orgFields: this.storage.organizationFields,
+        fields: this.globalStorage.userFields,
+        orgFields: this.globalStorage.organizationFields,
         orgFieldsActivated: this.storage.orgFieldsActivated
       });
       this.$('.admin').html(html).show();
@@ -373,29 +326,33 @@
 
     onGetCustomRolesDone: function(data) {
       var roles = data.custom_roles;
+
       var role = _.find(roles, function(role) {
-        return role.id == this.currentUser().role();
+        return role.id === this.currentUser().role();
       }, this);
-      this.orgEditable.general = role.configuration.organization_editing;
-      this.orgEditable.notes = role.configuration.organization_notes_editing;
-      this.userEditable = role.configuration.end_user_profile_access == "full";
+
+      this.globalStorage.orgEditable.general = role.configuration.organization_editing;
+      this.globalStorage.orgEditable.notes = role.configuration.organization_notes_editing;
+      this.globalStorage.userEditable = role.configuration.end_user_profile_access === "full";
+
       _.each(this.storage.organizationFields, function(field) {
         if (field.key === '##builtin_tags') {
           return;
+
         } else if (field.key === '##builtin_notes') {
-          field.editable = this.orgEditable.notes;
+          field.editable = this.globalStorage.orgEditable.notes;
+
         } else {
-          field.editable = this.orgEditable.general;
+          field.editable = this.globalStorage.orgEditable.general;
         }
       }, this);
     },
 
     onGetLocalesDone: function(data) {
-      var locales = {};
-      _.each(data.locales, function(obj) {
+      this.globalStorage.locales = _.reduce(data.locales, function(locales, obj) {
         locales[obj.locale] = obj.name;
-      });
-      this.storage.locales = locales;
+        return locales;
+      }, {});
     },
 
     onGetUserDone: function(data) {
@@ -513,7 +470,6 @@
     },
 
     onGetOrganizationFieldsDone: function(data) {
-      var selectedFields = this.storage.selectedOrgKeys;
       var fields = [
         {
           key: '##builtin_tags',
@@ -528,7 +484,7 @@
           description: '',
           position: Number.MAX_SAFE_INTEGER - 1,
           active: true,
-          editable: this.orgEditable.general
+          editable: this.globalStorage.orgEditable.general
         },
         {
           key: '##builtin_notes',
@@ -536,28 +492,30 @@
           description: '',
           position: Number.MAX_SAFE_INTEGER,
           active: true,
-          editable: this.orgEditable.notes
+          editable: this.globalStorage.orgEditable.notes
         }
       ].concat(data.organization_fields);
+
       var activeFields = _.filter(fields, function(field) {
         return field.active;
       });
+
       var restrictedFields = _.map(activeFields, function(field) {
         return {
           key: field.key,
           title: field.title,
           description: field.description,
           position: field.position,
-          selected: _.contains(selectedFields, field.key),
+          selected: _.contains(this.storage.selectedOrgKeys, field.key),
           editable: field.editable,
           type: field.type
         };
-      });
-      this.storage.organizationFields = _.sortBy(restrictedFields, 'position');
+      }, this);
+
+      this.globalStorage.organizationFields = _.sortBy(restrictedFields, 'position');
     },
 
     onGetUserFieldsDone: function(data) {
-      var selectedFields = this.storage.selectedKeys;
       var fields = [
         {
           key: '##builtin_tags',
@@ -579,7 +537,7 @@
           description: '',
           position: Number.MAX_SAFE_INTEGER - 1,
           active: true,
-          editable: this.userEditable
+          editable: this.globalStorage.userEditable
         },
         {
           key: '##builtin_notes',
@@ -587,24 +545,27 @@
           description: '',
           position: Number.MAX_SAFE_INTEGER,
           active: true,
-          editable: this.userEditable
+          editable: this.globalStorage.userEditable
         }
       ].concat(data.user_fields);
+
       var activeFields = _.filter(fields, function(field) {
         return field.active;
       });
+
       var restrictedFields = _.map(activeFields, function(field) {
         return {
           key: field.key,
           title: field.title,
           description: field.description,
           position: field.position,
-          selected: _.contains(selectedFields, field.key),
+          selected: _.contains(this.storage.selectedKeys, field.key),
           editable: field.editable,
           type: field.type
         };
-      });
-      this.storage.fields = _.sortBy(restrictedFields, 'position');
+      }, this);
+
+      this.globalStorage.userFields = _.sortBy(restrictedFields, 'position');
     }
   };
 }());
