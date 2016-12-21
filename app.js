@@ -119,6 +119,15 @@
                                    this.storage.user.organization.organization_fields);
     },
 
+    fillEmptyStatuses: function(list) {
+      return _.reduce(this.TICKET_STATUSES, function(list, key) {
+        if (!list[key]) {
+          list[key] = '-';
+        }
+        return list;
+      }, list);
+    },
+
     fieldsForCurrentUser: function() {
       if (!this.storage.user) {
         return {};
@@ -232,19 +241,8 @@
     onRequestsFinished: function() {
       if (!this.storage.user) return;
 
-      var ticketsCounters = this.storage.ticketsCounters;
-      _.each(this.TICKET_STATUSES, function(key) {
-        if (!ticketsCounters[key]) {
-          ticketsCounters[key] = '-';
-        }
-      });
-
-      var orgTicketsCounters = this.storage.orgTicketsCounters;
-      _.each(this.TICKET_STATUSES, function(key) {
-        if (!orgTicketsCounters[key]) {
-          orgTicketsCounters[key] = '-';
-        }
-      });
+      var ticketsCounters = this.fillEmptyStatuses(this.storage.ticketsCounters);
+      var orgTicketsCounters = this.fillEmptyStatuses(this.storage.orgTicketsCounters);
 
       this.showDisplay();
     },
@@ -440,16 +438,16 @@
     onGetTicketsDone: function(data) {
       this.storage.tickets.push.apply(this.storage.tickets, data.tickets);
       if (data.next_page) {
-        if (data.count / data.tickets.length - 1 > this.TICKET_STATUSES.length) {
         // determine if it is fewer API hits to search by ticket status type, or to continue loading remaining pages
+        if (data.count / data.tickets.length - 1 > this.TICKET_STATUSES.length) {
           this.ticketSearchStatus = 0;
           this.countedAjax('searchTickets', this.storage.user.id, this.TICKET_STATUSES[this.ticketSearchStatus]);
           return;
         }
         var pageNumber = data.next_page.match(/page=(\d+)/)[1];
         this.countedAjax('getTickets', this.storage.user.id, pageNumber);
-      }
-      else {
+
+      } else {
         var grouped = _.groupBy(this.storage.tickets, 'status');
         var res = _.object(_.map(grouped, function(value, key) {
           return [key, value.length];
