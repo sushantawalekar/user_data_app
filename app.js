@@ -200,8 +200,9 @@
     // EVENTS ==================================================================
 
     init: function() {
-      var defaultSelection = '["##builtin_tags", "##builtin_details", "##builtin_notes"]';
-      var defaultOrgSelection = '[]';
+      var selectedFields = this.setting('selectedFields');
+      var defaultSelection = ["##builtin_tags", "##builtin_details", "##builtin_notes"];
+      var orgFields = this.setting('orgFields');
 
       this.storage = {
         user: null,
@@ -209,8 +210,8 @@
         orgTicketsCounters: {},
         requestsCount: 0,
         fields: [],
-        selectedKeys: JSON.parse(this.setting('selectedFields') || defaultSelection),
-        selectedOrgKeys: JSON.parse(this.setting('orgFields') || defaultOrgSelection),
+        selectedKeys: selectedFields ? JSON.parse(selectedFields) || defaultSelection,
+        selectedOrgKeys: orgFields ? JSON.parse(orgFields) || [],
         orgFieldsActivated: this.setting('orgFieldsActivated') === 'true',
         tickets: []
       };
