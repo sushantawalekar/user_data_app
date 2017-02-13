@@ -210,8 +210,8 @@
         orgTicketsCounters: {},
         requestsCount: 0,
         fields: [],
-        selectedKeys: selectedFields ? JSON.parse(selectedFields) || defaultSelection,
-        selectedOrgKeys: orgFields ? JSON.parse(orgFields) || [],
+        selectedKeys: selectedFields ? JSON.parse(selectedFields) : defaultSelection,
+        selectedOrgKeys: orgFields ? JSON.parse(orgFields) : [],
         orgFieldsActivated: this.setting('orgFieldsActivated') === 'true',
         tickets: []
       };
