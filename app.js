@@ -9,15 +9,9 @@
       'ticket.requester.email.changed': 'onRequesterEmailChanged',
 
       // Requests
-      'getUser.done': 'onGetUserDone',
       'getLocales.done': 'onGetLocalesDone',
       'getUserFields.done': 'onGetUserFieldsDone',
       'getOrganizationFields.done': 'onGetOrganizationFieldsDone',
-      'getTickets.done': 'onGetTicketsDone',
-      'searchTickets.done': 'onSearchTicketsDone',
-      'getOrganizationTickets.done': 'onGetOrganizationTicketsDone',
-      'getTicketAudits.done': 'getTicketAuditsDone',
-      'getCustomRoles.done': 'onGetCustomRolesDone',
 
       // UI
       'click .expand-bar': 'onClickExpandBar',
@@ -176,7 +170,7 @@
       };
 
       if (role !== "admin" && role !== "agent") {
-        promises.push( this.ajax('getCustomRoles') );
+        promises.push( this.ajax('getCustomRoles').then(this.onGetCustomRolesDone.bind(this)) );
       }
 
       promises.push ( this.ajax('getLocales') );
@@ -212,7 +206,7 @@
 
       if (this.ticket().requester()) {
         this.requesterEmail = this.ticket().requester().email();
-        var localPromise = this.ajax('getUser', this.ticket().requester().id());
+        var localPromise = this.ajax('getUser', this.ticket().requester().id()).then(this.onGetUserDone.bind(this));
 
         this.when(globalPromise, localPromise).then(function() {
           this.trigger('requestsFinished');
@@ -364,22 +358,22 @@
 
       var promises = [];
       if (data.user && data.user.id) {
-        promises.push( this.ajax('getTickets', this.storage.user.id) );
+        promises.push( this.ajax('getTickets', this.storage.user.id).then(this.onGetTicketsDone.bind(this)) );
       }
       if (data.user.organization) {
         this.storage.organization = {
           id: data.user.organization.id
         };
-        promises.push( this.ajax('getOrganizationTickets', this.storage.organization.id) );
+        promises.push( this.ajax('getOrganizationTickets', this.storage.organization.id).then(this.onGetOrganizationTicketsDone.bind(this)) );
       }
 
       if (this.ticket().id()) {
-        promises.push( this.ajax('getTicketAudits', this.ticket().id()) );
+        promises.push( this.ajax('getTicketAudits', this.ticket().id()).then(this.onGetTicketAuditsDone.bind(this)) );
       }
       return this.when.apply(this, promises);
     },
 
-    getTicketAuditsDone: function(data){
+    onGetTicketAuditsDone: function(data) {
       _.each(data.audits, function(audit){
         _.each(audit.events, function(e){
           if (this.auditEventIsSpoke(e)){
@@ -427,7 +421,7 @@
         return;
       }
 
-      return this.ajax('searchTickets', this.storage.user.id, this.TICKET_STATUSES[++this.ticketSearchStatus]);
+      return this.ajax('searchTickets', this.storage.user.id, this.TICKET_STATUSES[++this.ticketSearchStatus]).then(this.onSearchTicketsDone.bind(this));
     },
 
     onGetTicketsDone: function(data) {
@@ -436,10 +430,10 @@
         // determine if it is fewer API hits to search by ticket status type, or to continue loading remaining pages
         if (data.count / data.tickets.length - 1 > this.TICKET_STATUSES.length) {
           this.ticketSearchStatus = 0;
-          return this.ajax('searchTickets', this.storage.user.id, this.TICKET_STATUSES[this.ticketSearchStatus]);
+          return this.ajax('searchTickets', this.storage.user.id, this.TICKET_STATUSES[this.ticketSearchStatus]).then(this.onSearchTicketsDone.bind(this));
         }
         var pageNumber = data.next_page.match(/page=(\d+)/)[1];
-        return this.ajax('getTickets', this.storage.user.id, pageNumber);
+        return this.ajax('getTickets', this.storage.user.id, pageNumber).then(this.onGetTicketsDone.bind(this));
 
       } else {
         var grouped = _.groupBy(this.storage.tickets, 'status');
