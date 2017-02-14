@@ -34,42 +34,15 @@
     requests: require('requests'),
 
     globalStorage: {
+      promise: null,
       locales: null,
       organizationFields: null,
       userFields: null,
       orgEditable: null,
-      userEditable: false,
-      startedFetch: false,
-      requestsCount: 0
+      userEditable: false
     },
 
     // TOOLS ===================================================================
-
-    countedAjax: function() {
-      this.storage.requestsCount++;
-      return this.ajax.apply(this, arguments).always((function() {
-        _.defer(this.finishedAjax.bind(this));
-      }).bind(this));
-    },
-
-    globalCountedAjax: function() {
-      this.globalStorage.requestsCount++;
-      return this.ajax.apply(this, arguments).always((function() {
-        _.defer(this.finishedAjax.bind(this, true));
-      }).bind(this));
-    },
-
-    finishedAjax: function(isGlobalRequest) {
-      if (isGlobalRequest) {
-        --this.globalStorage.requestsCount;
-      } else {
-        --this.storage.requestsCount;
-      }
-
-      if (this.storage.requestsCount === 0 && this.globalStorage.requestsCount === 0) {
-        this.trigger('requestsFinished');
-      }
-    },
 
     fieldsForCurrent: function(target, fields, selected, values) {
       return _.compact(_.map(selected, (function(key) {
@@ -191,7 +164,10 @@
       return links;
     },
 
-    setEditable: function() {
+    setGlobalStorage: function() {
+      if (this.globalStorage.promise) return this.globalStorage.promise;
+
+      var promises = [];
       var role = this.currentUser().role();
 
       this.globalStorage.orgEditable = {
@@ -200,15 +176,16 @@
       };
 
       if (role !== "admin" && role !== "agent") {
-        this.globalCountedAjax('getCustomRoles');
+        promises.push( this.ajax('getCustomRoles') );
       }
-    },
 
-    setGlobalStorage: function() {
-      this.globalStorage.startedFetch = true;
-      this.globalStorage.locales || this.globalCountedAjax('getLocales');
-      this.globalStorage.organizationFields || this.globalCountedAjax('getOrganizationFields');
-      this.globalStorage.userFields || this.globalCountedAjax('getUserFields');
+      promises.push ( this.ajax('getLocales') );
+      promises.push ( this.ajax('getOrganizationFields') );
+      promises.push ( this.ajax('getUserFields') );
+
+      this.globalStorage.promise = this.when.apply(this, promises);
+
+      return this.globalStorage.promise;
     },
 
     // EVENTS ==================================================================
@@ -222,7 +199,6 @@
         user: null,
         ticketsCounters: {},
         orgTicketsCounters: {},
-        requestsCount: 0,
         fields: [],
         selectedKeys: selectedFields ? JSON.parse(selectedFields) : defaultSelection,
         selectedOrgKeys: orgFields ? JSON.parse(orgFields) : [],
@@ -232,17 +208,15 @@
 
       this.locale = this.locale || this.currentUser().locale();
 
-      if (!this.globalStorage.orgEditable) {
-        this.setEditable();
-      }
-
-      if (!this.globalStorage.startedFetch) {
-        this.setGlobalStorage();
-      }
+      var globalPromise = this.setGlobalStorage();
 
       if (this.ticket().requester()) {
         this.requesterEmail = this.ticket().requester().email();
-        this.countedAjax('getUser', this.ticket().requester().id());
+        var localPromise = this.ajax('getUser', this.ticket().requester().id());
+
+        this.when(globalPromise, localPromise).then(function() {
+          this.trigger('requestsFinished');
+        }.bind(this));
 
       } else {
         this.switchTo('empty');
@@ -387,19 +361,22 @@
           return org.id === ticketOrg.id();
         });
       }
+
+      var promises = [];
       if (data.user && data.user.id) {
-        this.countedAjax('getTickets', this.storage.user.id);
+        promises.push( this.ajax('getTickets', this.storage.user.id) );
       }
       if (data.user.organization) {
         this.storage.organization = {
           id: data.user.organization.id
         };
-        this.countedAjax('getOrganizationTickets', this.storage.organization.id);
+        promises.push( this.ajax('getOrganizationTickets', this.storage.organization.id) );
       }
 
       if (this.ticket().id()) {
-        this.countedAjax('getTicketAudits', this.ticket().id());
+        promises.push( this.ajax('getTicketAudits', this.ticket().id()) );
       }
+      return this.when.apply(this, promises);
     },
 
     getTicketAuditsDone: function(data){
@@ -449,7 +426,8 @@
       if (this.ticketSearchStatus === this.TICKET_STATUSES.length - 1) {
         return;
       }
-      this.countedAjax('searchTickets', this.storage.user.id, this.TICKET_STATUSES[++this.ticketSearchStatus]);
+
+      return this.ajax('searchTickets', this.storage.user.id, this.TICKET_STATUSES[++this.ticketSearchStatus]);
     },
 
     onGetTicketsDone: function(data) {
@@ -458,11 +436,10 @@
         // determine if it is fewer API hits to search by ticket status type, or to continue loading remaining pages
         if (data.count / data.tickets.length - 1 > this.TICKET_STATUSES.length) {
           this.ticketSearchStatus = 0;
-          this.countedAjax('searchTickets', this.storage.user.id, this.TICKET_STATUSES[this.ticketSearchStatus]);
-          return;
+          return this.ajax('searchTickets', this.storage.user.id, this.TICKET_STATUSES[this.ticketSearchStatus]);
         }
         var pageNumber = data.next_page.match(/page=(\d+)/)[1];
-        this.countedAjax('getTickets', this.storage.user.id, pageNumber);
+        return this.ajax('getTickets', this.storage.user.id, pageNumber);
 
       } else {
         var grouped = _.groupBy(this.storage.tickets, 'status');
