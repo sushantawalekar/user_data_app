@@ -34,12 +34,11 @@
     requests: require('requests'),
 
     globalStorage: {
+      hasFetched: false,
       locales: null,
       organizationFields: null,
       userFields: null,
-
       orgEditable: null,
-
       userEditable: false
     },
 
@@ -192,6 +191,7 @@
     },
 
     setGlobalStorage: function() {
+      this.globalStorage.hasFetched = true;
       this.globalStorage.locales || this.countedAjax('getLocales');
       this.globalStorage.organizationFields || this.countedAjax('getOrganizationFields');
       this.globalStorage.userFields || this.countedAjax('getUserFields');
@@ -222,7 +222,9 @@
         this.setEditable();
       }
 
-      this.setGlobalStorage();
+      if (!this.globalStorage.hasFetched) {
+        this.setGlobalStorage();
+      }
 
       if (this.ticket().requester()) {
         this.requesterEmail = this.ticket().requester().email();
