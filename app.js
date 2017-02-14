@@ -34,7 +34,7 @@
     requests: require('requests'),
 
     globalStorage: {
-      hasFetched: false,
+      startedFetch: false,
       locales: null,
       organizationFields: null,
       userFields: null,
@@ -191,7 +191,7 @@
     },
 
     setGlobalStorage: function() {
-      this.globalStorage.hasFetched = true;
+      this.globalStorage.startedFetch = true;
       this.globalStorage.locales || this.countedAjax('getLocales');
       this.globalStorage.organizationFields || this.countedAjax('getOrganizationFields');
       this.globalStorage.userFields || this.countedAjax('getUserFields');
@@ -222,7 +222,7 @@
         this.setEditable();
       }
 
-      if (!this.globalStorage.hasFetched) {
+      if (!this.globalStorage.startedFetch) {
         this.setGlobalStorage();
       }
 
