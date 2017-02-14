@@ -34,12 +34,13 @@
     requests: require('requests'),
 
     globalStorage: {
-      startedFetch: false,
       locales: null,
       organizationFields: null,
       userFields: null,
       orgEditable: null,
-      userEditable: false
+      userEditable: false,
+      startedFetch: false,
+      requestsCount: 0
     },
 
     // TOOLS ===================================================================
@@ -47,12 +48,25 @@
     countedAjax: function() {
       this.storage.requestsCount++;
       return this.ajax.apply(this, arguments).always((function() {
-        _.defer((this.finishedAjax).bind(this));
+        _.defer(this.finishedAjax.bind(this));
       }).bind(this));
     },
 
-    finishedAjax: function() {
-      if (--this.storage.requestsCount === 0) {
+    globalCountedAjax: function() {
+      this.globalStorage.requestsCount++;
+      return this.ajax.apply(this, arguments).always((function() {
+        _.defer(this.finishedAjax.bind(this, true));
+      }).bind(this));
+    },
+
+    finishedAjax: function(isGlobalRequest) {
+      if (isGlobalRequest) {
+        --this.globalStorage.requestsCount;
+      } else {
+        --this.storage.requestsCount;
+      }
+
+      if (this.storage.requestsCount === 0 && this.globalStorage.requestsCount === 0) {
         this.trigger('requestsFinished');
       }
     },
@@ -186,15 +200,15 @@
       };
 
       if (role !== "admin" && role !== "agent") {
-        this.countedAjax('getCustomRoles');
+        this.globalCountedAjax('getCustomRoles');
       }
     },
 
     setGlobalStorage: function() {
       this.globalStorage.startedFetch = true;
-      this.globalStorage.locales || this.countedAjax('getLocales');
-      this.globalStorage.organizationFields || this.countedAjax('getOrganizationFields');
-      this.globalStorage.userFields || this.countedAjax('getUserFields');
+      this.globalStorage.locales || this.globalCountedAjax('getLocales');
+      this.globalStorage.organizationFields || this.globalCountedAjax('getOrganizationFields');
+      this.globalStorage.userFields || this.globalCountedAjax('getUserFields');
     },
 
     // EVENTS ==================================================================
