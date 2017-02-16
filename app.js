@@ -66,7 +66,7 @@
             result.html = true;
 
           } else if (subkey === 'locale') {
-            result.value = this.storage.locales[result.value];
+            result.value = this.globalStorage.locales[result.value];
 
           } else if (!result.editable) {
             result.value = _.escape(result.value).replace(/\n/g,'<br>');
@@ -94,7 +94,7 @@
         return {};
       }
       return this.fieldsForCurrent(this.storage.user.organization,
-                                   this.storage.organizationFields,
+                                   this.globalStorage.organizationFields,
                                    this.storage.selectedOrgKeys,
                                    this.storage.user.organization.organization_fields);
     },
@@ -315,7 +315,7 @@
       this.globalStorage.orgEditable.notes = role.configuration.organization_notes_editing;
       this.globalStorage.userEditable = role.configuration.end_user_profile_access === "full";
 
-      _.each(this.storage.organizationFields, function(field) {
+      _.each(this.globalStorage.organizationFields, function(field) {
         if (field.key === '##builtin_tags') {
           return;
 
