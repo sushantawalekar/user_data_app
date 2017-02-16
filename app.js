@@ -193,7 +193,6 @@
         user: null,
         ticketsCounters: {},
         orgTicketsCounters: {},
-        fields: [],
         selectedKeys: selectedFields ? JSON.parse(selectedFields) : defaultSelection,
         selectedOrgKeys: orgFields ? JSON.parse(orgFields) : [],
         orgFieldsActivated: this.setting('orgFieldsActivated') === 'true',
@@ -269,6 +268,8 @@
       this.$('input, button').prop('disabled', true);
       this.$('.save').hide();
       this.$('.wait-spin').show();
+
+      this.globalStorage.promise = null; // we need to reset the promise object to have getUserFields run again
       this.ajax('saveSelectedFields', keys, orgKeys)
         .always(this.init.bind(this));
     },
