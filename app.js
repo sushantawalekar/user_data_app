@@ -33,7 +33,7 @@
       organizationFields: null,
       userFields: null,
       orgEditable: null,
-      userEditable: false
+      userEditable: true
     },
 
     // TOOLS ===================================================================
