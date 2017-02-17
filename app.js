@@ -195,7 +195,7 @@
         selectedKeys: selectedFields ? JSON.parse(selectedFields) : ["##builtin_tags", "##builtin_details", "##builtin_notes"],
         selectedOrgKeys: orgFields ? JSON.parse(orgFields) : [],
         orgFieldsActivated: this.setting('orgFieldsActivated') === 'true'
-      })
+      });
 
       this.storage = {
         user: null,
