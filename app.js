@@ -33,7 +33,10 @@
       organizationFields: null,
       userFields: null,
       orgEditable: null,
-      userEditable: false
+      userEditable: true,
+      selectedKeys: null,
+      selectedOrgKeys: null,
+      orgFieldsActivated: false,
     },
 
     // TOOLS ===================================================================
@@ -66,7 +69,7 @@
             result.html = true;
 
           } else if (subkey === 'locale') {
-            result.value = this.storage.locales[result.value];
+            result.value = this.globalStorage.locales[result.value];
 
           } else if (!result.editable) {
             result.value = _.escape(result.value).replace(/\n/g,'<br>');
@@ -94,8 +97,8 @@
         return {};
       }
       return this.fieldsForCurrent(this.storage.user.organization,
-                                   this.storage.organizationFields,
-                                   this.storage.selectedOrgKeys,
+                                   this.globalStorage.organizationFields,
+                                   this.globalStorage.selectedOrgKeys,
                                    this.storage.user.organization.organization_fields);
     },
 
@@ -114,7 +117,7 @@
       }
       return this.fieldsForCurrent(this.storage.user,
                                    this.globalStorage.userFields,
-                                   this.storage.selectedKeys,
+                                   this.globalStorage.selectedKeys,
                                    this.storage.user.user_fields);
     },
 
@@ -130,7 +133,7 @@
         tickets: this.makeTicketsLinks(this.storage.ticketsCounters),
         fields: this.fieldsForCurrentUser(),
         orgFields: this.fieldsForCurrentOrg(),
-        orgFieldsActivated: this.storage.user && this.storage.orgFieldsActivated && this.storage.user.organization,
+        orgFieldsActivated: this.storage.user && this.globalStorage.orgFieldsActivated && this.storage.user.organization,
         org: this.storage.user && this.storage.user.organization,
         orgTickets: this.makeTicketsLinks(this.storage.orgTicketsCounters)
       });
@@ -186,17 +189,18 @@
 
     init: function() {
       var selectedFields = this.setting('selectedFields');
-      var defaultSelection = ["##builtin_tags", "##builtin_details", "##builtin_notes"];
       var orgFields = this.setting('orgFields');
+
+      _.extend(this.globalStorage, {
+        selectedKeys: selectedFields ? JSON.parse(selectedFields) : ["##builtin_tags", "##builtin_details", "##builtin_notes"],
+        selectedOrgKeys: orgFields ? JSON.parse(orgFields) : [],
+        orgFieldsActivated: this.setting('orgFieldsActivated') === 'true'
+      })
 
       this.storage = {
         user: null,
         ticketsCounters: {},
         orgTicketsCounters: {},
-        fields: [],
-        selectedKeys: selectedFields ? JSON.parse(selectedFields) : defaultSelection,
-        selectedOrgKeys: orgFields ? JSON.parse(orgFields) : [],
-        orgFieldsActivated: this.setting('orgFieldsActivated') === 'true',
         tickets: []
       };
 
@@ -251,7 +255,7 @@
       var html = this.renderTemplate('admin', {
         fields: this.globalStorage.userFields,
         orgFields: this.globalStorage.organizationFields,
-        orgFieldsActivated: this.storage.orgFieldsActivated
+        orgFieldsActivated: this.globalStorage.orgFieldsActivated
       });
       this.$('.admin').html(html).show();
       this.$('.whole').hide();
@@ -269,6 +273,8 @@
       this.$('input, button').prop('disabled', true);
       this.$('.save').hide();
       this.$('.wait-spin').show();
+
+      this.globalStorage.promise = null; // we need to reset the promise object to have getUserFields run again
       this.ajax('saveSelectedFields', keys, orgKeys)
         .always(this.init.bind(this));
     },
@@ -298,7 +304,7 @@
 
     onActivateOrgFieldsChange: function(event) {
       var activate = this.$(event.target).is(':checked');
-      this.storage.orgFieldsActivated = activate;
+      this.globalStorage.orgFieldsActivated = activate;
       this.$('.org-fields-list').toggle(activate);
     },
 
@@ -315,7 +321,7 @@
       this.globalStorage.orgEditable.notes = role.configuration.organization_notes_editing;
       this.globalStorage.userEditable = role.configuration.end_user_profile_access === "full";
 
-      _.each(this.storage.organizationFields, function(field) {
+      _.each(this.globalStorage.organizationFields, function(field) {
         if (field.key === '##builtin_tags') {
           return;
 
@@ -489,7 +495,7 @@
           title: field.title,
           description: field.description,
           position: field.position,
-          selected: _.contains(this.storage.selectedOrgKeys, field.key),
+          selected: _.contains(this.globalStorage.selectedOrgKeys, field.key),
           editable: field.editable,
           type: field.type
         };
@@ -542,7 +548,7 @@
           title: field.title,
           description: field.description,
           position: field.position,
-          selected: _.contains(this.storage.selectedKeys, field.key),
+          selected: _.contains(this.globalStorage.selectedKeys, field.key),
           editable: field.editable,
           type: field.type
         };
