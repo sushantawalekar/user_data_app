@@ -75,10 +75,10 @@
           {{else}}
             <p>
             {{#if link}}
-							<a target="_blank" href="{{value}}">{{value}}</a>
-						{{else}}
-							{{#if html}}{{{value}}}{{else}}{{value}}{{/if}}
-						{{/if}}      
+              <a target="_blank" href="{{value}}">{{value}}</a>
+            {{else}}
+              {{#if html}}{{{value}}}{{else}}{{value}}{{/if}}
+            {{/if}}      
             </p>
           {{/if}}
         </div>
