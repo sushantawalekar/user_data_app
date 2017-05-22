@@ -80,6 +80,10 @@
           result.simpleKey = ['custom', key].join(' ');
           result.value = values[key];
 
+          if (result.value.indexOf('http') > -1 ){
+            result.link = true;
+          }
+          
           if (field.type === 'date') {
             result.value = (result.value ? this.toLocaleDate(result.value) : '');
 
