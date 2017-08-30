@@ -80,7 +80,7 @@
           result.simpleKey = ['custom', key].join(' ');
           result.value = values[key];
 
-          if (result.value.indexOf('http') > -1 ){
+          if (result.value && result.value.indexOf('http') > -1 ){
             result.link = true;
           }
           
