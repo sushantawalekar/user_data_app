@@ -1,4 +1,13 @@
-&.box.apps_ticket_sidebar.app_view {
+html, body {
+  overflow: hidden;
+}
+
+.loader {
+  padding-left: 144px;
+  padding-top: 60px;
+}
+
+.box.apps_ticket_sidebar.app_view {
   padding-bottom: 0px;
   padding-top: 15px;
   color: #333;
@@ -36,6 +45,41 @@
     margin-right: auto;
     padding-left: 20px;
     padding-right: 20px;
+  }
+}
+
+i.icon-circle-arrow-left {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  line-height: 14px;
+  vertical-align: text-top;
+  background-image: url("images/glyphicons.png");
+  background-position: -264px -144px;
+  background-repeat: no-repeat;
+}
+
+.ticket_status_label {
+  color: #FFFFFF;
+  border-radius: 3px;
+
+  &.new {
+    background: #F5CA00;
+  }
+  &.open {
+    background: #E82A2A;
+  }
+  &.solved {
+    background: #828282;
+  }
+  &.pending {
+    background: #59BBE0;
+  }
+  &.hold {
+    background: #000000;
+  }
+  &.closed {
+    background: #DDDDDD;
   }
 }
 
@@ -133,10 +177,10 @@
       width: 12px;
       height: 12px;
       display: inline-block;
-      background-image: app-asset-url("ico-settings-normal.png");
+      background-image: url("images/ico-settings-normal.png");
 
       &:hover {
-        background-image: app-asset-url("ico-settings-hover.png");
+        background-image: url("images/ico-settings-hover.png");
       }
     }
 
@@ -147,7 +191,7 @@
 
       a {
         display: block;
-        background-image: app-asset-url("ico-social-sprite.png");
+        background-image: url("images/ico-social-sprite.png");
 
         &.facebook {
           width: 5px;
@@ -176,12 +220,12 @@
       float: left;
 
       &.default {
-        background-image: app-asset-url("avatar.png");
+        background-image: url("images/avatar.png");
         background-size: cover;
         border-radius: 50px;
 
         &.org {
-          background-image: app-asset-url("org.png");
+          background-image: url("images/org.png");
         }
       }
 
@@ -260,6 +304,7 @@
   }
 
   .expand-bar {
+    cursor: pointer;
     background-color: #fff;
     border-top: 1px solid #f0f0f0;
     padding-top: 0px;
@@ -276,22 +321,22 @@
       background-position: center;
 
       &.arrow-down {
-        background-image: app-asset-url("ico-arrow-down-normal.png");
+        background-image: url("images/ico-arrow-down-normal.png");
         &:hover {
-          background-image: app-asset-url("ico-arrow-down-hover.png");
+          background-image: url("images/ico-arrow-down-hover.png");
         }
       }
 
       &.arrow-up {
-        background-image: app-asset-url("ico-arrow-up-normal.png");
+        background-image: url("images/ico-arrow-up-normal.png");
         &:hover {
-          background-image: app-asset-url("ico-arrow-up-hover.png");
+          background-image: url("images/ico-arrow-up-hover.png");
         }
       }
     }
 
     &:hover {
-      background-image: app-asset-url("hover-bg.png");
+      background-image: url("images/hover-bg.png");
       background-repeat: no-repeat;
       background-position: center top;
     }
