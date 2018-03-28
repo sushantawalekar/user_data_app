@@ -74,11 +74,11 @@
             <textarea class="notes-or-details" data-field-name="{{name}}" data-field-type="users">{{value}}</textarea>
           {{else}}
             <p>
-            {{#if link}}
-              <a target="_blank" href="{{value}}">{{value}}</a>
-            {{else}}
-              {{#if html}}{{{value}}}{{else}}{{value}}{{/if}}
-            {{/if}}      
+              {{#if html}}
+                {{{value}}}
+              {{else}}
+                {{value}}
+              {{/if}}
             </p>
           {{/if}}
         </div>
