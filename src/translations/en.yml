@@ -151,4 +151,3 @@ By enabling this app, You agree to the [Built by Zendesk Terms of Use](https://w
       key: "txt.apps.user_data_app.spoke_ticket_id"
       title: "this is the ticket ID from the spoke of that user"
       value: "Spoke ticket ID"
-
