@@ -1,0 +1,23 @@
+selectedFields:
+  - "##builtin_tags"
+  - user_field_1
+  - test
+  - "##builtin_locale"
+  - user_field_2
+  - text
+  - user_field_3
+  - test2
+  - system::embeddable_last_seen
+  - desc
+  - "##builtin_details"
+  - "##builtin_notes"
+orgFields:
+  - "##builtin_tags"
+  - field_1
+  - organization_field_1
+  - drop_down
+  - organization_field_2
+  - organization_field_3
+  - "##builtin_details"
+  - "##builtin_notes"
+orgFieldsActivated: true
