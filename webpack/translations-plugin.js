@@ -22,10 +22,7 @@ function toObj (yaml) {
     return translation.obsolete ? (new Date(translation.obsolete) > new Date()) : true
   })
 
-  const enHash = arrayToNestedHash(translations).txt.apps[pkg]
-  enHash.app.package = pkg
-
-  return enHash
+  return arrayToNestedHash(translations).txt.apps[pkg]
 }
 
 function arrayToNestedHash (arr) {
@@ -36,7 +33,7 @@ function arrayToNestedHash (arr) {
       current[key] = current[key] || {}
       current = current[key]
     })
-    current[keys.slice(-1)] = { title: item.title, value: item.value }
+    current[keys.slice(-1)] = item.value
     return result
   }, {})
 }

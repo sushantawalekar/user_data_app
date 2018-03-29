@@ -2,7 +2,7 @@ const flatten = require('lodash/flatten')
 
 function translationFlatten (object, flattened = {}, currentKeys = []) {
   Object.keys(object).map(function (key) {
-    if (['title', 'value'].indexOf(key) >= 0 && typeof object[key] !== 'object') {
+    if (['title', 'value'].indexOf(key) >= 0 && typeof object[key] === 'object') {
       flattened[currentKeys.join('.')] = object['value']
     } else if (object[key] && typeof object[key] === 'object') {
       translationFlatten(object[key], flattened, flatten([currentKeys, key]))
