@@ -28,5 +28,5 @@
   </div>
 {{/if}}
 
-<button class="btn save">{{t "admin.save"}}</button>
+<button class="save c-btn c-btn--primary">{{t "admin.save"}}</button>
 <div class="wait-spin hide">{{spinner}}</div>

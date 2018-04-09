@@ -1,6 +1,7 @@
 @import '~@zendesk/garden-css-bedrock/dist/index';
 @import '~@zendesk/garden-css-tags';
 @import '~@zendesk/garden-css-forms';
+@import '~@zendesk/garden-css-buttons';
 
 html, body {
   overflow: hidden;
@@ -49,8 +50,6 @@ html, body {
     margin-top: 20px;
     margin-left: auto;
     margin-right: auto;
-    padding-left: 20px;
-    padding-right: 20px;
   }
 }
 
