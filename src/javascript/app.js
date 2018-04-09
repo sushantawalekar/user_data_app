@@ -540,5 +540,6 @@ $(document).on('change keyup input paste', '.notes-or-details', app.onNotesOrDet
 $(document).on('change', '.org-fields-activate', app.onActivateOrgFieldsChange)
 $(document).on('click', '.back', app.onBackClick)
 $(document).on('click', '.save', app.onSaveClick)
+$(document).on('mouseup', 'textarea', debounce(app.resize, 300))
 
 export default app
