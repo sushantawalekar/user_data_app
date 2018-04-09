@@ -71,7 +71,7 @@
         <div class="field {{simpleKey}}" key="{{key}}" data-editable="{{editable}}">
           <h4>{{title}}</h4>
           {{#if editable}}
-            <textarea class="notes-or-details" data-field-name="{{name}}" data-field-type="users">{{value}}</textarea>
+            <textarea class="notes-or-details c-txt__input c-txt__input--area is-resizable" data-field-name="{{name}}" data-field-type="users">{{value}}</textarea>
           {{else}}
             <p>
               {{#if html}}
@@ -136,7 +136,7 @@
           <div class="field {{simpleKey}}" key="{{key}}" data-editable="{{editable}}">
             <h4>{{title}}</h4>
             {{#if editable}}
-              <textarea class="notes-or-details" data-field-name="{{name}}" data-field-type="organizations">{{value}}</textarea>
+              <textarea class="notes-or-details c-txt__input c-txt__input--area is-resizable" data-field-name="{{name}}" data-field-type="organizations">{{value}}</textarea>
             {{else}}
               <p>{{#if html}}{{{value}}}{{else}}{{value}}{{/if}}</p>
             {{/if}}

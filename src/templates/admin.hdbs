@@ -1,33 +1,30 @@
 <a class="back"><i class="icon-circle-arrow-left"/></a>
-<h4>{{t "admin.title"}}</h4>
 <p>{{t "admin.text"}}</p>
 
-<ul class="fields-list">
+<div class="fields-list">
   {{#each fields}}
-    <li>
-      <input type="checkbox" value="{{key}}" id="{{key}}" {{#if selected}}checked{{/if}}/>
-      <label for="{{key}}">{{title}}</label>
-    </li>
+    <div class="c-chk">
+      <input class="c-chk__input" value="{{key}}" id="{{key}}" {{#if selected}}checked{{/if}} type="checkbox">
+      <label class="c-chk__label c-chk__label--toggle c-chk__label--regular" for="{{key}}"><span dir="ltr">{{title}}</span></label>
+    </div>
   {{/each}}
-</ul>
+</div>
 
 {{#if orgFields.length }}
   <div class="org-fields">
-    <label class="checkbox">
-      <input type="checkbox" class="org-fields-activate" {{#if orgFieldsActivated}}checked{{/if}}>
-      {{t "admin.include_org_fields"}}
-    </label>
+     <div class="c-chk">
+      <input class="c-chk__input org-fields-activate" id="org-fields-activate" value="{{key}}" {{#if orgFieldsActivated}}checked{{/if}} type="checkbox">
+      <label class="c-chk__label c-chk__label--toggle" for="org-fields-activate"><span dir="ltr">{{t "admin.include_org_fields"}}</span></label>
+    </div>
 
-    <ul class="org-fields-list" {{#unless orgFieldsActivated}}style="display: none"{{/unless}}>
+    <div class="org-fields-list" {{#unless orgFieldsActivated}}style="display: none"{{/unless}}>
       {{#each orgFields}}
-        <li>
-          <label class="checkbox">
-            <input type="checkbox" value="{{key}}" {{#if selected}}checked{{/if}}>
-            {{title}}
-          </label>
-        </li>
+        <div class="c-chk">
+          <input class="c-chk__input" value="{{key}}" id="org_{{key}}" {{#if selected}}checked{{/if}} type="checkbox">
+          <label class="c-chk__label c-chk__label--toggle c-chk__label--regular" for="org_{{key}}"><span dir="ltr">{{title}}</span></label>
+        </div>
       {{/each}}
-    </ul>
+    </div>
   </div>
 {{/if}}
 

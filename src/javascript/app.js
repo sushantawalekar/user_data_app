@@ -190,7 +190,6 @@ const app = {
     })
   },
 
-  // TOOLS ===================================================================
   fieldsForCurrent: function (target, fields, selected, values, locales) {
     return compact(map(selected, function (key) {
       const field = find(fields, function (field) {
@@ -320,8 +319,6 @@ const app = {
     return links
   },
 
-  // EVENTS ==================================================================
-
   onRequesterEmailChanged: function (event, email) {
     const requester = storage('requester')
     if (email && requester.email !== email) {
@@ -404,9 +401,8 @@ const app = {
     const activate = $(event.target).is(':checked')
     setting('orgFieldsActivated', activate)
     $('.org-fields-list').toggle(activate)
+    app.resize()
   },
-
-  // REQUESTS ================================================================
 
   displaySpoke: function () {
     const html = spoke(storage('spokeData'))

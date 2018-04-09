@@ -1,3 +1,7 @@
+@import '~@zendesk/garden-css-bedrock/dist/index';
+@import '~@zendesk/garden-css-tags';
+@import '~@zendesk/garden-css-forms';
+
 html, body {
   overflow: hidden;
 }
@@ -15,20 +19,22 @@ html, body {
 
 .admin {
   margin-bottom: 15px;
+
+  .c-chk {
+    margin-bottom: 4px;
+  }
+
   p {
     color: #999;
-    margin-top: 1em;
     margin-bottom: 1em;
   }
 
-  .fields-list {
-    label {
-      display: inline;
-    }
+  .org-fields {
+    margin-top: 20px;
   }
 
-  .org-fields {
-    margin-top: 15px;
+  .org-fields-list {
+    margin-left: 20px;
   }
 
   .back {
@@ -102,13 +108,7 @@ i.icon-circle-arrow-left {
       padding-top: 10px;
 
       textarea {
-        box-shadow: white 0px 0px 0px 0px inset;
-        padding: 0px;
-        width: 100%;
         height: 72px;
-        box-sizing: border-box;
-        border: 0px;
-        font-size: 14px;
       }
 
       &.builtin.tags {
@@ -124,25 +124,6 @@ i.icon-circle-arrow-left {
           clear: both;
           border: 0px;
           margin-bottom: 0px;
-        }
-
-        li {
-          float: left;
-          margin: 0 3px 3px 0;
-          padding: 3px 6px 4px 6px;
-          font-size: 11px;
-          line-height: 13px;
-          display: block;
-          background: #f4f4f4;
-          color: #333;
-          min-height: 13px;
-          border-radius: 3px;
-          border: 1px solid #ddd;
-          word-break: break-all;
-          white-space: pre-wrap;
-          white-space: -moz-pre-wrap;
-          word-wrap: break-word;
-          -ms-word-break: break-all;
         }
       }
 
@@ -307,8 +288,7 @@ i.icon-circle-arrow-left {
     cursor: pointer;
     background-color: #fff;
     border-top: 1px solid #f0f0f0;
-    padding-top: 0px;
-    padding-bottom: 15px;
+    padding: 0px;
     display: block;
     margin-top: 30px;
 
