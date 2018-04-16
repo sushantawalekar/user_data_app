@@ -1,4 +1,4 @@
-const orgClient = ZAFClient.init()
+const orgClient = window.ZAFClient.init()
 function Client () {}
 Client.prototype = orgClient
 const client = new Client()

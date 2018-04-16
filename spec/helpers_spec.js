@@ -1,3 +1,4 @@
+/* eslint-env jasmine */
 import * as helpers from '../src/javascript/lib/helpers'
 import client from '../src/javascript/lib/client'
 
@@ -83,7 +84,7 @@ describe('Helpers', () => {
 
         spyOn(client, 'request').and.callFake(function (request) {
           const r = ticketsResponse[idx++]
-          return (idx === 2) ? Promise.reject('error') : Promise.resolve(r)
+          return (idx === 2) ? Promise.reject(new Error('error')) : Promise.resolve(r)
         })
       })
 

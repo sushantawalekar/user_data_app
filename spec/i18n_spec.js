@@ -1,3 +1,4 @@
+/* eslint-env jasmine */
 import I18n from '../src/javascript/lib/i18n'
 
 const en = {

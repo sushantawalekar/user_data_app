@@ -74,15 +74,15 @@ export function urlify (message, hostname) {
     elm.href = (match[0].indexOf('www') === 0) ? 'http://' + match[0] : match[0]
 
     urls.push({
-      match: match[0],         // "http://www.google.com/test/image.png?te=1&amp;ab=2#/tickets/2345"
-      href: elm.href,          // "http://www.google.com/test/image.png?te=1&amp;ab=2#/tickets/2345"
-      protocol: elm.protocol,  // "http:"
-      host: elm.host,          // "www.google.com"
-      hostname: elm.hostname,  // "www.google.com"
-      port: elm.port,          // ""
-      pathname: elm.pathname,  // "/test/image.png"
-      hash: elm.hash,          // "#/tickets/2345"
-      search: elm.search       // "?te=1&amp;ab=2"
+      match: match[0], // "http://www.google.com/test/image.png?te=1&amp;ab=2#/tickets/2345"
+      href: elm.href, // "http://www.google.com/test/image.png?te=1&amp;ab=2#/tickets/2345"
+      protocol: elm.protocol, // "http:"
+      host: elm.host, // "www.google.com"
+      hostname: elm.hostname, // "www.google.com"
+      port: elm.port, // ""
+      pathname: elm.pathname, // "/test/image.png"
+      hash: elm.hash, // "#/tickets/2345"
+      search: elm.search // "?te=1&amp;ab=2"
     })
   }
 

@@ -151,7 +151,6 @@ const app = {
 
           each(storage('organizationFields'), (field) => {
             if (field.key === '##builtin_tags') {
-              return
             } else if (field.key === '##builtin_notes') {
               field.editable = storage('orgEditable.notes')
             } else {
@@ -181,7 +180,7 @@ const app = {
 
       return Promise.all(promises)
     }).then((data) => {
-      const [[user, organizationTicketCounters, audits, ticketCounters], locales, organizationFields, userFields] = data
+      const [[user, organizationTicketCounters, audits, ticketCounters], locales, organizationFields, userFields] = data // eslint-disable-line no-unused-vars
 
       app.fillEmptyStatuses(ticketCounters)
       app.fillEmptyStatuses(organizationTicketCounters)
@@ -249,19 +248,19 @@ const app = {
   fieldsForCurrentUser: function () {
     if (!storage('user')) { return {} }
     return app.fieldsForCurrent(storage('user'),
-                                storage('userFields'),
-                                setting('selectedFields') ? JSON.parse(setting('selectedFields')) : ['##builtin_tags', '##builtin_details', '##builtin_notes'],
-                                storage('user').user_fields,
-                                storage('locales'))
+      storage('userFields'),
+      setting('selectedFields') ? JSON.parse(setting('selectedFields')) : ['##builtin_tags', '##builtin_details', '##builtin_notes'],
+      storage('user').user_fields,
+      storage('locales'))
   },
 
   fieldsForCurrentOrg: function () {
     if (!storage('user') || !storage('user').organization) { return {} }
     return app.fieldsForCurrent(storage('user').organization,
-                                storage('organizationFields'),
-                                setting('orgFields') ? JSON.parse(setting('orgFields')) : [],
-                                storage('user').organization.organization_fields,
-                                storage('locales'))
+      storage('organizationFields'),
+      setting('orgFields') ? JSON.parse(setting('orgFields')) : [],
+      storage('user').organization.organization_fields,
+      storage('locales'))
   },
 
   fillEmptyStatuses: function (list) {

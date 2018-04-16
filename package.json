@@ -6,11 +6,11 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "karma start --single-run",
     "watch": "webpack --watch",
     "build": "webpack",
     "build:prod": "webpack --env.production -p",
-    "karma": "karma"
+    "lint": "standard"
   },
   "devDependencies": {
     "@zendesk/garden-css-bedrock": "^4.0.0",
@@ -39,6 +39,7 @@
     "lodash": "^4.17.5",
     "node-sass": "^4.7.2",
     "sass-loader": "^6.0.6",
+    "standard": "^11.0.1",
     "url-loader": "^0.6.2",
     "webpack": "^3.11.0"
   }
