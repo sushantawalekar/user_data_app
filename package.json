@@ -13,10 +13,10 @@
     "lint": "standard"
   },
   "devDependencies": {
-    "@zendesk/garden-css-bedrock": "^4.0.0",
-    "@zendesk/garden-css-buttons": "^4.1.1",
-    "@zendesk/garden-css-forms": "^4.0.1",
-    "@zendesk/garden-css-tags": "^2",
+    "@zendeskgarden/css-bedrock": "^6.0.0",
+    "@zendeskgarden/css-buttons": "^5.0.1",
+    "@zendeskgarden/css-forms": "^5.0.1",
+    "@zendeskgarden/css-tags": "^3.0.1",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.3",
     "babel-preset-env": "^1.6.1",
