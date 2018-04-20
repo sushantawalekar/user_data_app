@@ -6,7 +6,7 @@ Client.prototype = orgClient
 const client = new Client()
 
 function handleClientError (error) {
-  client.invoke('notify', I18n.t('client.get.error', error.message))
+  client.invoke('notify', I18n.t('client.get.error', { error: error.message }), 'error')
 }
 
 client.get = function (stringOrArray) {
@@ -17,7 +17,7 @@ client.get = function (stringOrArray) {
 
     if (typeof stringOrArray === 'string') {
       if (data[stringOrArray]) return data[stringOrArray]
-      error = new Error(data.errors[stringOrArray])
+      error = new Error(data.errors[stringOrArray].message)
       handleClientError(error)
       return error
     } else {
@@ -25,7 +25,7 @@ client.get = function (stringOrArray) {
         if (data[key]) {
           returnValue.push(data[key])
         } else {
-          error = new Error(data.errors[key])
+          error = new Error(data.errors[key].message)
           handleClientError(error)
           returnValue.push(error)
         }

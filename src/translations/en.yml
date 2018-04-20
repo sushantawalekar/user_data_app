@@ -82,7 +82,7 @@ By enabling this app, You agree to the [Built by Zendesk Terms of Use](https://w
   - translation:
       key: "txt.apps.user_data_app.client.get.error"
       title: "Error message notification when a get request fails"
-      value: "An error occurred: '%@'"
+      value: "An error occurred: {{error}}"
   - translation:
       key: "txt.apps.user_data_app.tickets"
       title: "Number of tickets for this user after this it will always be a number like 12 or 3"

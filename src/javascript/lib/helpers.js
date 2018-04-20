@@ -8,7 +8,7 @@ export function ajax (...args) {
   const funcName = args.shift()
   const funcOrObj = requests[funcName]
   const obj = typeof funcOrObj === 'function' ? funcOrObj.apply(window, args) : funcOrObj
-  if (!obj.url) return Promise.reject(new Error('request function did not return a url'))
+  if (!obj.url) return Promise.resolve()
   return client.request(obj)
 }
 

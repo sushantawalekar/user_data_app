@@ -32,11 +32,20 @@ const app = {
     storage('userFields', null)
     storage('userEditable', true)
 
-    client.get(['ticket.requester2', 'ticket.id', 'ticket.organization', 'currentUser']).then((data) => {
-      const [ requester, ticketId, ticketOrg, currentUser ] = data
+    app.getInformation().then((data) => {
+      const [[user, organizationTicketCounters, audits, ticketCounters], locales, organizationFields, userFields] = data // eslint-disable-line no-unused-vars
 
+      app.fillEmptyStatuses(ticketCounters)
+      app.fillEmptyStatuses(organizationTicketCounters)
+
+      app.showDisplay()
+    })
+  },
+
+  getInformation: function () {
+    return client.get(['ticket.requester', 'ticket.id', 'ticket.organization', 'currentUser']).then((data) => {
+      const [ requester, ticketId, ticketOrg, currentUser ] = data
       const promises = []
-      let promise
 
       storage('currentUser', currentUser)
       storage('requester', requester)
@@ -46,131 +55,138 @@ const app = {
 
       I18n.loadTranslations(currentUser.locale)
 
-      promise = ajax('getUser', requester.id).then((data) => {
-        const promises = []
-        const user = data.user
-        let promise
-
-        user.identities = data.identities.filter(function (ident) {
-          return includes(['twitter', 'facebook'], ident.type)
-        }).map(function (ident) {
-          if (ident.type === 'twitter') {
-            ident.value = `https://twitter.com/${ident.value}`
-          } else if (ident.type === 'facebook') {
-            ident.value = `https://facebook.com/${ident.value}`
-          }
-          return ident
-        })
-
-        user.organization = data.organizations[0]
-        if (ticketOrg) {
-          user.organization = data.organizations.find(function (org) {
-            return org.id === ticketOrg.id
-          })
-        }
-        promises.push(user)
-        storage('user', user)
-
-        if (data.user.organization_id) {
-          promise = ajax('getOrganizationTickets', data.user.organization_id).then((data) => {
-            const grouped = groupBy(data.tickets, 'status')
-            const res = fromPairs(map(grouped, (value, key) => {
-              return [key, value.length]
-            }))
-            storage('orgTicketsCounters', res)
-            return res
-          })
-          promises.push(promise)
-        }
-
-        if (ticketId) {
-          promise = ajax('getTicketAudits', ticketId).then((data) => {
-            each(data.audits, (audit) => {
-              each(audit.events, (e) => {
-                if (app.auditEventIsSpoke(e)) {
-                  const spokeData = app.spokeData(e)
-
-                  if (spokeData) {
-                    storage('spokeData', spokeData)
-                    const user = storage('user')
-                    user.email = spokeData.email
-                    storage('user', user)
-                    app.displaySpoke()
-                  }
-                }
-              })
-            })
-            return data.audits
-          })
-          promises.push(promise)
-        }
-
-        promise = ajaxPaging('getTickets', user.id).then((data) => {
-          const grouped = groupBy(data.tickets, 'status')
-          const res = fromPairs(map(grouped, (value, key) => {
-            return [key, value.length]
-          }))
-          storage('ticketsCounters', res)
-          return res
-        })
-        promises.push(promise)
-
-        return Promise.all(promises)
-      })
-
-      promises.push(promise)
+      promises.push(app.getUser(ticketOrg))
 
       // If not admin or agent
       if (['admin', 'agent'].indexOf(currentUser.role) === -1) {
-        promise = ajax('getCustomRoles').then((data) => {
-          const currentUser = storage('currentUser')
-          const roles = data.custom_roles
-
-          const role = find(roles, (role) => {
-            return role.id === currentUser.role
-          })
-
-          storage('orgEditable.general', role.configuration.organization_editing)
-          storage('orgEditable.notes', role.configuration.organization_notes_editing)
-          storage('userEditable', role.configuration.end_user_profile_access === 'full')
-
-          each(storage('organizationFields'), (field) => {
-            if (field.key === '##builtin_tags') {
-            } else if (field.key === '##builtin_notes') {
-              field.editable = storage('orgEditable.notes')
-            } else {
-              field.editable = storage('orgEditable.general')
-            }
-          })
-          return data
-        })
-        promises.push(promise)
+        promises.push(app.getCustomRoles())
       }
 
-      promise = ajax('getLocales').then((data) => {
-        const locales = fromPairs(map(data.locales, function (locale) {
-          return [locale.locale, locale.name]
-        }))
-
-        storage('locales', locales)
-        return locales
-      })
-      promises.push(promise)
-
-      promise = ajax('getOrganizationFields').then(app.onGetOrganizationFieldsDone)
-      promises.push(promise)
-
-      promise = ajax('getUserFields').then(app.onGetUserFieldsDone)
-      promises.push(promise)
+      promises.push(app.getLocales())
+      promises.push(ajax('getOrganizationFields').then(app.onGetOrganizationFieldsDone))
+      promises.push(ajax('getUserFields').then(app.onGetUserFieldsDone))
 
       return Promise.all(promises)
-    }).then((data) => {
-      const [[user, organizationTicketCounters, audits, ticketCounters], locales, organizationFields, userFields] = data // eslint-disable-line no-unused-vars
+    })
+  },
 
-      app.fillEmptyStatuses(ticketCounters)
-      app.fillEmptyStatuses(organizationTicketCounters)
+  getUser: function (ticketOrg) {
+    const requester = storage('requester')
 
-      app.showDisplay()
+    return ajax('getUser', requester.id).then((data) => {
+      const promises = []
+      const user = data.user
+
+      user.identities = data.identities.filter(function (ident) {
+        return includes(['twitter', 'facebook'], ident.type)
+      }).map(function (ident) {
+        if (ident.type === 'twitter') {
+          ident.value = `https://twitter.com/${ident.value}`
+        } else if (ident.type === 'facebook') {
+          ident.value = `https://facebook.com/${ident.value}`
+        }
+        return ident
+      })
+
+      user.organization = data.organizations[0]
+      if (ticketOrg) {
+        user.organization = data.organizations.find(function (org) {
+          return org.id === ticketOrg.id
+        })
+      }
+      promises.push(user)
+      storage('user', user)
+
+      if (data.user.organization_id) {
+        promises.push(app.getOrganizationTickets(data.user.organization_id))
+      }
+
+      if (storage('ticketId')) {
+        promises.push(app.getTicketAudits())
+      }
+
+      promises.push(app.getTickets(user.id))
+
+      return Promise.all(promises)
+    })
+  },
+
+  getCustomRoles: function () {
+    return ajax('getCustomRoles').then((data) => {
+      const currentUser = storage('currentUser')
+      const roles = data.custom_roles
+
+      const role = find(roles, (role) => {
+        return role.id === currentUser.role
+      })
+
+      storage('orgEditable.general', role.configuration.organization_editing)
+      storage('orgEditable.notes', role.configuration.organization_notes_editing)
+      storage('userEditable', role.configuration.end_user_profile_access === 'full')
+
+      each(storage('organizationFields'), (field) => {
+        if (field.key === '##builtin_tags') {
+        } else if (field.key === '##builtin_notes') {
+          field.editable = storage('orgEditable.notes')
+        } else {
+          field.editable = storage('orgEditable.general')
+        }
+      })
+      return data
+    })
+  },
+
+  getLocales: function () {
+    return ajax('getLocales').then((data) => {
+      const locales = fromPairs(map(data.locales, function (locale) {
+        return [locale.locale, locale.name]
+      }))
+
+      storage('locales', locales)
+      return locales
+    })
+  },
+
+  getOrganizationTickets: function (organizationId) {
+    return ajax('getOrganizationTickets', organizationId).then((data) => {
+      const grouped = groupBy(data.tickets, 'status')
+      const res = fromPairs(map(grouped, (value, key) => {
+        return [key, value.length]
+      }))
+      storage('orgTicketsCounters', res)
+      return res
+    })
+  },
+
+  getTicketAudits: function () {
+    return ajax('getTicketAudits', storage('ticketId')).then((data) => {
+      each(data.audits, (audit) => {
+        each(audit.events, (e) => {
+          if (app.auditEventIsSpoke(e)) {
+            const spokeData = app.spokeData(e)
+
+            if (spokeData) {
+              storage('spokeData', spokeData)
+              const user = storage('user')
+              user.email = spokeData.email
+              storage('user', user)
+              app.displaySpoke()
+            }
+          }
+        })
+      })
+      return data.audits
+    })
+  },
+
+  getTickets: function (userId) {
+    return ajaxPaging('getTickets', userId).then((data) => {
+      const grouped = groupBy(data.tickets, 'status')
+      const res = fromPairs(map(grouped, (value, key) => {
+        return [key, value.length]
+      }))
+      storage('ticketsCounters', res)
+      return res
     })
   },
 
