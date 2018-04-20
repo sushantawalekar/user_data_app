@@ -2,11 +2,13 @@ import forEach from 'lodash/forEach'
 import requests from './requests'
 import client from './client'
 
+const MAX_PAGES = 10
+
 export function ajax (...args) {
   const funcName = args.shift()
   const funcOrObj = requests[funcName]
   const obj = typeof funcOrObj === 'function' ? funcOrObj.apply(window, args) : funcOrObj
-  if (!obj.url) return Promise.resolve()
+  if (!obj.url) return Promise.reject(new Error('request function did not return a url'))
   return client.request(obj)
 }
 
@@ -17,17 +19,18 @@ export function ajax (...args) {
  * It cannot continue when it's either the first page or when it has two consecutive fails.
  */
 export function ajaxPaging (...args) {
+  let pages = 1
+
   return new Promise(function (resolve, reject) {
     const allData = []
     let lastNextPage = null
 
-    ajax.apply(window, args).then(done).catch(fail)
-
-    function done (data) {
+    const done = function (data) {
       allData.push(data)
 
-      if (data.next_page) {
+      if (pages < MAX_PAGES && data.next_page) {
         lastNextPage = data.next_page
+        pages++
 
         client.request({
           url: data.next_page
@@ -37,8 +40,12 @@ export function ajaxPaging (...args) {
       }
     }
 
-    function fail (err) {
+    const fail = function (err) {
+      // Limit the pages we will request to not create an endless flow of requests
+      if (pages === MAX_PAGES) return resolve(allData)
+
       if (lastNextPage) {
+        // if we have a lastPage url, we replace.
         const nextPage = lastNextPage.replace(/([?|&])page=(\d+)/, (match, connector, page) => { return connector + 'page=' + (+page + 1) })
 
         lastNextPage = null
@@ -50,6 +57,8 @@ export function ajaxPaging (...args) {
         reject(err)
       }
     }
+
+    ajax.apply(window, args).then(done).catch(fail)
   }).then((allData) => {
     const groupedData = allData.reduce((groupedData, subData) => {
       forEach(subData, (value, key) => {

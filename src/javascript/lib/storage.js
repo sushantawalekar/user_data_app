@@ -1,11 +1,13 @@
 export function localStorage (keyOrObject, value) {
+  const installationId = storage('installationId')
+
   if (value === undefined) {
-    return JSON.parse(window.localStorage.getItem(`user_data_app:${keyOrObject}`))
+    return JSON.parse(window.localStorage.getItem(`${installationId}:${keyOrObject}`))
   } else if (typeof keyOrObject === 'string') {
-    window.localStorage.setItem(`user_data_app:${keyOrObject}`, JSON.stringify(value))
+    window.localStorage.setItem(`${installationId}:${keyOrObject}`, JSON.stringify(value))
   } else if (typeof keyOrObject === 'object') {
     Object.keys(keyOrObject).forEach((key) => {
-      window.localStorage.setItem(`user_data_app:${key}`, JSON.stringify(keyOrObject[key]))
+      window.localStorage.setItem(`${installationId}:${key}`, JSON.stringify(keyOrObject[key]))
     })
   }
 }

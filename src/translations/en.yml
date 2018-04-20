@@ -80,6 +80,10 @@ By enabling this app, You agree to the [Built by Zendesk Terms of Use](https://w
       title: "Error message notification"
       value: "An error occurred. Please try again later."
   - translation:
+      key: "txt.apps.user_data_app.client.get.error"
+      title: "Error message notification when a get request fails"
+      value: "An error occurred: '%@'"
+  - translation:
       key: "txt.apps.user_data_app.tickets"
       title: "Number of tickets for this user after this it will always be a number like 12 or 3"
       value: "Tickets"

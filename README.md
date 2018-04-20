@@ -7,7 +7,7 @@ This is the [User Data App](https://www.zendesk.com/apps/user-data) for Zendesk.
 
 Setup
 ===============
-Since a ZAF V2 app is free to implement its own system, we have tried several approaches and looked at how the [App scaffold](https://github.com/zendesk/app_scaffold) had merged different systems together. Personally I like simple system, and feel that the less files we have, the less magic is going on.
+Since a ZAF V2 app is free to implement its own system, we have tried several approaches and looked at how the [App scaffold](https://github.com/zendesk/app_scaffold) had merged different systems together.
 
 * dist/
   * An empty folder that needs *no* input from the developer. Point your ZAT server to this folder: `zat server -p dist/`

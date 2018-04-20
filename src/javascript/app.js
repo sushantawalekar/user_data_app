@@ -3,10 +3,10 @@ import { localStorage, storage, setting } from './lib/storage'
 import I18n from './lib/i18n'
 import client from './lib/client'
 
-import admin from '../templates/admin.hdbs'
-import display from '../templates/display.hdbs'
-import spoke from '../templates/spoke.hdbs'
-import tags from '../templates/tags.hdbs'
+import renderAdmin from '../templates/admin.hdbs'
+import renderDisplay from '../templates/display.hdbs'
+import renderSpoke from '../templates/spoke.hdbs'
+import renderTags from '../templates/tags.hdbs'
 
 import $ from 'jquery/src/core'
 import 'jquery/src/core/parseHTML'
@@ -18,18 +18,7 @@ import 'jquery/src/dimensions'
 import 'jquery/src/css'
 import 'jquery/src/data'
 
-import debounce from 'lodash/debounce'
-import filter from 'lodash/filter'
-import map from 'lodash/map'
-import find from 'lodash/find'
-import reduce from 'lodash/reduce'
-import includes from 'lodash/includes'
-import sortBy from 'lodash/sortBy'
-import each from 'lodash/each'
-import compact from 'lodash/compact'
-import groupBy from 'lodash/groupBy'
-import fromPairs from 'lodash/fromPairs'
-import isEmpty from 'lodash/isEmpty'
+import { debounce, filter, map, find, reduce, includes, sortBy, each, compact, groupBy, fromPairs, isEmpty } from 'lodash'
 
 const TICKET_STATUSES = ['new', 'open', 'solved', 'pending', 'hold', 'closed']
 
@@ -38,18 +27,14 @@ const app = {
     storage('ticketsCounters', {})
     storage('orgTicketsCounters', {})
     storage('user', null)
-    storage('tickets', [])
-    storage('promise', null)
     storage('locales', null)
     storage('organizationFields', null)
     storage('userFields', null)
     storage('userEditable', true)
-    storage('selectedKeys', null)
-    storage('selectedOrgKeys', null)
-    storage('orgFieldsActivated', false)
 
-    client.get(['ticket.requester', 'ticket.id', 'ticket.organization', 'currentUser']).then((data) => {
+    client.get(['ticket.requester2', 'ticket.id', 'ticket.organization', 'currentUser']).then((data) => {
       const [ requester, ticketId, ticketOrg, currentUser ] = data
+
       const promises = []
       let promise
 
@@ -189,7 +174,7 @@ const app = {
     })
   },
 
-  fieldsForCurrent: function (target, fields, selected, values, locales) {
+  formatFields: function (target, fields, selected, values, locales) {
     return compact(map(selected, function (key) {
       const field = find(fields, function (field) {
         return field.key === key
@@ -211,7 +196,7 @@ const app = {
         result.simpleKey = ['builtin', subkey].join(' ')
 
         if (subkey === 'tags') {
-          result.value = tags({tags: result.value})
+          result.value = renderTags({tags: result.value})
           result.html = true
         } else if (subkey === 'locale') {
           result.value = locales[result.value]
@@ -247,20 +232,24 @@ const app = {
 
   fieldsForCurrentUser: function () {
     if (!storage('user')) { return {} }
-    return app.fieldsForCurrent(storage('user'),
+    return app.formatFields(
+      storage('user'),
       storage('userFields'),
       setting('selectedFields') ? JSON.parse(setting('selectedFields')) : ['##builtin_tags', '##builtin_details', '##builtin_notes'],
       storage('user').user_fields,
-      storage('locales'))
+      storage('locales')
+    )
   },
 
   fieldsForCurrentOrg: function () {
     if (!storage('user') || !storage('user').organization) { return {} }
-    return app.fieldsForCurrent(storage('user').organization,
+    return app.formatFields(
+      storage('user').organization,
       storage('organizationFields'),
       setting('orgFields') ? JSON.parse(setting('orgFields')) : [],
       storage('user').organization.organization_fields,
-      storage('locales'))
+      storage('locales')
+    )
   },
 
   fillEmptyStatuses: function (list) {
@@ -279,7 +268,7 @@ const app = {
 
   showDisplay: function () {
     const currentUser = storage('currentUser')
-    const view = display({
+    const view = renderDisplay({
       ticketId: storage('ticketId'),
       isAdmin: currentUser.role === 'admin',
       user: storage('user'),
@@ -344,7 +333,7 @@ const app = {
   },
 
   onCogClick: function () {
-    const html = admin({
+    const html = renderAdmin({
       fields: storage('userFields'),
       orgFields: storage('organizationFields'),
       orgFieldsActivated: setting('orgFieldsActivated')
@@ -366,8 +355,6 @@ const app = {
     $('input, button').prop('disabled', true)
     $('.save').hide()
     $('.wait-spin').show()
-
-    storage('promise', null) // we need to reset the promise object to have getUserFields run again
 
     ajax('saveSelectedFields', keys, orgKeys).then(app.init)
   },
@@ -404,7 +391,7 @@ const app = {
   },
 
   displaySpoke: function () {
-    const html = spoke(storage('spokeData'))
+    const html = renderSpoke(storage('spokeData'))
     $('.spoke').html(html)
     app.resize()
   },

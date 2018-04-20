@@ -1,7 +1,7 @@
-@import '~@zendesk/garden-css-bedrock/dist/index';
-@import '~@zendesk/garden-css-tags';
-@import '~@zendesk/garden-css-forms';
-@import '~@zendesk/garden-css-buttons';
+@import '~@zendeskgarden/css-bedrock';
+@import '~@zendeskgarden/css-tags';
+@import '~@zendeskgarden/css-forms';
+@import '~@zendeskgarden/css-buttons';
 
 html, body {
   overflow: hidden;
