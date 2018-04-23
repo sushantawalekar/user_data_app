@@ -6,7 +6,9 @@ Client.prototype = orgClient
 const client = new Client()
 
 function handleClientError (error) {
-  client.invoke('notify', I18n.t('client.get.error', { error: error.message }), 'error')
+  let errorMessage = I18n.t('client.get.error', { error: error.message })
+  console.error(errorMessage)
+  client.invoke('notify', errorMessage, 'error')
 }
 
 client.get = function (stringOrArray) {
