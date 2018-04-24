@@ -32,7 +32,7 @@ const app = {
     storage('userFields', null)
     storage('userEditable', true)
 
-    app.getInformation().then((data) => {
+    app.getUserInformation().then((data) => {
       const [[user, organizationTicketCounters, audits, ticketCounters], locales, organizationFields, userFields] = data // eslint-disable-line no-unused-vars
 
       app.fillEmptyStatuses(ticketCounters)
@@ -42,7 +42,7 @@ const app = {
     })
   },
 
-  getInformation: function () {
+  getUserInformation: function () {
     return client.get(['ticket.requester', 'ticket.id', 'ticket.organization', 'currentUser']).then((data) => {
       const [ requester, ticketId, ticketOrg, currentUser ] = data
       const promises = []
@@ -55,7 +55,7 @@ const app = {
 
       I18n.loadTranslations(currentUser.locale)
 
-      promises.push(app.getUser(ticketOrg))
+      promises.push(app.getUserInformation(ticketOrg))
 
       // If not admin or agent
       if (['admin', 'agent'].indexOf(currentUser.role) === -1) {
@@ -70,7 +70,7 @@ const app = {
     })
   },
 
-  getUser: function (ticketOrg) {
+  getUserInformation: function (ticketOrg) {
     const requester = storage('requester')
 
     return ajax('getUser', requester.id).then((data) => {
