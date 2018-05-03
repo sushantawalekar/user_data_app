@@ -32,7 +32,7 @@ const app = {
     storage('userFields', null)
     storage('userEditable', true)
 
-    app.getUserInformation().then((data) => {
+    app.getInformation().then((data) => {
       const [[user, organizationTicketCounters, audits, ticketCounters], locales, organizationFields, userFields] = data // eslint-disable-line no-unused-vars
 
       app.fillEmptyStatuses(ticketCounters)
@@ -42,7 +42,7 @@ const app = {
     })
   },
 
-  getUserInformation: function () {
+  getInformation: function () {
     return client.get(['ticket.requester', 'ticket.id', 'ticket.organization', 'currentUser']).then((data) => {
       const [ requester, ticketId, ticketOrg, currentUser ] = data
       const promises = []

@@ -60,7 +60,7 @@ export function ajaxPaging (...args) {
 
     ajax.apply(window, args).then(done).catch(fail)
   }).then((allData) => {
-    const groupedData = allData.reduce((groupedData, subData) => {
+    return allData.reduce((groupedData, subData) => {
       forEach(subData, (value, key) => {
         // remove the next_page/previous_page properties because they don't make sense anymore.
         if (key === 'next_page' || key === 'previous_page') return
@@ -68,8 +68,6 @@ export function ajaxPaging (...args) {
       })
       return groupedData
     }, {})
-
-    return groupedData
   })
 }
 
