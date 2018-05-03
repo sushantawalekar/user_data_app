@@ -1,0 +1,6 @@
+<ul>
+  {{#each tags}}
+    <li class="c-tag c-tag--pill c-tag--light">{{this}}</li>
+  {{/each}}
+</ul>
+<hr>
