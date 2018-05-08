@@ -37,7 +37,7 @@ const app = {
       app.fillEmptyStatuses(storage('ticketsCounters'))
       app.fillEmptyStatuses(storage('orgTicketsCounters'))
       app.showDisplay()
-    }).catch((err) => {
+    }).catch(() => {
       const view = renderNoRequester()
       $('[data-main]').html(view)
       app.resize()

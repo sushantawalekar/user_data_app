@@ -24,8 +24,6 @@ client.get = function (stringOrArray) {
         error = new Error(data.errors[stringOrArray].message)
         handleClientError(error)
         return error
-      } else {
-        return
       }
     } else {
       return stringOrArray.reduce((returnValue, key) => {
