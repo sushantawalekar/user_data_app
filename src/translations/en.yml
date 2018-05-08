@@ -96,6 +96,10 @@ By enabling this app, You agree to the [Built by Zendesk Terms of Use](https://w
       title: "Link to toggle open / close the organization box"
       value: "Toggle organization"
   - translation:
+      key: "txt.apps.user_data_app.no_requester"
+      title: "Message that the current ticket does not have a requester. Likely to happen on new tickets."
+      value: "This ticket has no requester"
+  - translation:
       key: "txt.apps.user_data_app.details_and_notes"
       title: "Header/title for the details and notes box"
       value: "Details and notes"

@@ -5,6 +5,7 @@ import client from './lib/client'
 
 import renderAdmin from '../templates/admin.hdbs'
 import renderDisplay from '../templates/display.hdbs'
+import renderNoRequester from '../templates/no_requester.hdbs'
 import renderSpoke from '../templates/spoke.hdbs'
 import renderTags from '../templates/tags.hdbs'
 
@@ -32,13 +33,14 @@ const app = {
     storage('userFields', null)
     storage('userEditable', true)
 
-    app.getInformation().then((data) => {
-      const [[user, organizationTicketCounters, audits, ticketCounters], locales, organizationFields, userFields] = data // eslint-disable-line no-unused-vars
-
-      app.fillEmptyStatuses(ticketCounters)
-      app.fillEmptyStatuses(organizationTicketCounters)
-
+    app.getInformation().then(() => {
+      app.fillEmptyStatuses(storage('ticketsCounters'))
+      app.fillEmptyStatuses(storage('orgTicketsCounters'))
       app.showDisplay()
+    }).catch((err) => {
+      const view = renderNoRequester()
+      $('[data-main]').html(view)
+      app.resize()
     })
   },
 
@@ -55,7 +57,8 @@ const app = {
 
       I18n.loadTranslations(currentUser.locale)
 
-      promises.push(app.getUserInformation(ticketOrg))
+      if (requester) promises.push(app.getUserInformation(ticketOrg))
+      else return Promise.reject(new Error('no requester'))
 
       // If not admin or agent
       if (['admin', 'agent'].indexOf(currentUser.role) === -1) {
@@ -323,8 +326,9 @@ const app = {
     return links
   },
 
-  onRequesterEmailChanged: function (event, email) {
-    const requester = storage('requester')
+  onRequesterEmailChanged: function (email) {
+    const requester = storage('requester') || {}
+
     if (email && requester.email !== email) {
       app.init()
     }

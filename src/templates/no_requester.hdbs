@@ -1,0 +1,5 @@
+<div class="admin" style="display: none"></div>
+
+<div class="no_requester">
+  {{t "no_requester"}}
+</div>

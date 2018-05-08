@@ -18,18 +18,25 @@ client.get = function (stringOrArray) {
     let error
 
     if (typeof stringOrArray === 'string') {
-      if (data[stringOrArray]) return data[stringOrArray]
-      error = new Error(data.errors[stringOrArray].message)
-      handleClientError(error)
-      return error
+      if (data[stringOrArray]) {
+        return data[stringOrArray]
+      } else if (data.errors[stringOrArray]) {
+        error = new Error(data.errors[stringOrArray].message)
+        handleClientError(error)
+        return error
+      } else {
+        return
+      }
     } else {
       return stringOrArray.reduce((returnValue, key) => {
         if (data[key]) {
           returnValue.push(data[key])
-        } else {
+        } else if (data.errors[key]) {
           error = new Error(data.errors[key].message)
           handleClientError(error)
           returnValue.push(error)
+        } else {
+          returnValue.push(undefined)
         }
         return returnValue
       }, [])
