@@ -57,8 +57,11 @@ const app = {
 
       I18n.loadTranslations(currentUser.locale)
 
-      if (requester) promises.push(app.getUserInformation(ticketOrg))
-      else return Promise.reject(new Error('no requester'))
+      if (requester) {
+        promises.push(app.getUserInformation(ticketOrg))
+      } else {
+        return Promise.reject(new Error('no requester'))
+      }
 
       // If not admin or agent
       if (['admin', 'agent'].indexOf(currentUser.role) === -1) {
