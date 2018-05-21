@@ -3,7 +3,7 @@
 
 <div class="fields-list">
   {{#each fields}}
-    <div class="c-chk">
+    <div class="c_chk">
       <input class="c-chk__input" value="{{key}}" id="{{key}}" {{#if selected}}checked{{/if}} type="checkbox">
       <label class="c-chk__label c-chk__label--toggle c-chk__label--regular" for="{{key}}"><span dir="ltr">{{title}}</span></label>
     </div>
@@ -11,15 +11,15 @@
 </div>
 
 {{#if orgFields.length }}
-  <div class="org-fields">
-     <div class="c-chk">
-      <input class="c-chk__input org-fields-activate" id="org-fields-activate" value="{{key}}" {{#if orgFieldsActivated}}checked{{/if}} type="checkbox">
-      <label class="c-chk__label c-chk__label--toggle" for="org-fields-activate"><span dir="ltr">{{t "admin.include_org_fields"}}</span></label>
+  <div class="org_fields">
+     <div class="c_chk">
+      <input class="c-chk__input org_fields_activate" id="org_fields_activate" value="{{key}}" {{#if orgFieldsActivated}}checked{{/if}} type="checkbox">
+      <label class="c-chk__label c-chk__label--toggle" for="org_fields_activate"><span dir="ltr">{{t "admin.include_org_fields"}}</span></label>
     </div>
 
-    <div class="org-fields-list" {{#unless orgFieldsActivated}}style="display: none"{{/unless}}>
+    <div class="org_fields_list" {{#unless orgFieldsActivated}}style="display: none"{{/unless}}>
       {{#each orgFields}}
-        <div class="c-chk">
+        <div class="c_chk">
           <input class="c-chk__input" value="{{key}}" id="org_{{key}}" {{#if selected}}checked{{/if}} type="checkbox">
           <label class="c-chk__label c-chk__label--toggle c-chk__label--regular" for="org_{{key}}"><span dir="ltr">{{title}}</span></label>
         </div>

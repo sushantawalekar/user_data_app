@@ -367,7 +367,7 @@ const app = {
 
   onSaveClick: function () {
     const keys = $('.fields-list input:checked').map(function () { return $(this).val() })
-    const orgKeys = $('.org-fields-list input:checked').map(function () { return $(this).val() })
+    const orgKeys = $('.org_fields_list input:checked').map(function () { return $(this).val() })
     $('input, button').prop('disabled', true)
     $('.save').hide()
     $('.wait-spin').show()
@@ -402,7 +402,7 @@ const app = {
   onActivateOrgFieldsChange: function (event) {
     const activate = $(event.target).is(':checked')
     setting('orgFieldsActivated', activate)
-    $('.org-fields-list').toggle(activate)
+    $('.org_fields_list').toggle(activate)
     appResize()
   },
 
@@ -539,7 +539,7 @@ const app = {
 $(document).on('click', 'a.expand_bar', app.onClickExpandBar)
 $(document).on('click', '.cog', app.onCogClick)
 $(document).on('change keyup input paste', '.notes-or-details', app.onNotesOrDetailsChanged)
-$(document).on('change', '.org-fields-activate', app.onActivateOrgFieldsChange)
+$(document).on('change', '.org_fields_activate', app.onActivateOrgFieldsChange)
 $(document).on('click', '.back', app.onBackClick)
 $(document).on('click', '.save', app.onSaveClick)
 $(document).on('mouseup', 'textarea', debounce(appResize, 300))
