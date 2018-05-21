@@ -1,8 +1,15 @@
 /* eslint-env jasmine */
 import * as helpers from '../src/javascript/lib/helpers'
+import requests from '../src/javascript/lib/requests'
 import client from '../src/javascript/lib/client'
 
 describe('Helpers', () => {
+  beforeAll(() => {
+    requests.getLocales = {
+      url: '/api/v2/locales.json'
+    }
+  })
+
   describe('#ajaxPaging', function () {
     const ajaxPaging = helpers.ajaxPaging
 
@@ -26,7 +33,7 @@ describe('Helpers', () => {
       })
 
       it('makes a ticket requests', function (done) {
-        ajaxPaging('getTickets').then(function (data) {
+        ajaxPaging('getLocales').then(function (data) {
           expect(data).toEqual({count: 4, tickets: [1, 2, 3, 4]})
           done()
         })
@@ -57,7 +64,7 @@ describe('Helpers', () => {
       })
 
       it('makes a ticket request to multiple pages', function (done) {
-        ajaxPaging('getTickets').then(function (data) {
+        ajaxPaging('getLocales').then(function (data) {
           expect(data.tickets).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
           done()
         })
@@ -89,7 +96,7 @@ describe('Helpers', () => {
       })
 
       it('makes a ticket request to multiple pages', function (done) {
-        ajaxPaging('getTickets').then(function (data) {
+        ajaxPaging('getLocales').then(function (data) {
           expect(data.tickets).toEqual([1, 2, 3, 4, 9, 10, 11, 12])
           done()
         })

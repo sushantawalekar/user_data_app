@@ -14,8 +14,8 @@ module.exports = function (config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'spec/zaf.js',
       'https://assets.zendesk.com/apps/sdk/2.0/zaf_sdk.js',
+      'spec/before.js',
       'spec/*_spec.js'
     ],
 

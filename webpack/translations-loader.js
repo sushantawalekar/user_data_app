@@ -27,14 +27,16 @@ const flatten = require('lodash/flatten')
 function translationFlatten (object, flattened = {}, currentKeys = []) {
   Object.keys(object).map(function (key) {
     const value = object[key]
+    const keyArr = flatten([currentKeys, key])
+
     if (typeof value === 'object') {
       if (value.title && value.value) {
-        flattened[flatten([currentKeys, key]).join('.')] = value.value
+        flattened[keyArr.join('.')] = value.value
       } else {
-        translationFlatten(value, flattened, flatten([currentKeys, key]))
+        translationFlatten(value, flattened, keyArr)
       }
     } else {
-      flattened[flatten([currentKeys, key]).join('.')] = value
+      flattened[keyArr.join('.')] = value
     }
   })
   return flattened

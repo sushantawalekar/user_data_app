@@ -1,4 +1,4 @@
-<a class="back"><i class="icon-circle-arrow-left"/></a>
+<a class="back"><i class="icon_circle_arrow_left"/></a>
 <p>{{t "admin.text"}}</p>
 
 <div class="fields-list">

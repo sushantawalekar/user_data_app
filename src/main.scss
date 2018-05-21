@@ -57,7 +57,7 @@ html, body {
   }
 }
 
-i.icon-circle-arrow-left {
+i.icon_circle_arrow_left {
   display: inline-block;
   width: 14px;
   height: 14px;
@@ -287,7 +287,7 @@ i.icon-circle-arrow-left {
     }
   }
 
-  .expand-bar {
+  .expand_bar {
     cursor: pointer;
     background-color: #fff;
     border-top: 1px solid #f0f0f0;
@@ -303,14 +303,14 @@ i.icon-circle-arrow-left {
       background-repeat: no-repeat;
       background-position: center;
 
-      &.arrow-down {
+      &.arrow_down {
         background-image: url("images/ico-arrow-down-normal.png");
         &:hover {
           background-image: url("images/ico-arrow-down-hover.png");
         }
       }
 
-      &.arrow-up {
+      &.arrow_up {
         background-image: url("images/ico-arrow-up-normal.png");
         &:hover {
           background-image: url("images/ico-arrow-up-hover.png");
