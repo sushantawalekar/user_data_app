@@ -1,5 +1,7 @@
-/* eslint-env jasmine */
+/* eslint-env mocha */
 import I18n from '../src/javascript/lib/i18n'
+import assert from 'assert'
+import sinon from 'sinon'
 
 const en = {
   'one': 'the first translation',
@@ -11,8 +13,8 @@ const en = {
 describe('I18n', () => {
   const t = I18n.t
 
-  beforeAll(function () {
-    spyOn(I18n, 'tryRequire').and.callFake(function (locale) {
+  before(function () {
+    sinon.stub(I18n, 'tryRequire').callsFake((locale) => {
       return en
     })
 
@@ -22,14 +24,14 @@ describe('I18n', () => {
   describe('#t', function () {
     it('returns a string', function () {
       const result = t('one')
-      expect(result).toEqual('the first translation')
+      assert.strictEqual(result, 'the first translation')
     })
 
     it('interpolates one string', function () {
       const result = t('two.one', {
         name: 'olaf'
       })
-      expect(result).toEqual('the second for: olaf')
+      assert.strictEqual(result, 'the second for: olaf')
     })
 
     it('interpolates multiple strings', function () {
@@ -37,14 +39,14 @@ describe('I18n', () => {
         name: 'olaf',
         other: 'test'
       })
-      expect(result).toEqual('the second for: olaf-test')
+      assert.strictEqual(result, 'the second for: olaf-test')
     })
 
     it('interpolates duplicates strings', function () {
       const result = t('three.one.one', {
         name: 'olaf'
       })
-      expect(result).toEqual('the olaf for olaf should be olaf')
+      assert.strictEqual(result, 'the olaf for olaf should be olaf')
     })
   })
 })

@@ -6,7 +6,7 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "test": "karma start --single-run",
+    "test": "mocha && karma start --single-run",
     "watch": "webpack --watch",
     "build": "webpack",
     "build:prod": "webpack --env.production -p",
@@ -37,12 +37,13 @@
     "webpack": "^3.11.0"
   },
   "devDependencies": {
-    "jasmine-core": "^3.1.0",
     "karma": "^2.0.0",
     "karma-chrome-launcher": "^2.2.0",
     "karma-handlebars-preprocessor": "^0.3.0",
-    "karma-jasmine": "^1.1.1",
+    "karma-mocha": "^1.3.0",
     "karma-webpack": "^2.0.13",
+    "mocha": "^5.2.0",
+    "sinon": "^5.0.7",
     "standard": "^11.0.1"
   }
 }

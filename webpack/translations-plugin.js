@@ -72,7 +72,7 @@ function enYmlToJson (options) {
     })
   })
 
-  promise.then((file) => {
+  return promise.then((file) => {
     return new Promise((resolve, reject) => {
       const translationsInput = JSON.stringify(toObj(file.content), null, JS_INDENT)
 
