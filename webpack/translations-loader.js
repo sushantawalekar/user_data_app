@@ -1,13 +1,42 @@
 const flatten = require('lodash/flatten')
 
+/**
+ * {
+ *   name: 'test app'
+ *   author: {
+ *     title: 'the author',
+ *     value: 'mr programmer'
+ *   },
+ *   app: {
+ *     instructions: 'install'
+ *     steps: {
+ *       click: 'this button'
+ *     }
+ *   }
+ * }
+ *
+ * becomes
+ *
+ * {
+ *   name: 'test app',
+ *   author: 'mr programmer',
+ *   app.instructions: 'install',
+ *   app.steps.click: 'this button'
+ * }
+ */
 function translationFlatten (object, flattened = {}, currentKeys = []) {
   Object.keys(object).map(function (key) {
-    if (['title', 'value'].indexOf(key) >= 0 && typeof object[key] === 'object') {
-      flattened[currentKeys.join('.')] = object['value']
-    } else if (object[key] && typeof object[key] === 'object') {
-      translationFlatten(object[key], flattened, flatten([currentKeys, key]))
+    const value = object[key]
+    const keyArr = flatten([currentKeys, key])
+
+    if (typeof value === 'object') {
+      if (value.title && value.value) {
+        flattened[keyArr.join('.')] = value.value
+      } else {
+        translationFlatten(value, flattened, keyArr)
+      }
     } else {
-      flattened[flatten([currentKeys, key]).join('.')] = object[key]
+      flattened[keyArr.join('.')] = value
     }
   })
   return flattened

@@ -15,21 +15,32 @@ client.get = function (stringOrArray) {
   if (typeof stringOrArray !== 'string' && !Array.isArray(stringOrArray)) { throw new Error('type for get not supported.') }
 
   return orgClient.get(stringOrArray).then((data) => {
-    let error
+    let error, str, arr
 
     if (typeof stringOrArray === 'string') {
-      if (data[stringOrArray]) return data[stringOrArray]
-      error = new Error(data.errors[stringOrArray].message)
-      handleClientError(error)
-      return error
+      str = stringOrArray
     } else {
-      return stringOrArray.reduce((returnValue, key) => {
+      arr = stringOrArray
+    }
+
+    if (str) {
+      if (data[str]) {
+        return data[str]
+      } else if (data.errors[str]) {
+        error = new Error(data.errors[str].message)
+        handleClientError(error)
+        return error
+      }
+    } else {
+      return arr.reduce((returnValue, key) => {
         if (data[key]) {
           returnValue.push(data[key])
-        } else {
+        } else if (data.errors[key]) {
           error = new Error(data.errors[key].message)
           handleClientError(error)
           returnValue.push(error)
+        } else {
+          returnValue.push(undefined)
         }
         return returnValue
       }, [])

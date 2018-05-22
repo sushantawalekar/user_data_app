@@ -1,10 +1,11 @@
-import { ajax, ajaxPaging, urlify } from './lib/helpers'
+import { ajax, ajaxPaging, urlify, appResize } from './lib/helpers'
 import { localStorage, storage, setting } from './lib/storage'
 import I18n from './lib/i18n'
 import client from './lib/client'
 
 import renderAdmin from '../templates/admin.hdbs'
 import renderDisplay from '../templates/display.hdbs'
+import renderNoRequester from '../templates/no_requester.hdbs'
 import renderSpoke from '../templates/spoke.hdbs'
 import renderTags from '../templates/tags.hdbs'
 
@@ -32,13 +33,14 @@ const app = {
     storage('userFields', null)
     storage('userEditable', true)
 
-    app.getInformation().then((data) => {
-      const [[user, organizationTicketCounters, audits, ticketCounters], locales, organizationFields, userFields] = data // eslint-disable-line no-unused-vars
-
-      app.fillEmptyStatuses(ticketCounters)
-      app.fillEmptyStatuses(organizationTicketCounters)
-
+    app.getInformation().then(() => {
+      app.fillEmptyStatuses(storage('ticketsCounters'))
+      app.fillEmptyStatuses(storage('orgTicketsCounters'))
       app.showDisplay()
+    }).catch(() => {
+      const view = renderNoRequester()
+      $('[data-main]').html(view)
+      appResize()
     })
   },
 
@@ -55,7 +57,11 @@ const app = {
 
       I18n.loadTranslations(currentUser.locale)
 
-      promises.push(app.getUserInformation(ticketOrg))
+      if (requester) {
+        promises.push(app.getUserInformation(ticketOrg))
+      } else {
+        return Promise.reject(new Error('no requester'))
+      }
 
       // If not admin or agent
       if (['admin', 'agent'].indexOf(currentUser.role) === -1) {
@@ -297,7 +303,7 @@ const app = {
     })
 
     $('[data-main]').html(view)
-    app.resize()
+    appResize()
 
     if (storage('spokeData')) {
       app.displaySpoke()
@@ -319,12 +325,13 @@ const app = {
         links[key] = value
       }
     })
-    app.resize()
+    appResize()
     return links
   },
 
-  onRequesterEmailChanged: function (event, email) {
-    const requester = storage('requester')
+  onRequesterEmailChanged: function (email) {
+    const requester = storage('requester') || {}
+
     if (email && requester.email !== email) {
       app.init()
     }
@@ -332,20 +339,13 @@ const app = {
 
   onClickExpandBar: function (event, immediate) {
     const additional = $('.more-info')
-    const expandBar = $('.expand-bar i')
+    const expandBar = $('.expand_bar i')
     expandBar.attr('class', 'arrow')
     const visible = additional.is(':visible')
-    additional.toggle(!visible, app.resize)
+    additional.toggle(!visible, appResize)
     localStorage('expanded', !visible)
-    expandBar.addClass(visible ? 'arrow-down' : 'arrow-up')
-    app.resize()
-  },
-
-  resize: function () {
-    setTimeout(function () {
-      const body = document.querySelector('body')
-      client.invoke('resize', { width: '100%', height: body.scrollHeight })
-    }, 5)
+    expandBar.addClass(visible ? 'arrow_down' : 'arrow_up')
+    appResize()
   },
 
   onCogClick: function () {
@@ -356,18 +356,18 @@ const app = {
     })
     $('.admin').html(html).show()
     $('.whole').hide()
-    app.resize()
+    appResize()
   },
 
   onBackClick: function () {
     $('.admin').hide()
     $('.whole').show()
-    app.resize()
+    appResize()
   },
 
   onSaveClick: function () {
     const keys = $('.fields-list input:checked').map(function () { return $(this).val() })
-    const orgKeys = $('.org-fields-list input:checked').map(function () { return $(this).val() })
+    const orgKeys = $('.org_fields_list input:checked').map(function () { return $(this).val() })
     $('input, button').prop('disabled', true)
     $('.save').hide()
     $('.wait-spin').show()
@@ -402,14 +402,14 @@ const app = {
   onActivateOrgFieldsChange: function (event) {
     const activate = $(event.target).is(':checked')
     setting('orgFieldsActivated', activate)
-    $('.org-fields-list').toggle(activate)
-    app.resize()
+    $('.org_fields_list').toggle(activate)
+    appResize()
   },
 
   displaySpoke: function () {
     const html = renderSpoke(storage('spokeData'))
     $('.spoke').html(html)
-    app.resize()
+    appResize()
   },
 
   auditEventIsSpoke: function (event) {
@@ -536,12 +536,12 @@ const app = {
   }
 }
 
-$(document).on('click', 'a.expand-bar', app.onClickExpandBar)
+$(document).on('click', 'a.expand_bar', app.onClickExpandBar)
 $(document).on('click', '.cog', app.onCogClick)
 $(document).on('change keyup input paste', '.notes-or-details', app.onNotesOrDetailsChanged)
-$(document).on('change', '.org-fields-activate', app.onActivateOrgFieldsChange)
+$(document).on('change', '.org_fields_activate', app.onActivateOrgFieldsChange)
 $(document).on('click', '.back', app.onBackClick)
 $(document).on('click', '.save', app.onSaveClick)
-$(document).on('mouseup', 'textarea', debounce(app.resize, 300))
+$(document).on('mouseup', 'textarea', debounce(appResize, 300))
 
 export default app

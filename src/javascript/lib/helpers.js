@@ -8,6 +8,7 @@ export function ajax (...args) {
   const funcName = args.shift()
   const funcOrObj = requests[funcName]
   const obj = typeof funcOrObj === 'function' ? funcOrObj.apply(window, args) : funcOrObj
+  if (!obj) return Promise.reject(new Error(`no such request: "${funcName}"`))
   if (!obj.url) return Promise.resolve()
   return client.request(obj)
 }
@@ -96,4 +97,10 @@ export function urlify (message, hostname) {
   return urls.reduce(function (message, url) {
     return message.replace(url.match, `<a class="link link-external" target="_blank" href="${url.href}">${url.href}</a>`)
   }, message)
+}
+
+export function appResize () {
+  const body = document.querySelector('body')
+  const newHeight = body.scrollHeight > 85 ? body.scrollHeight : 85
+  client.invoke('resize', { height: newHeight })
 }

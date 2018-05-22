@@ -8,8 +8,9 @@ html, body {
 }
 
 .loader {
-  padding-left: 144px;
-  padding-top: 60px;
+  width: 50px;
+  display: block;
+  margin: 45px auto;
 }
 
 .box.apps_ticket_sidebar.app_view {
@@ -18,10 +19,14 @@ html, body {
   color: #333;
 }
 
+.no_requester {
+  text-align: center;
+}
+
 .admin {
   margin-bottom: 15px;
 
-  .c-chk {
+  .c_chk {
     margin-bottom: 4px;
   }
 
@@ -30,11 +35,11 @@ html, body {
     margin-bottom: 1em;
   }
 
-  .org-fields {
+  .org_fields {
     margin-top: 20px;
   }
 
-  .org-fields-list {
+  .org_fields_list {
     margin-left: 20px;
   }
 
@@ -53,7 +58,7 @@ html, body {
   }
 }
 
-i.icon-circle-arrow-left {
+i.icon_circle_arrow_left {
   display: inline-block;
   width: 14px;
   height: 14px;
@@ -283,7 +288,7 @@ i.icon-circle-arrow-left {
     }
   }
 
-  .expand-bar {
+  .expand_bar {
     cursor: pointer;
     background-color: #fff;
     border-top: 1px solid #f0f0f0;
@@ -299,14 +304,14 @@ i.icon-circle-arrow-left {
       background-repeat: no-repeat;
       background-position: center;
 
-      &.arrow-down {
+      &.arrow_down {
         background-image: url("images/ico-arrow-down-normal.png");
         &:hover {
           background-image: url("images/ico-arrow-down-hover.png");
         }
       }
 
-      &.arrow-up {
+      &.arrow_up {
         background-image: url("images/ico-arrow-up-normal.png");
         &:hover {
           background-image: url("images/ico-arrow-up-hover.png");

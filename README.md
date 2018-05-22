@@ -32,6 +32,6 @@ Webpack is the builder that will transform the `src` directory into an `dist/` a
 
 As seen in the `package.json` `yarn build:prod`, will run the end result through babel, because IE11 doesn't understand ES6 code, and webpack's `-p` options will minify the code.
 
-Karma + Jasmine
+Karma + Mocha
 ===============
-Karma is a test runner, Jasmine the test framework. In order to make this work we tell karma to compile the files first using webpack (with out webpack.config.js loaded in).
+Karma is a test runner, Mocha the test framework. In order to make this work we tell karma to compile the files first using webpack (with out webpack.config.js loaded in).
