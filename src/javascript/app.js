@@ -96,7 +96,7 @@ const app = {
 
       user.organization = data.organizations[0]
       if (ticketOrg) {
-        user.organization = data.organizations.find(function (org) {
+        user.organization = find(data.organizations, function (org) {
           return org.id === ticketOrg.id
         })
       }
