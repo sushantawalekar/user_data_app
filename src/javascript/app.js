@@ -369,8 +369,7 @@ const app = {
     const keys = $('.fields-list input:checked').map(function () { return $(this).val() })
     const orgKeys = $('.org_fields_list input:checked').map(function () { return $(this).val() })
     $('input, button').prop('disabled', true)
-    $('.save').hide()
-    $('.wait-spin').show()
+    $('.save').html('<img class="loader" src="dot.gif"/>')
 
     ajax('saveSelectedFields', keys, orgKeys).then(app.init)
   },
