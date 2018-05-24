@@ -1,5 +1,5 @@
 import { setting, storage } from './storage'
-import toArray from 'lodash/toArray'
+import { toArray } from 'lodash'
 
 export default {
   getLocales: {
@@ -54,17 +54,26 @@ export default {
     setting('selectedFields', JSON.stringify(toArray(keys)))
     setting('orgFields', JSON.stringify(toArray(orgKeys)))
 
-    // For dev
-    if (installationId < 1) return {}
-
-    return {
+    const settingsRequest = {
       url: `/api/v2/apps/installations/${installationId}.json`,
       type: 'PUT',
       data: {
-        'settings': setting(),
+        'settings': {
+          selectedFields: setting('selectedFields'),
+          orgFields: setting('orgFields'),
+          orgFieldsActivated: setting('orgFieldsActivated')
+        },
         'enabled': true
       }
     }
+
+    // For dev
+    if (installationId < 1) {
+      console.log('would have send', settingsRequest);
+      return {}
+    }
+
+    return settingsRequest
   },
 
   updateNotesOrDetails: function (type, id, data) {
