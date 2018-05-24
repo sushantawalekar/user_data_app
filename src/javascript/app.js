@@ -316,11 +316,11 @@ const app = {
   makeTicketsLinks: function (counters) {
     const links = {}
     const link = `#/tickets/${storage('ticketId')}/requester/requested_tickets`
-    const tag = $('<div>').append($('<a>').attr('href', link))
+    const $tag = $('<div>').append($('<a>').attr('href', link))
     each(counters, function (value, key) {
       if (value && value !== '-') {
-        tag.find('a').html(value)
-        links[key] = tag.html()
+        $tag.find('a').html(value)
+        links[key] = $tag.html()
       } else {
         links[key] = value
       }
