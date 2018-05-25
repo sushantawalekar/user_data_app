@@ -52,13 +52,16 @@ html, body {
 
   .save {
     display: block;
-    margin-top: 20px;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 20px auto;
+    width: 180px;
+    height: 40px;
+    padding: 0;
+    text-align: center;
 
-    img  {
-      width: 44px;
-      margin: 0 35px;
+    img.spinner {
+      display: none;
+      width: 35px;
+      margin-top: 4px;
     }
   }
 }
