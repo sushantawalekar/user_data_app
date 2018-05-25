@@ -238,9 +238,10 @@ const app = {
         if (field.type === 'date') {
           result.value = (result.value ? app.toLocaleDate(result.value) : '')
         } else if (field.type === 'dropdown' && field.custom_field_options) {
-          result.value = find(field.custom_field_options, function (option) {
+          const option = find(field.custom_field_options, function (option) {
             return option.value === result.value
-          }).name
+          })
+          result.value = (option) ? option.name : ''
         } else if (!result.editable && result.value) {
           if (typeof result.value === 'string') {
             result.value = result.value.replace(/\n/g, '<br>')
