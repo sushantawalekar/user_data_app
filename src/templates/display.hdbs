@@ -112,16 +112,16 @@
               <span class="count open">{{{orgTickets.open}}}</span>
             </li>
             <li>
-              <span class="ticket_status_label solved">{{t "ticket_status.solved"}}</span>
-              <span class="count solved">{{{orgTickets.solved}}}</span>
-            </li>
-            <li>
               <span class="ticket_status_label pending">{{t "ticket_status.pending"}}</span>
               <span class="count pending">{{{orgTickets.pending}}}</span>
             </li>
             <li>
               <span class="ticket_status_label hold">{{t "ticket_status.hold"}}</span>
               <span class="count hold">{{{orgTickets.hold}}}</span>
+            </li>
+            <li>
+              <span class="ticket_status_label solved">{{t "ticket_status.solved"}}</span>
+              <span class="count solved">{{{orgTickets.solved}}}</span>
             </li>
             <li>
               <span class="ticket_status_label closed">{{t "ticket_status.closed"}}</span>
