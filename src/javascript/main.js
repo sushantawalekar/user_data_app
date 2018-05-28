@@ -13,7 +13,7 @@ client.on('app.registered', function (context) {
   client.get('currentUser').then((currentUser) => {
     return currentUser.role === 'admin'
   }).then((isAdmin) => {
-    return (isAdmin) ? client.request(`/api/v2/apps/installations/${installationId}.json`) : Promise.reject()
+    return (isAdmin) ? client.request(`/api/v2/apps/installations/${installationId}.json`) : Promise.reject(new Error('not an agent'))
   }).then((data) => {
     return data.settings
   }).catch(() => {

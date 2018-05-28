@@ -69,7 +69,7 @@ export default {
 
     // For dev
     if (installationId < 1) {
-      console.log('would have sent', settingsRequest);
+      console.log('would have sent', settingsRequest)
       return {}
     }
 
