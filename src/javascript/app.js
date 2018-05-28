@@ -96,7 +96,7 @@ const app = {
 
       user.organization = data.organizations[0]
       if (ticketOrg) {
-        user.organization = data.organizations.find(function (org) {
+        user.organization = find(data.organizations, function (org) {
           return org.id === ticketOrg.id
         })
       }
@@ -238,9 +238,10 @@ const app = {
         if (field.type === 'date') {
           result.value = (result.value ? app.toLocaleDate(result.value) : '')
         } else if (field.type === 'dropdown' && field.custom_field_options) {
-          result.value = find(field.custom_field_options, function (option) {
+          const option = find(field.custom_field_options, function (option) {
             return option.value === result.value
-          }).name
+          })
+          result.value = (option) ? option.name : ''
         } else if (!result.editable && result.value) {
           if (typeof result.value === 'string') {
             result.value = result.value.replace(/\n/g, '<br>')
@@ -316,11 +317,11 @@ const app = {
   makeTicketsLinks: function (counters) {
     const links = {}
     const link = `#/tickets/${storage('ticketId')}/requester/requested_tickets`
-    const tag = $('<div>').append($('<a>').attr('href', link))
+    const $tag = $('<div>').append($('<a>').attr('href', link))
     each(counters, function (value, key) {
       if (value && value !== '-') {
-        tag.find('a').html(value)
-        links[key] = tag.html()
+        $tag.find('a').html(value)
+        links[key] = $tag.html()
       } else {
         links[key] = value
       }
@@ -369,8 +370,8 @@ const app = {
     const keys = $('.fields-list input:checked').map(function () { return $(this).val() })
     const orgKeys = $('.org_fields_list input:checked').map(function () { return $(this).val() })
     $('input, button').prop('disabled', true)
-    $('.save').hide()
-    $('.wait-spin').show()
+    $('.save .text').hide()
+    $('.save .spinner').show()
 
     ajax('saveSelectedFields', keys, orgKeys).then(app.init)
   },

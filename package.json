@@ -8,8 +8,8 @@
   "scripts": {
     "test": "mocha && karma start --single-run",
     "watch": "webpack --watch",
-    "build": "webpack",
-    "build:prod": "webpack --env.production -p",
+    "build:dev": "webpack",
+    "build": "webpack --env.production -p",
     "lint": "standard"
   },
   "dependencies": {
