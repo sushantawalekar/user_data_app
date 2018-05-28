@@ -10,10 +10,14 @@ client.on('app.registered', function (context) {
   const installationId = context.metadata.installationId
   storage('installationId', installationId)
 
-  client.request(`/api/v2/apps/installations/${installationId}.json`).then((data) => {
-    return data.settings;
+  client.get('currentUser').then((currentUser) => {
+    return currentUser.role === 'admin'
+  }).then((isAdmin) => {
+    return (isAdmin) ? client.request(`/api/v2/apps/installations/${installationId}.json`) : Promise.reject()
+  }).then((data) => {
+    return data.settings
   }).catch(() => {
-    return context.metadata.settings;
+    return context.metadata.settings
   }).then((settings) => {
     Object.keys(settings).forEach((key) => {
       const value = settings[key]
