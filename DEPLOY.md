@@ -8,7 +8,7 @@ Compile the app for DEV
 
 Compile the app for PROD
 ===============
-1) `npm run install`
+1) `npm install --only=production`
 2) `zat translate to_json -p src`
 3) `zat translate update -p src` - This will download the newest translations from Rosetta
 4) `npm run build`
