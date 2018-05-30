@@ -10,7 +10,7 @@ Setup
 Since a ZAF V2 app is free to implement its own system, we have tried several approaches and looked at how the [App scaffold](https://github.com/zendesk/app_scaffold) had merged different systems together.
 
 * dist/
-  * An empty folder that needs *no* input from the developer. It's contents comes from webpack. Point your ZAT server to this folder: `zat server -p dist/`.
+  * An empty folder that needs *no* input from the developer. Its content comes from webpack. Point your ZAT server to this folder: `zat server -p dist/`.
 * spec/
   * The (mocha with karma on Chrome) specs in this folder test the `src/javascript/` files. These test run in ChromeHeadless as defined by `karma.conf.js`.
 * src/
