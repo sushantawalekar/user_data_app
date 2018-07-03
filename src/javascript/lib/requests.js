@@ -61,7 +61,8 @@ export default {
         'settings': {
           selectedFields: setting('selectedFields'),
           orgFields: setting('orgFields'),
-          orgFieldsActivated: setting('orgFieldsActivated')
+          orgFieldsActivated: setting('orgFieldsActivated'),
+          hideEmptyFields: setting('hideEmptyFields')
         },
         'enabled': true
       }

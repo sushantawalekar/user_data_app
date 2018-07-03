@@ -217,6 +217,8 @@ const app = {
         result.value = target[subkey]
         result.simpleKey = ['builtin', subkey].join(' ')
 
+        if (setting('hideEmptyFields') && !result.value && !result.editable) { return null }
+
         if (subkey === 'tags') {
           result.value = renderTags({tags: result.value})
           result.html = true
@@ -229,6 +231,8 @@ const app = {
       } else {
         result.simpleKey = ['custom', key].join(' ')
         result.value = values[key]
+
+        if (setting('hideEmptyFields') && !result.value && !result.editable) { return null }
 
         if (typeof result.value === 'string' && result.value.indexOf('http') > -1) {
           result.html = true
@@ -353,7 +357,8 @@ const app = {
     const html = renderAdmin({
       fields: storage('userFields'),
       orgFields: storage('organizationFields'),
-      orgFieldsActivated: setting('orgFieldsActivated')
+      orgFieldsActivated: setting('orgFieldsActivated'),
+      hideEmptyFields: setting('hideEmptyFields')
     })
     $('.admin').html(html).show()
     $('.whole').hide()
@@ -369,6 +374,9 @@ const app = {
   onSaveClick: function () {
     const keys = $('.fields-list input:checked').map(function () { return $(this).val() })
     const orgKeys = $('.org_fields_list input:checked').map(function () { return $(this).val() })
+    const hideEmptyFields = $('input.hide_empty_fields').is(':checked')
+    setting('hideEmptyFields', hideEmptyFields)
+
     $('input, button').prop('disabled', true)
     $('.save .text').hide()
     $('.save .spinner').show()
