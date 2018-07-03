@@ -217,7 +217,7 @@ const app = {
         result.value = target[subkey]
         result.simpleKey = ['builtin', subkey].join(' ')
 
-        if (setting('hideEmptyFields') && !result.value && !result.editable) { return null }
+        if (app.couldHideField(result)) { return null }
 
         if (subkey === 'tags') {
           result.value = renderTags({tags: result.value})
@@ -232,7 +232,7 @@ const app = {
         result.simpleKey = ['custom', key].join(' ')
         result.value = values[key]
 
-        if (setting('hideEmptyFields') && !result.value && !result.editable) { return null }
+        if (app.couldHideField(result)) { return null }
 
         if (typeof result.value === 'string' && result.value.indexOf('http') > -1) {
           result.html = true
@@ -286,6 +286,10 @@ const app = {
       }
       return list
     }, list)
+  },
+
+  couldHideField: function (field) {
+    return setting('hideEmptyFields') && !field.value && !field.editable
   },
 
   toLocaleDate: function (date) {
