@@ -35,7 +35,7 @@ html, body {
     margin-bottom: 1em;
   }
 
-  .org_fields {
+  .hide_empty_fields, .org_fields {
     margin-top: 20px;
   }
 
@@ -82,22 +82,28 @@ i.icon_circle_arrow_left {
   border-radius: 3px;
 
   &.new {
-    background: #F5CA00;
+    background: #FCDBA9;
+    color: #703B15;
   }
   &.open {
-    background: #E82A2A;
+    background: #F5B5BA;
+    color: #681219;
   }
   &.solved {
-    background: #828282;
+    background: #68737D;
+    color: #F8F9F9;
   }
   &.pending {
-    background: #59BBE0;
+    background: #ADCCE4;
+    color: #0F3554;
   }
   &.hold {
-    background: #000000;
+    background: #2F3941;
+    color: #F8F9F9;
   }
   &.closed {
-    background: #DDDDDD;
+    background: #D8DCDE;
+    color: #2F3941;
   }
 }
 
@@ -278,19 +284,17 @@ i.icon_circle_arrow_left {
         }
 
         .ticket_status_label {
-          font-size: 10px;
-          line-height: 14px;
-          padding: 0;
-          padding-left: 4px;
-          padding-right: 4px;
-          height: 15px;
           display: inline-block;
+          height: 15px;
+          width: 15px;
+          font-weight: bold;
+          text-transform: uppercase;
+          font-size: 10px;
+          line-height: 15px;
+          text-align: center;
           vertical-align: middle;
           box-sizing: border-box;
           white-space: nowrap;
-          text-align: center;
-          opacity: 0.6;
-          width: 15px;
         }
       }
     }

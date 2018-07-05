@@ -16,7 +16,7 @@ describe('Helpers', () => {
     const ajaxPaging = helpers.ajaxPaging
 
     it('returns a promise', function () {
-      const result = ajaxPaging()
+      const result = ajaxPaging('getLocales')
       assert.strictEqual(typeof result.then, 'function')
     })
 

@@ -21,3 +21,4 @@ orgFields:
   - "##builtin_details"
   - "##builtin_notes"
 orgFieldsActivated: true
+hideEmptyFields: true
