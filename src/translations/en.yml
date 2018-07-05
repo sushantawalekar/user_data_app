@@ -60,6 +60,11 @@ By enabling this app, You agree to the [Built by Zendesk Terms of Use](https://w
       title: "Check box to display org fields"
       value: "Display organization information"
   - translation:
+      key: "txt.apps.user_data_app.admin.hide_empty_fields"
+      title: "Check box to hide empty fields"
+      value: "Hide empty fields"
+      screenshot: https://drive.google.com/open?id=1ibq9TGmmMc-t8-kVhUo1-ogd6Jr9ovMQ
+  - translation:
       key: "txt.apps.user_data_app.info.no_tags"
       title: "Placeholder when there are no tags"
       value: "No tags"
