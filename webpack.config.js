@@ -5,7 +5,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const TranslationsPlugin = require('./webpack/translations-plugin')
 const Visualizer = require('webpack-visualizer-plugin')
 
-module.exports = (env) => {
+module.exports = (env = {}) => {
   const config = {
     entry: {
       app: [
