@@ -57,15 +57,16 @@ export default {
     const settingsRequest = {
       url: `/api/v2/apps/installations/${installationId}.json`,
       type: 'PUT',
-      data: {
-        'settings': {
+      contentType: 'application/json',
+      data: JSON.stringify({
+        settings: {
           selectedFields: setting('selectedFields'),
           orgFields: setting('orgFields'),
-          orgFieldsActivated: setting('orgFieldsActivated'),
-          hideEmptyFields: setting('hideEmptyFields')
+          orgFieldsActivated: setting('orgFieldsActivated') ? 'true' : 'false',
+          hideEmptyFields: setting('hideEmptyFields') ? 'true' : 'false'
         },
-        'enabled': true
-      }
+        enabled: true
+      })
     }
 
     // For dev
