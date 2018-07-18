@@ -1,5 +1,3 @@
-const flatten = require('lodash/flatten')
-
 /**
  * {
  *   name: 'test app'
@@ -27,7 +25,7 @@ const flatten = require('lodash/flatten')
 function translationFlatten (object, flattened = {}, currentKeys = []) {
   Object.keys(object).map(function (key) {
     const value = object[key]
-    const keyArr = flatten([currentKeys, key])
+    const keyArr = [...currentKeys, key]
 
     if (typeof value === 'object') {
       if (value.title && value.value) {

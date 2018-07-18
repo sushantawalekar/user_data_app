@@ -20,7 +20,12 @@ client.on('app.registered', function (context) {
     return context.metadata.settings
   }).then((settings) => {
     Object.keys(settings).forEach((key) => {
-      const value = settings[key]
+      let value = settings[key]
+
+      // convert true/false string into bool
+      if (value === 'true') value = true
+      else if (value === 'false') value = false
+
       setting(key, value)
     })
     app.init()

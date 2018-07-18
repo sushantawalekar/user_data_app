@@ -18,8 +18,8 @@ describe('App', () => {
       sinon.stub(helpers, 'ajax').callsFake(() => {
         return Promise.resolve({
           locales: [
-            { id: 1005, locale: "nl", name: "Nederlands (Dutch)" },
-            { id: 1, locale: "en-US", name: "English" }
+            { id: 1005, locale: 'nl', name: 'Nederlands (Dutch)' },
+            { id: 1, locale: 'en-US', name: 'English' }
           ]
         })
       })
@@ -32,8 +32,8 @@ describe('App', () => {
     it('returns a locales', (done) => {
       app.getLocales().then((data) => {
         assert.deepStrictEqual(data, {
-          "nl": "Nederlands (Dutch)",
-          "en-US": "English"
+          nl: 'Nederlands (Dutch)',
+          'en-US': 'English'
         })
         done()
       })
@@ -42,8 +42,8 @@ describe('App', () => {
     it('stores the locales in storage', (done) => {
       app.getLocales().then(() => {
         assert.deepStrictEqual(storage.storage('locales'), {
-          "nl": "Nederlands (Dutch)",
-          "en-US": "English"
+          nl: 'Nederlands (Dutch)',
+          'en-US': 'English'
         })
         done()
       })

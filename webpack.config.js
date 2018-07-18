@@ -3,14 +3,10 @@ const CleanWebpackPlugin = require('clean-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const TranslationsPlugin = require('./webpack/translations-plugin')
+const Visualizer = require('webpack-visualizer-plugin')
 
-module.exports = (env) => {
-  // true if running: yarn build:prod
-  function ifProd (obj) {
-    return env && env.production ? obj : {}
-  }
-
-  return {
+module.exports = (env = {}) => {
+  const config = {
     entry: {
       app: [
         './src/javascript/main.js',
@@ -26,10 +22,6 @@ module.exports = (env) => {
     // list of which loaders to use for which files
     module: {
       rules: [
-        ifProd({
-          test: /\.js$/,
-          use: { loader: 'babel-loader', options: { presets: ['babel-preset-env'] } }
-        }),
         {
           test: /\.hdbs$/,
           use: 'handlebars-loader'
@@ -79,4 +71,19 @@ module.exports = (env) => {
       new ExtractTextPlugin('styles.css')
     ]
   }
+
+  if (env.production) {
+    config.module.rules.push({
+      test: /\.js$/,
+      use: { loader: 'babel-loader', options: { plugins: ['lodash'], presets: ['babel-preset-env'] } }
+    })
+  }
+
+  if (env.stats) {
+    config.plugins.push(new Visualizer({
+      filename: '../statistics.html'
+    }))
+  }
+
+  return config
 }
