@@ -1,4 +1,10 @@
-const flatten = require('lodash/flatten')
+function flatten(array) {
+  return array.reduce((memo, item) => {
+    if (Array.isArray(item)) memo = memo.concat( flatten(item) )
+    else memo.push(item)
+    return memo
+  }, [])
+}
 
 /**
  * {
