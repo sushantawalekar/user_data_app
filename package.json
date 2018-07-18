@@ -10,7 +10,7 @@
     "watch": "webpack --watch",
     "build:dev": "webpack",
     "build": "webpack --env.production -p",
-    "build:stats": "node ./webpack/stats.js",
+    "stats": "node ./webpack/stats.js",
     "lint": "standard"
   },
   "dependencies": {
