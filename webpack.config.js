@@ -3,7 +3,6 @@ const CleanWebpackPlugin = require('clean-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const TranslationsPlugin = require('./webpack/translations-plugin')
-const Visualizer = require('webpack-visualizer-plugin')
 
 module.exports = (env = {}) => {
   const config = {
@@ -80,6 +79,7 @@ module.exports = (env = {}) => {
   }
 
   if (env.stats) {
+    const Visualizer = require('webpack-visualizer-plugin')
     config.plugins.push(new Visualizer({
       filename: '../statistics.html'
     }))
