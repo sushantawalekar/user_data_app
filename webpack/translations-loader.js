@@ -1,11 +1,3 @@
-function flatten(array) {
-  return array.reduce((memo, item) => {
-    if (Array.isArray(item)) memo = memo.concat( flatten(item) )
-    else memo.push(item)
-    return memo
-  }, [])
-}
-
 /**
  * {
  *   name: 'test app'
@@ -33,7 +25,7 @@ function flatten(array) {
 function translationFlatten (object, flattened = {}, currentKeys = []) {
   Object.keys(object).map(function (key) {
     const value = object[key]
-    const keyArr = flatten([currentKeys, key])
+    const keyArr = [...currentKeys, key]
 
     if (typeof value === 'object') {
       if (value.title && value.value) {
