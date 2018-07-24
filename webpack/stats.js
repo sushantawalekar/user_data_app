@@ -2,6 +2,8 @@ const exec = require('child_process').exec
 const fs = require('fs')
 const zlib = require('zlib')
 
+const FILE_PATH = './dist/assets'
+
 new Promise((resolve, reject) => {
   exec('npm run build -- --env.stats', (error, stdout, stderr) => {
     if (error) reject(stderr)
@@ -11,21 +13,43 @@ new Promise((resolve, reject) => {
   exec('open ./dist/statistics.html')
 }).then(() => {
   return new Promise((resolve, reject) => {
-    fs.readFile('./dist/assets/bundle.js', 'utf8', (err, data) => {
+    fs.readdir(FILE_PATH, (err, files) => {
       if (err) reject(err)
-      resolve(data)
+      resolve(files)
     })
   })
-}).then((bundleContent) => {
-  return new Promise((resolve, reject) => {
-    zlib.gzip(bundleContent, (err, buffer) => {
-      if (err) reject(err)
-      resolve({ original: bundleContent.length, compressed: buffer.length })
+}).then((files) => {
+  return files.filter((file) => {
+    return /\.js$/.test(file)
+  })
+}).then((files) => {
+  const promises = files.map((filename) => {
+    return new Promise((resolve, reject) => {
+      fs.readFile(`${FILE_PATH}/${filename}`, 'utf8', (err, data) => {
+        if (err) reject(err)
+        resolve({ filename, content: data })
+      })
     })
   })
-}).then((result) => {
-  console.log('original', result.original.toString().padStart(15))
-  console.log('original gzip', result.compressed.toString().padStart(10))
+  return Promise.all(promises)
+}).then((files) => {
+  const promises = files.map((file) => {
+    const { filename, content } = file
+    return new Promise((resolve, reject) => {
+      zlib.gzip(content, (err, buffer) => {
+        if (err) reject(err)
+        resolve({ filename, original: content.length, compressed: buffer.length })
+      })
+    })
+  })
+  return Promise.all(promises)
+}).then((results) => {
+  results.forEach((result) => {
+    console.log(`${FILE_PATH}/${result.filename}`)
+    console.log('original', result.original.toString().padStart(15))
+    console.log('original gzip', result.compressed.toString().padStart(10))
+    console.log('')
+  })
 }).catch((err) => {
   console.error(err)
 })
