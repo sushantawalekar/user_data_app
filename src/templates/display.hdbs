@@ -1,7 +1,7 @@
 <div class="admin" style="display: none"></div>
 
 <div class="whole">
-  <div class="card">
+  <div class="card user">
     <div class="row-fluid">
       {{#if isAdmin}}
         <a class="cog"></a>
@@ -24,12 +24,12 @@
       {{/if}}
 
       <div class="contacts">
-        <div class="name"><a href="#/tickets/{{ticketId}}/requester/tickets">{{user.name}}</a></div>
+        <div class="name"><a href="javascript:void(0)">{{user.name}}</a></div>
         <div class="email">{{user.email}}</div>
         <div class="phone">{{user.phone}}</div>
         {{#if user.organization}}
           <div class="organization">
-            <a href="#/tickets/{{ticketId}}/organization/tickets">{{user.organization.name}}</a>
+            <a href="javascript:void(0)">{{user.organization.name}}</a>
           </div>
         {{/if}}
       </div>
@@ -96,7 +96,7 @@
           {{/if}}
 
           <div class="contacts">
-            <div class="name"><a href="#/tickets/{{ticketId}}/organization/tickets">{{org.name}}</a></div>
+            <div class="name"><a href="javascript:void(0)">{{org.name}}</a></div>
             <div class="email">{{org.email}}</div>
           </div>
         </div>
