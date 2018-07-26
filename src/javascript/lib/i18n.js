@@ -60,6 +60,8 @@ const I18n = {
   }
 }
 
+I18n.loadTranslations(defaultLocale)
+
 Handlebars.registerHelper('t', function (key, context) {
   try {
     return I18n.t(key, context.hash)
