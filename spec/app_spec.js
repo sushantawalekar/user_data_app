@@ -1,5 +1,6 @@
 /* eslint-env mocha */
 import app from '../src/javascript/app'
+import client from '../src/javascript/lib/client'
 import * as helpers from '../src/javascript/lib/helpers'
 import * as storage from '../src/javascript/lib/storage'
 import assert from 'assert'
@@ -87,6 +88,33 @@ describe('App', () => {
       field.value = ''
       field.editable = false
       assert.strictEqual(app.couldHideField(field), true)
+    })
+  })
+
+  describe('a click triggers the right event', () => {
+    let invokeSpy
+
+    before(() => {
+      document.body.innerHTML = ('<section data-main><img class="loader" src="dot.gif"/></section>')
+
+      invokeSpy = sinon.stub(client, 'invoke').callsFake(() => {
+        return Promise.resolve()
+      })
+
+      storage.storage('currentUser', {})
+      storage.storage('ticketsCounters', {
+        new: 23
+      })
+    })
+
+    after(() => {
+      client.invoke.restore()
+    })
+
+    it('invokes routeTo when we click <a>', () => {
+      app.showDisplay()
+      document.querySelector('.card.user .counts .new a').click()
+      assert(invokeSpy.withArgs('routeTo').calledOnce)
     })
   })
 })
