@@ -91,28 +91,46 @@ describe('App', () => {
     })
   })
 
-  describe('a click triggers the right event', () => {
+  describe('link actions', () => {
     let invokeSpy
 
     before(() => {
-      document.body.innerHTML = ('<section data-main><img class="loader" src="dot.gif"/></section>')
+      document.body.innerHTML = ('<section data-main></section>')
 
-      invokeSpy = sinon.stub(client, 'invoke').callsFake(() => {
-        return Promise.resolve()
-      })
+      invokeSpy = sinon.stub(client, 'invoke')
 
+      storage.setting('orgFieldsActivated', true)
+      storage.storage('user', { name: 'User', organization: { name: 'Company' } })
+      storage.storage('ticketId', 100)
       storage.storage('currentUser', {})
       storage.storage('ticketsCounters', { new: 23 })
+      storage.storage('orgTicketsCounters', { new: 46 })
+
+      app.showDisplay()
     })
 
     after(() => {
       client.invoke.restore()
     })
 
-    it('invokes routeTo when we click <a>', () => {
-      app.showDisplay()
-      document.querySelector('.card.user .counts .new a').click()
-      assert(invokeSpy.withArgs('routeTo').calledOnce)
+    it('routes to the requester when clicked on the name', () => {
+      document.querySelector('.card.user .contacts .name a').click()
+      assert(invokeSpy.withArgs('routeTo', 'nav_bar', '', sinon.match('requester/requested_tickets')).called)
+    })
+
+    it('routes to the requester when clicked on the ticket numbers', () => {
+      document.querySelector('.card.user .count.new a').click()
+      assert(invokeSpy.withArgs('routeTo', 'nav_bar', '', sinon.match('requester/requested_tickets')).called)
+    })
+
+    it('routes to the organization when clicked on the name', () => {
+      document.querySelector('.card.org .contacts .name a').click()
+      assert(invokeSpy.withArgs('routeTo', 'nav_bar', '', sinon.match('organization/tickets')).called)
+    })
+
+    it('routes to the organization when clicked on the ticket numbers', () => {
+      document.querySelector('.card.org .count.new a').click()
+      assert(invokeSpy.withArgs('routeTo', 'nav_bar', '', sinon.match('organization/tickets')).called)
     })
   })
 })
