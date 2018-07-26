@@ -1,5 +1,4 @@
 import app from './app'
-import I18n from './lib/i18n'
 import client from './lib/client'
 import { storage, setting } from './lib/storage'
 

@@ -102,9 +102,7 @@ describe('App', () => {
       })
 
       storage.storage('currentUser', {})
-      storage.storage('ticketsCounters', {
-        new: 23
-      })
+      storage.storage('ticketsCounters', { new: 23 })
     })
 
     after(() => {
