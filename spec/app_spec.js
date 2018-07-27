@@ -1,5 +1,6 @@
 /* eslint-env mocha */
 import app from '../src/javascript/app'
+import client from '../src/javascript/lib/client'
 import * as helpers from '../src/javascript/lib/helpers'
 import * as storage from '../src/javascript/lib/storage'
 import assert from 'assert'
@@ -87,6 +88,49 @@ describe('App', () => {
       field.value = ''
       field.editable = false
       assert.strictEqual(app.couldHideField(field), true)
+    })
+  })
+
+  describe('link actions', () => {
+    let invokeSpy
+
+    before(() => {
+      document.body.innerHTML = ('<section data-main></section>')
+
+      invokeSpy = sinon.spy(client, 'invoke')
+
+      storage.setting('orgFieldsActivated', true)
+      storage.storage('user', { name: 'User', organization: { name: 'Company' } })
+      storage.storage('ticketId', 100)
+      storage.storage('currentUser', {})
+      storage.storage('ticketsCounters', { new: 23 })
+      storage.storage('orgTicketsCounters', { new: 46 })
+
+      app.showDisplay()
+    })
+
+    after(() => {
+      client.invoke.restore()
+    })
+
+    it('routes to the requester when clicked on the name', () => {
+      document.querySelector('.card.user .contacts .name a').click()
+      assert(invokeSpy.withArgs('routeTo', 'nav_bar', '', sinon.match('requester/requested_tickets')).called)
+    })
+
+    it('routes to the requester when clicked on the ticket numbers', () => {
+      document.querySelector('.card.user .count.new a').click()
+      assert(invokeSpy.withArgs('routeTo', 'nav_bar', '', sinon.match('requester/requested_tickets')).called)
+    })
+
+    it('routes to the organization when clicked on the name', () => {
+      document.querySelector('.card.org .contacts .name a').click()
+      assert(invokeSpy.withArgs('routeTo', 'nav_bar', '', sinon.match('organization/tickets')).called)
+    })
+
+    it('routes to the organization when clicked on the ticket numbers', () => {
+      document.querySelector('.card.org .count.new a').click()
+      assert(invokeSpy.withArgs('routeTo', 'nav_bar', '', sinon.match('organization/tickets')).called)
     })
   })
 })

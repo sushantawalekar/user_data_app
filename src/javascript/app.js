@@ -324,8 +324,7 @@ const app = {
 
   makeTicketsLinks: function (counters) {
     const links = {}
-    const link = `#/tickets/${storage('ticketId')}/requester/requested_tickets`
-    const $tag = $('<div>').append($('<a>').attr('href', link))
+    const $tag = $('<div>').append($('<a>').attr('href', 'javascript:void(0)'))
     each(counters, function (value, key) {
       if (value && value !== '-') {
         $tag.find('a').html(value)
@@ -546,6 +545,16 @@ const app = {
 
     storage('userFields', sortBy(restrictedFields, 'position'))
     return restrictedFields
+  },
+
+  // HACK for navigating to a url, since routeTo doesn't support this.
+  // https://developer.zendesk.com/apps/docs/support-api/all_locations#routeto
+  goToRequester: function () {
+    return client.invoke('routeTo', 'nav_bar', '', `../../tickets/${storage('ticketId')}/requester/requested_tickets`)
+  },
+
+  goToOrganization: function () {
+    return client.invoke('routeTo', 'nav_bar', '', `../../tickets/${storage('ticketId')}/organization/tickets`)
   }
 }
 
@@ -556,5 +565,7 @@ $(document).on('change', '.org_fields_activate', app.onActivateOrgFieldsChange)
 $(document).on('click', '.back', app.onBackClick)
 $(document).on('click', '.save', app.onSaveClick)
 $(document).on('mouseup', 'textarea', debounce(appResize, 300))
+$(document).on('click', '.card.user .counts a, .card.user .contacts .name a', app.goToRequester)
+$(document).on('click', '.card.org .counts a, .card.user .contacts .organization a, .card.org .contacts .name a', app.goToOrganization)
 
 export default app

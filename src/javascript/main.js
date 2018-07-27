@@ -1,10 +1,6 @@
 import app from './app'
-import I18n from './lib/i18n'
 import client from './lib/client'
 import { storage, setting } from './lib/storage'
-
-// we start off with en, and once we have the user.locale we switch it.
-I18n.loadTranslations('en')
 
 client.on('app.registered', function (context) {
   const installationId = context.metadata.installationId
