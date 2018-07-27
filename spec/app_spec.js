@@ -97,7 +97,7 @@ describe('App', () => {
     before(() => {
       document.body.innerHTML = ('<section data-main></section>')
 
-      invokeSpy = sinon.stub(client, 'invoke')
+      invokeSpy = sinon.spy(client, 'invoke')
 
       storage.setting('orgFieldsActivated', true)
       storage.storage('user', { name: 'User', organization: { name: 'Company' } })
