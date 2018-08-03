@@ -1,4 +1,4 @@
-import { setting, storage } from './storage'
+import { setting, storage } from './helpers'
 import { toArray } from 'lodash'
 
 export default {

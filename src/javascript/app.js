@@ -1,5 +1,4 @@
-import { ajax, ajaxPaging, urlify, appResize } from './lib/helpers'
-import { localStorage, storage, setting } from './lib/storage'
+import { ajax, ajaxPaging, urlify, appResize, localStorage, storage, setting } from './lib/helpers'
 import I18n from './lib/i18n'
 import client from './lib/client'
 

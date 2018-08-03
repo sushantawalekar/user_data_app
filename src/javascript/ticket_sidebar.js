@@ -1,6 +1,6 @@
 import app from './app'
 import client from './lib/client'
-import { storage, setting } from './lib/storage'
+import { storage, setting } from './lib/helpers'
 
 client.on('app.registered', function (context) {
   const installationId = context.metadata.installationId

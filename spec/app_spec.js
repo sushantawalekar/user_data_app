@@ -2,7 +2,6 @@
 import app from '../src/javascript/app'
 import client from '../src/javascript/lib/client'
 import * as helpers from '../src/javascript/lib/helpers'
-import * as storage from '../src/javascript/lib/storage'
 import assert from 'assert'
 import sinon from 'sinon'
 
@@ -42,7 +41,7 @@ describe('App', () => {
 
     it('stores the locales in storage', (done) => {
       app.getLocales().then(() => {
-        assert.deepStrictEqual(storage.storage('locales'), {
+        assert.deepStrictEqual(helpers.storage('locales'), {
           nl: 'Nederlands (Dutch)',
           'en-US': 'English'
         })
@@ -56,13 +55,13 @@ describe('App', () => {
     const field = {}
 
     before(() => {
-      sinon.stub(storage, 'setting').callsFake(() => {
+      sinon.stub(helpers, 'setting').callsFake(() => {
         return hideEmptyFields
       })
     })
 
     after(() => {
-      storage.setting.restore()
+      helpers.setting.restore()
     })
 
     it('return false when setting is false', () => {
@@ -99,12 +98,12 @@ describe('App', () => {
 
       invokeSpy = sinon.spy(client, 'invoke')
 
-      storage.setting('orgFieldsActivated', true)
-      storage.storage('user', { name: 'User', organization: { name: 'Company' } })
-      storage.storage('ticketId', 100)
-      storage.storage('currentUser', {})
-      storage.storage('ticketsCounters', { new: 23 })
-      storage.storage('orgTicketsCounters', { new: 46 })
+      helpers.setting('orgFieldsActivated', true)
+      helpers.storage('user', { name: 'User', organization: { name: 'Company' } })
+      helpers.storage('ticketId', 100)
+      helpers.storage('currentUser', {})
+      helpers.storage('ticketsCounters', { new: 23 })
+      helpers.storage('orgTicketsCounters', { new: 46 })
 
       app.showDisplay()
     })
