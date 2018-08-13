@@ -132,4 +132,53 @@ describe('App', () => {
       assert(invokeSpy.withArgs('routeTo', 'nav_bar', '', sinon.match('organization/tickets')).called)
     })
   })
+
+  describe('#getTickets', () => {
+    let ajaxStub, searchData, ticketData
+
+    before(() => {
+      ajaxStub = sinon.stub(helpers, 'ajax').callsFake((r) => {
+        const data = (r === 'searchTickets') ? searchData : ticketData
+        return Promise.resolve(data)
+      })
+    })
+
+    after(() => {
+      helpers.ajax.restore()
+    })
+
+    it('returns after 1 call with the data', (done) => {
+      searchData = { count: 1, results: [{ id: 123, status: 'open' }] }
+
+      app.getTickets('requester', 1).then((result) => {
+        assert(ajaxStub.withArgs('searchTickets', 'requester:1').called)
+        assert.deepStrictEqual(result, { open: '1' })
+        done()
+      })
+    })
+
+    it('makes additional calls when count is between 1 and up to 100', (done) => {
+      searchData = { count: 2, results: [{ id: 123, status: 'open' }] }
+      ticketData = { count: 2, tickets: [{ id: 123, status: 'open' }, { id: 456, status: 'open' }] }
+
+      app.getTickets('requester', 1).then((result) => {
+        assert(ajaxStub.withArgs('searchTickets', 'requester:1').called)
+        assert(ajaxStub.withArgs('getTickets', 1).called)
+        assert.deepStrictEqual(result, { open: '2' })
+        done()
+      })
+    })
+
+    it('makes additional calls when count is > 100', (done) => {
+      searchData = { count: 101, results: [{ id: 123, status: 'open' }] }
+
+      app.getTickets('requester', 1).then((result) => {
+        assert(ajaxStub.withArgs('searchTickets', 'requester:1').called)
+        assert(ajaxStub.withArgs('searchTickets', 'requester:1 status:open').called)
+        assert(ajaxStub.withArgs('searchTickets', 'requester:1 status:closed').called)
+        assert.deepStrictEqual(result, {new: '101', open: '101', solved: '101', pending: '101', hold: '101', closed: '101'})
+        done()
+      })
+    })
+  })
 })
