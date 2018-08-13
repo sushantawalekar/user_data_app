@@ -1,4 +1,4 @@
-import { ajax, ajaxPaging, urlify, appResize, localStorage, storage, setting } from './lib/helpers'
+import { ajax, urlify, appResize, localStorage, storage, setting, parseNum } from './lib/helpers'
 import I18n from './lib/i18n'
 import client from './lib/client'
 
@@ -103,14 +103,14 @@ const app = {
       storage('user', user)
 
       if (data.user.organization_id) {
-        promises.push(app.getOrganizationTickets(data.user.organization_id))
+        promises.push(app.getTickets('organization', data.user.organization_id))
       }
 
       if (storage('ticketId')) {
         promises.push(app.getTicketAudits())
       }
 
-      promises.push(app.getTickets(user.id))
+      promises.push(app.getTickets('requester', user.id))
 
       return Promise.all(promises)
     })
@@ -152,17 +152,6 @@ const app = {
     })
   },
 
-  getOrganizationTickets: function (organizationId) {
-    return ajax('getOrganizationTickets', organizationId).then((data) => {
-      const grouped = groupBy(data.tickets, 'status')
-      const res = fromPairs(map(grouped, (value, key) => {
-        return [key, value.length]
-      }))
-      storage('orgTicketsCounters', res)
-      return res
-    })
-  },
-
   getTicketAudits: function () {
     return ajax('getTicketAudits', storage('ticketId')).then((data) => {
       each(data.audits, (audit) => {
@@ -184,15 +173,61 @@ const app = {
     })
   },
 
-  getTickets: function (userId) {
-    return ajaxPaging('getTickets', userId).then((data) => {
-      const grouped = groupBy(data.tickets, 'status')
-      const res = fromPairs(map(grouped, (value, key) => {
-        return [key, value.length]
-      }))
-      storage('ticketsCounters', res)
+  getTickets: function (type, id) {
+    const TYPES = {
+      requester: { ajax: 'getTickets', storage: 'ticketsCounters' },
+      organization: { ajax: 'getOrganizationTickets', storage: 'orgTicketsCounters' }
+    }
+
+    if (!TYPES[type]) throw new Error('no such type defined.')
+
+    // First use search to decide what to do
+    return ajax('searchTickets', `${type}:${id}`).then((data) => {
+      if (data.count === 1) {
+        // If only 1 result, we already have that result, and trick processTicketData
+        // into thinking we got the data from tickets response
+        data.tickets = data.results
+        return data
+      } else if (data.count <= 100) {
+        // If we only needed 1 requests
+        return ajax(TYPES[type].ajax, id)
+      } else {
+        // If we need more requests
+        return app.getTicketsThroughSearch(`${type}:${id}`)
+      }
+    }).then((data) => {
+      const res = app.processTicketData(data)
+      storage(TYPES[type].storage, res)
       return res
     })
+  },
+
+  getTicketsThroughSearch: function (searchTerm) {
+    const promises = TICKET_STATUSES.map((status) => {
+      return ajax('searchTickets', `${searchTerm} status:${status}`)
+    })
+    return Promise.all(promises)
+  },
+
+  processTicketData: function (data) {
+    let res
+
+    // If data.tickets it means it's a tickets repsonse
+    if (data.tickets) {
+      const grouped = groupBy(data.tickets, 'status')
+      res = fromPairs(map(grouped, (value, key) => {
+        return [key, parseNum(value.length)]
+      }))
+
+    // Else it's a search response
+    } else {
+      res = TICKET_STATUSES.reduce((memo, status, i) => {
+        memo[status] = parseNum(data[i].count)
+        return memo
+      }, {})
+    }
+
+    return res
   },
 
   formatFields: function (target, fields, selected, values, locales) {
