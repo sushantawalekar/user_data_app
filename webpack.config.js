@@ -7,14 +7,14 @@ const TranslationsPlugin = require('./webpack/translations-plugin')
 module.exports = (env = {}) => {
   const config = {
     entry: {
-      app: [
-        './src/javascript/main.js',
+      ticket_sidebar: [
+        './src/javascript/ticket_sidebar.js',
         './src/main.scss'
       ]
     },
 
     output: {
-      filename: 'bundle.js',
+      filename: '[name].js',
       path: path.resolve(__dirname, 'dist/assets')
     },
 
@@ -59,7 +59,7 @@ module.exports = (env = {}) => {
         { from: 'src/images/logo.png', to: '.', flatten: true },
         { from: 'src/images/logo-small.png', to: '.', flatten: true },
         { from: 'src/images/screenshot*', to: '.', flatten: true },
-        { from: 'src/templates/iframe.html', to: '.', flatten: true }
+        { from: 'src/templates/ticket_sidebar.html', to: '.', flatten: true }
       ]),
 
       new TranslationsPlugin({

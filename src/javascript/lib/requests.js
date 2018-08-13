@@ -1,4 +1,4 @@
-import { setting, storage } from './storage'
+import { setting, storage } from './helpers'
 import { toArray } from 'lodash'
 
 export default {
@@ -18,9 +18,9 @@ export default {
     url: '/api/v2/user_fields.json'
   },
 
-  getOrganizationTickets: function (orgId) {
+  getOrganizationTickets: function (orgId, page = 1) {
     return {
-      url: `/api/v2/organizations/${orgId}/tickets.json`
+      url: `/api/v2/organizations/${orgId}/tickets.json?page=${page}`
     }
   },
 
@@ -30,15 +30,15 @@ export default {
     }
   },
 
-  getTickets: function (userId) {
+  getTickets: function (userId, page = 1) {
     return {
-      url: `/api/v2/users/${userId}/tickets/requested.json`
+      url: `/api/v2/users/${userId}/tickets/requested.json?page=${page}`
     }
   },
 
-  searchTickets: function (userId, status) {
+  searchTickets: function (searchTerm = '') {
     return {
-      url: `/api/v2/search.json?query=type:ticket requester:${userId} status:${status}`
+      url: `/api/v2/search.json?query=type:ticket ${searchTerm}&per_page=1`
     }
   },
 

@@ -14,8 +14,8 @@
 
   "location": {
     "support": {
-      "ticket_sidebar": "assets/iframe.html",
-      "new_ticket_sidebar": "assets/iframe.html"
+      "ticket_sidebar": "assets/ticket_sidebar.html",
+      "new_ticket_sidebar": "assets/ticket_sidebar.html"
     }
   },
 

@@ -2,7 +2,6 @@
 import app from '../src/javascript/app'
 import client from '../src/javascript/lib/client'
 import * as helpers from '../src/javascript/lib/helpers'
-import * as storage from '../src/javascript/lib/storage'
 import assert from 'assert'
 import sinon from 'sinon'
 
@@ -42,7 +41,7 @@ describe('App', () => {
 
     it('stores the locales in storage', (done) => {
       app.getLocales().then(() => {
-        assert.deepStrictEqual(storage.storage('locales'), {
+        assert.deepStrictEqual(helpers.storage('locales'), {
           nl: 'Nederlands (Dutch)',
           'en-US': 'English'
         })
@@ -56,13 +55,13 @@ describe('App', () => {
     const field = {}
 
     before(() => {
-      sinon.stub(storage, 'setting').callsFake(() => {
+      sinon.stub(helpers, 'setting').callsFake(() => {
         return hideEmptyFields
       })
     })
 
     after(() => {
-      storage.setting.restore()
+      helpers.setting.restore()
     })
 
     it('return false when setting is false', () => {
@@ -99,12 +98,12 @@ describe('App', () => {
 
       invokeSpy = sinon.spy(client, 'invoke')
 
-      storage.setting('orgFieldsActivated', true)
-      storage.storage('user', { name: 'User', organization: { name: 'Company' } })
-      storage.storage('ticketId', 100)
-      storage.storage('currentUser', {})
-      storage.storage('ticketsCounters', { new: 23 })
-      storage.storage('orgTicketsCounters', { new: 46 })
+      helpers.setting('orgFieldsActivated', true)
+      helpers.storage('user', { name: 'User', organization: { name: 'Company' } })
+      helpers.storage('ticketId', 100)
+      helpers.storage('currentUser', {})
+      helpers.storage('ticketsCounters', { new: 23 })
+      helpers.storage('orgTicketsCounters', { new: 46 })
 
       app.showDisplay()
     })
@@ -131,6 +130,55 @@ describe('App', () => {
     it('routes to the organization when clicked on the ticket numbers', () => {
       document.querySelector('.card.org .count.new a').click()
       assert(invokeSpy.withArgs('routeTo', 'nav_bar', '', sinon.match('organization/tickets')).called)
+    })
+  })
+
+  describe('#getTickets', () => {
+    let ajaxStub, searchData, ticketData
+
+    before(() => {
+      ajaxStub = sinon.stub(helpers, 'ajax').callsFake((r) => {
+        const data = (r === 'searchTickets') ? searchData : ticketData
+        return Promise.resolve(data)
+      })
+    })
+
+    after(() => {
+      helpers.ajax.restore()
+    })
+
+    it('returns after 1 call with the data', (done) => {
+      searchData = { count: 1, results: [{ id: 123, status: 'open' }] }
+
+      app.getTickets('requester', 1).then((result) => {
+        assert(ajaxStub.withArgs('searchTickets', 'requester:1').called)
+        assert.deepStrictEqual(result, { open: '1' })
+        done()
+      })
+    })
+
+    it('makes additional calls when count is between 1 and up to 100', (done) => {
+      searchData = { count: 2, results: [{ id: 123, status: 'open' }] }
+      ticketData = { count: 2, tickets: [{ id: 123, status: 'open' }, { id: 456, status: 'open' }] }
+
+      app.getTickets('requester', 1).then((result) => {
+        assert(ajaxStub.withArgs('searchTickets', 'requester:1').called)
+        assert(ajaxStub.withArgs('getTickets', 1).called)
+        assert.deepStrictEqual(result, { open: '2' })
+        done()
+      })
+    })
+
+    it('makes additional calls when count is > 100', (done) => {
+      searchData = { count: 101, results: [{ id: 123, status: 'open' }] }
+
+      app.getTickets('requester', 1).then((result) => {
+        assert(ajaxStub.withArgs('searchTickets', 'requester:1').called)
+        assert(ajaxStub.withArgs('searchTickets', 'requester:1 status:open').called)
+        assert(ajaxStub.withArgs('searchTickets', 'requester:1 status:closed').called)
+        assert.deepStrictEqual(result, {new: '101', open: '101', solved: '101', pending: '101', hold: '101', closed: '101'})
+        done()
+      })
     })
   })
 })
