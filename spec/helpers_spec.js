@@ -24,7 +24,6 @@ describe('Helpers', () => {
       before(() => {
         const ticketsResponse = {
           next_page: null,
-          previous_page: null,
           count: 4,
           tickets: [1, 2, 3, 4]
         }
@@ -114,6 +113,88 @@ describe('Helpers', () => {
           assert.deepStrictEqual(data.tickets, [1, 2, 3, 4, 9, 10, 11, 12])
           done()
         })
+      })
+    })
+  })
+
+  describe('#escapeSpecialChars', () => {
+    it('should escape open/close html tags', () => {
+      const str = helpers.escapeSpecialChars('<script></script>')
+      assert.strictEqual(str, '&lt;script&gt;&lt;/script&gt;')
+    })
+    it('should escape ampersand', () => {
+      const str = helpers.escapeSpecialChars('a && b')
+      assert.strictEqual(str, 'a &amp;&amp; b')
+    })
+    it('should escape quotes and back tick', () => {
+      const str = helpers.escapeSpecialChars('"string" \'string\' `string`')
+      assert.strictEqual(str, '&quot;string&quot; &#x27;string&#x27; &#x60;string&#x60;')
+    })
+    it('should escape equal sign', () => {
+      const str = helpers.escapeSpecialChars('a = b')
+      assert.strictEqual(str, 'a &#x3D; b')
+    })
+    it('should escape unsafe tags and characters', () => {
+      const str = helpers.escapeSpecialChars('Test Ticket for Text App</a><script>javascript:alert(1);</script>')
+      assert.strictEqual(str, 'Test Ticket for Text App&lt;/a&gt;&lt;script&gt;javascript:alert(1);&lt;/script&gt;')
+    })
+  })
+
+  describe('#find', () => {
+    it('should return a positive in an array', () => {
+      const result = helpers.find([1, 2, 3], (i) => {
+        return i === 2
+      })
+      assert.strictEqual(result, 2)
+    })
+
+    it('should return undefined if not found in an array', () => {
+      const result = helpers.find([1, 2, 3], (i) => {
+        return i === 4
+      })
+      assert.strictEqual(result, undefined)
+    })
+
+    it('should return a positive in an object', () => {
+      const result = helpers.find({ a: 'yes', b: 'no' }, (i) => {
+        return i === 'yes'
+      })
+      assert.strictEqual(result, 'yes')
+    })
+
+    it('should return undefined if not found in an object', () => {
+      const result = helpers.find({ a: 'yes', b: 'no' }, (i) => {
+        return i === 'maybe'
+      })
+      assert.strictEqual(result, undefined)
+    })
+  })
+
+  describe('#parseNum', () => {
+    it('always returns a string', () => {
+      const numbers = [1, 11, 111, 1111, 11111, 111111]
+      numbers.forEach((number) => {
+        const result = helpers.parseNum(number)
+        assert.strictEqual(typeof result, 'string')
+      })
+    })
+
+    it('converts into a string', () => {
+      const numbers = [
+        1, 11, 111, 1111, 11111, 111111, 1111111, 11111111, 111111111, 1111111111,
+        5, 55, 555, 5555, 55555, 555555, 5555555, 55555555, 555555555, 5555555555,
+        9, 99, 999, 9999, 99999, 999999, 9999999, 99999999, 999999999, 9999999999
+      ]
+      const answers = [
+        '1', '11', '111', '1111', '11k', '111k', '1.1M', '11M', '111M', '1.1G',
+        '5', '55', '555', '5555', '55k', '555k', '5.5M', '55M', '555M', '5.5G',
+        '9', '99', '999', '9999', '99k', '999k', '9.9M', '99M', '999M', '9.9G'
+      ]
+
+      numbers.forEach((number, i) => {
+        const answer = answers[i]
+        const result = helpers.parseNum(number)
+        assert.strictEqual(result, answer)
       })
     })
   })
