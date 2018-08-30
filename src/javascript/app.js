@@ -573,7 +573,8 @@ const app = {
           ? JSON.parse(setting('selectedFields'))
           : ['##builtin_tags', '##builtin_details', '##builtin_notes'], field.key),
         editable: field.editable,
-        type: field.type
+        type: field.type,
+        custom_field_options: field.custom_field_options
       }
     })
 
