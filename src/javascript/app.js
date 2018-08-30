@@ -327,7 +327,10 @@ const app = {
   },
 
   toLocaleDate: function (date) {
-    const localDate = new Date(date)
+    const userTimeZoneOffset = storage('currentUser').timeZone.offset * 60000
+    const dateTimestamp = new Date(date).getTime()
+    const localDate = new Date(dateTimestamp + userTimeZoneOffset)
+
     return `${localDate.getDate()}/${localDate.getMonth() + 1}/${localDate.getFullYear()}`
   },
 
