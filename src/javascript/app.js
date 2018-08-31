@@ -327,11 +327,12 @@ const app = {
   },
 
   toLocaleDate: function (date) {
-    const userTimeZoneOffset = storage('currentUser').timeZone.offset * 60000
-    const dateTimestamp = new Date(date).getTime()
-    const localDate = new Date(dateTimestamp + userTimeZoneOffset)
+    const currentUser = storage('currentUser')
+    const userTimeZoneOffset = currentUser.timeZone.offset * 60000 // offset in milliseconds
+    const utcTimestamp = new Date(date).getTime()
+    const localDate = new Date(utcTimestamp + userTimeZoneOffset)
 
-    return `${localDate.getDate()}/${localDate.getMonth() + 1}/${localDate.getFullYear()}`
+    return localDate.toLocaleDateString(currentUser.locale)
   },
 
   showDisplay: function () {
