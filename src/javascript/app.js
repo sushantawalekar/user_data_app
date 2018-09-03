@@ -21,6 +21,7 @@ import 'jquery/src/data'
 import { debounce, filter, map, find, reduce, includes, sortBy, each, compact, groupBy, fromPairs, isEmpty } from 'lodash'
 
 const TICKET_STATUSES = ['new', 'open', 'solved', 'pending', 'hold', 'closed']
+const MINUTES_TO_MILLISECONDS = 60000
 
 const app = {
   init: function () {
@@ -328,7 +329,7 @@ const app = {
 
   toLocaleDate: function (date) {
     const currentUser = storage('currentUser')
-    const userTimeZoneOffset = currentUser.timeZone.offset * 60000 // offset in milliseconds
+    const userTimeZoneOffset = currentUser.timeZone.offset * MINUTES_TO_MILLISECONDS // offset in milliseconds
     const utcTimestamp = new Date(date).getTime()
     const localDate = new Date(utcTimestamp + userTimeZoneOffset)
 
