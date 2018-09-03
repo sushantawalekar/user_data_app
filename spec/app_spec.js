@@ -7,25 +7,26 @@ import sinon from 'sinon'
 
 describe('App', () => {
   describe('#toLocaleDate', () => {
-    let date;
+    let date
+
     before(() => {
       date = '2018-10-01T00:00:00+00:00' // October 1st, 2018
     })
 
     describe("dates are formatted for the user's locale", () => {
-      it ('formats date for en-US', () => {
+      it('formats date for en-US', () => {
         helpers.storage('currentUser', { locale: 'en-US', timeZone: { offset: 0 } })
         const result = app.toLocaleDate(date)
         assert.strictEqual(result, '10/1/2018')
       })
 
-      it ('formats date for en-GB', () => {
+      it('formats date for en-GB', () => {
         helpers.storage('currentUser', { locale: 'en-GB', timeZone: { offset: 0 } })
         const result = app.toLocaleDate(date)
         assert.strictEqual(result, '01/10/2018')
       })
 
-      it ('formats date for ko-KR', () => {
+      it('formats date for ko-KR', () => {
         helpers.storage('currentUser', { locale: 'ko-KR', timeZone: { offset: 0 } })
         const result = app.toLocaleDate(date)
         assert.strictEqual(result, '2018. 10. 1.')
