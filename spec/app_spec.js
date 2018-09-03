@@ -6,10 +6,44 @@ import assert from 'assert'
 import sinon from 'sinon'
 
 describe('App', () => {
-  describe('#toLocaleDate', function () {
-    it('returns a string', function () {
-      const result = app.toLocaleDate('2018-10-02T00:00:00Z')
-      assert.strictEqual(result, '2/10/2018')
+  describe('#toLocaleDate', () => {
+    let date;
+    before(() => {
+      date = '2018-10-01T00:00:00+00:00' // October 1st, 2018
+    })
+
+    describe("dates are formatted for the user's locale", () => {
+      it ('formats date for en-US', () => {
+        helpers.storage('currentUser', { locale: 'en-US', timeZone: { offset: 0 } })
+        const result = app.toLocaleDate(date)
+        assert.strictEqual(result, '10/1/2018')
+      })
+
+      it ('formats date for en-GB', () => {
+        helpers.storage('currentUser', { locale: 'en-GB', timeZone: { offset: 0 } })
+        const result = app.toLocaleDate(date)
+        assert.strictEqual(result, '01/10/2018')
+      })
+
+      it ('formats date for ko-KR', () => {
+        helpers.storage('currentUser', { locale: 'ko-KR', timeZone: { offset: 0 } })
+        const result = app.toLocaleDate(date)
+        assert.strictEqual(result, '2018. 10. 1.')
+      })
+    })
+
+    describe("the date respects agent's timezone", () => {
+      it('shifts to a day earlier for negative timezone offsets', () => {
+        helpers.storage('currentUser', { locale: 'en-US', timeZone: { offset: -660 } }) // American Samoa
+        const result = app.toLocaleDate(date)
+        assert.strictEqual(result, '9/30/2018')
+      })
+
+      it('displays the same day or shifts to a day ahead for positive timezone offsets', () => {
+        helpers.storage('currentUser', { locale: 'en-US', timeZone: { offset: 780 } }) // Pacific/Fakaofo
+        const result = app.toLocaleDate(date)
+        assert.strictEqual(result, '10/1/2018')
+      })
     })
   })
 
