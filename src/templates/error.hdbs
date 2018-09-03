@@ -1,0 +1,5 @@
+<div class="admin" style="display: none"></div>
+
+<div class="error_message">
+  {{t "client.get.error" error=msg}}
+</div>

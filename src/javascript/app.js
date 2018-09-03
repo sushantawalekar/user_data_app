@@ -5,6 +5,7 @@ import client from './lib/client'
 import renderAdmin from '../templates/admin.hdbs'
 import renderDisplay from '../templates/display.hdbs'
 import renderNoRequester from '../templates/no_requester.hdbs'
+import errorMessage from '../templates/error.hdbs'
 import renderSpoke from '../templates/spoke.hdbs'
 import renderTags from '../templates/tags.hdbs'
 
@@ -37,8 +38,8 @@ const app = {
       app.fillEmptyStatuses(storage('ticketsCounters'))
       app.fillEmptyStatuses(storage('orgTicketsCounters'))
       app.showDisplay()
-    }).catch(() => {
-      const view = renderNoRequester()
+    }).catch((err) => {
+      const view = (err.message === 'no requester') ? renderNoRequester() : errorMessage({ msg: err.message })
       $('[data-main]').html(view)
       appResize()
     })
