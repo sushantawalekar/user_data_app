@@ -259,7 +259,7 @@ const app = {
           result.html = true
         } else if (subkey === 'locale') {
           result.value = locales[result.value]
-        } else if (!result.editable) {
+        } else if (!result.editable && typeof result.value === 'string') {
           result.value = result.value.replace(/\n/g, '<br>')
           result.html = true
         }
@@ -281,10 +281,8 @@ const app = {
             return option.value === result.value
           })
           result.value = (option) ? option.name : ''
-        } else if (!result.editable && result.value) {
-          if (typeof result.value === 'string') {
-            result.value = result.value.replace(/\n/g, '<br>')
-          }
+        } else if (!result.editable && result.value && typeof result.value === 'string') {
+          result.value = result.value.replace(/\n/g, '<br>')
           result.html = true
         }
       }
