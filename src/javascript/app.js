@@ -5,6 +5,7 @@ import client from './lib/client'
 import renderAdmin from '../templates/admin.hdbs'
 import renderDisplay from '../templates/display.hdbs'
 import renderNoRequester from '../templates/no_requester.hdbs'
+import errorMessage from '../templates/error.hdbs'
 import renderSpoke from '../templates/spoke.hdbs'
 import renderTags from '../templates/tags.hdbs'
 
@@ -37,8 +38,8 @@ const app = {
       app.fillEmptyStatuses(storage('ticketsCounters'))
       app.fillEmptyStatuses(storage('orgTicketsCounters'))
       app.showDisplay()
-    }).catch(() => {
-      const view = renderNoRequester()
+    }).catch((err) => {
+      const view = (err.message === 'no requester') ? renderNoRequester() : errorMessage({ msg: err.message })
       $('[data-main]').html(view)
       appResize()
     })
@@ -259,7 +260,7 @@ const app = {
           result.html = true
         } else if (subkey === 'locale') {
           result.value = locales[result.value]
-        } else if (!result.editable) {
+        } else if (!result.editable && typeof result.value === 'string') {
           result.value = result.value.replace(/\n/g, '<br>')
           result.html = true
         }
@@ -281,10 +282,8 @@ const app = {
             return option.value === result.value
           })
           result.value = (option) ? option.name : ''
-        } else if (!result.editable && result.value) {
-          if (typeof result.value === 'string') {
-            result.value = result.value.replace(/\n/g, '<br>')
-          }
+        } else if (!result.editable && typeof result.value === 'string') {
+          result.value = result.value.replace(/\n/g, '<br>')
           result.html = true
         }
       }
