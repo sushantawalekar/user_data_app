@@ -31,7 +31,7 @@ html, body {
   }
 
   p {
-    color: #999;
+    color: #2F3941;
     margin-bottom: 1em;
   }
 
@@ -40,7 +40,7 @@ html, body {
   }
 
   .org_fields_list {
-    margin-left: 20px;
+    margin-left: 23px;
   }
 
   .back {
@@ -82,28 +82,28 @@ i.icon_circle_arrow_left {
   border-radius: 3px;
 
   &.new {
-    background: #FCDBA9;
-    color: #703B15;
+    background: #F5CA00;
+    color: #FFFFFF;
   }
   &.open {
-    background: #F5B5BA;
-    color: #681219;
+    background: #E82828;
+    color: #FFFFFF;
   }
   &.solved {
-    background: #68737D;
-    color: #F8F9F9;
+    background: #828282;
+    color: #FFFFFF;
   }
   &.pending {
-    background: #ADCCE4;
-    color: #0F3554;
+    background: #59BBE0;
+    color: #FFFFFF;
   }
   &.hold {
     background: #2F3941;
-    color: #F8F9F9;
+    color: #FFFFFF;
   }
   &.closed {
     background: #D8DCDE;
-    color: #2F3941;
+    color: #FFFFFF;
   }
 }
 
@@ -122,7 +122,7 @@ i.icon_circle_arrow_left {
 
     .field {
       margin-top: 15px;
-      border-top: 1px solid #f0f0f0;
+      border-top: 1px solid #E9EBED;
       padding-top: 10px;
 
       textarea {
@@ -147,14 +147,14 @@ i.icon_circle_arrow_left {
 
       h4 {
         font-size: 14px;
-        color:  #999;
-        font-weight: normal;
+        color: #2F3941;
+        font-weight: bold;
         margin-bottom: 10px;
       }
 
       p {
         font-size: 14px;
-        color:  #555;
+        color: #2F3941;
         line-height: 1.4;
       }
     }
@@ -163,7 +163,7 @@ i.icon_circle_arrow_left {
   .card {
 
     &.org {
-      border-top: 1px solid #f0f0f0;
+      border-top: 1px solid #E9EBED;
       padding-top: 15px;
       margin-top: 15px;
     }
@@ -237,7 +237,7 @@ i.icon_circle_arrow_left {
       margin-left: 65px;
 
       div {
-        color: #999;
+        color: #68737D;
         font-size: 14px;
         word-wrap: break-word;
 
@@ -246,13 +246,13 @@ i.icon_circle_arrow_left {
           font-weight: 600;
 
           a {
-            color: #555;
+            color: #2F3941;
           }
         }
 
         &.organization {
           a {
-            color: #999;
+            color: #68737D;
           }
         }
 
@@ -273,12 +273,12 @@ i.icon_circle_arrow_left {
       li {
         display: inline-block;
         font-size: 12px;
-        color: #999;
-        width: 50px;
+        color: #68737D;
+        width: 48px;
         line-height: 1.486;
 
         a {
-          color: #999;
+          color: #2F3941;
           position: relative;
           top: 2px;
         }
