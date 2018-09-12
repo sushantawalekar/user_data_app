@@ -5,7 +5,7 @@
   {{#each fields}}
     <div class="c_chk">
       <input class="c-chk__input" value="{{key}}" id="{{key}}" {{#if selected}}checked{{/if}} type="checkbox">
-      <label class="c-chk__label c-chk__label--toggle c-chk__label--regular" for="{{key}}"><span dir="ltr">{{title}}</span></label>
+      <label class="c-chk__label c-chk__label c-chk__label--regular" for="{{key}}"><span dir="ltr">{{title}}</span></label>
     </div>
   {{/each}}
 </div>
@@ -14,14 +14,14 @@
   <div class="org_fields">
      <div class="c_chk">
       <input class="c-chk__input org_fields_activate" id="org_fields_activate" value="{{key}}" {{#if orgFieldsActivated}}checked{{/if}} type="checkbox">
-      <label class="c-chk__label c-chk__label--toggle" for="org_fields_activate"><span dir="ltr">{{t "admin.include_org_fields"}}</span></label>
+      <label class="c-chk__label c-chk__label" for="org_fields_activate"><span dir="ltr">{{t "admin.include_org_fields"}}</span></label>
     </div>
 
     <div class="org_fields_list" {{#unless orgFieldsActivated}}style="display: none"{{/unless}}>
       {{#each orgFields}}
         <div class="c_chk">
           <input class="c-chk__input" value="{{key}}" id="org_{{key}}" {{#if selected}}checked{{/if}} type="checkbox">
-          <label class="c-chk__label c-chk__label--toggle c-chk__label--regular" for="org_{{key}}"><span dir="ltr">{{title}}</span></label>
+          <label class="c-chk__label c-chk__label c-chk__label--regular" for="org_{{key}}"><span dir="ltr">{{title}}</span></label>
         </div>
       {{/each}}
     </div>
@@ -30,7 +30,7 @@
 
 <div class="hide_empty_fields">
   <input class="c-chk__input hide_empty_fields" id="hide_empty_fields" value="{{key}}" {{#if hideEmptyFields}}checked{{/if}} type="checkbox">
-  <label class="c-chk__label c-chk__label--toggle" for="hide_empty_fields"><span dir="ltr">{{t "admin.hide_empty_fields"}}</span></label>
+  <label class="c-chk__label c-chk__label" for="hide_empty_fields"><span dir="ltr">{{t "admin.hide_empty_fields"}}</span></label>
 </div>
 
 <button class="save c-btn"><span class="text">{{t "admin.save"}}</span><img class="spinner hide" src="dot.gif"/></button>
