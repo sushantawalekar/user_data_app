@@ -589,11 +589,23 @@ const app = {
   // HACK for navigating to a url, since routeTo doesn't support this.
   // https://developer.zendesk.com/apps/docs/support-api/all_locations#routeto
   goToRequester: function () {
-    return client.invoke('routeTo', 'nav_bar', '', `../../tickets/${storage('ticketId')}/requester/requested_tickets`)
+    if (!storage('ticketId')) {
+      app.openRequesterTab()
+    } else {
+      return client.invoke('routeTo', 'nav_bar', '', `../../tickets/${storage('ticketId')}/requester/requested_tickets`)
+    }
   },
 
   goToOrganization: function () {
-    return client.invoke('routeTo', 'nav_bar', '', `../../tickets/${storage('ticketId')}/organization/tickets`)
+    if (!storage('ticketId')) {
+      app.openRequesterTab()
+    } else {
+      return client.invoke('routeTo', 'nav_bar', '', `../../tickets/${storage('ticketId')}/organization/tickets`)
+    }
+  },
+
+  openRequesterTab: function () {
+    return client.invoke('routeTo', 'user', storage('requester').id)
   }
 }
 
