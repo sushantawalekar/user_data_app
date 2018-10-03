@@ -590,22 +590,28 @@ const app = {
   // https://developer.zendesk.com/apps/docs/support-api/all_locations#routeto
   goToRequester: function () {
     if (!storage('ticketId')) {
-      app.openRequesterTab()
+      return app.openRequesterTab()
     } else {
-      return client.invoke('routeTo', 'nav_bar', '', `../../tickets/${storage('ticketId')}/requester/requested_tickets`)
+      return app.routeToNavBar('requester')
     }
   },
 
   goToOrganization: function () {
     if (!storage('ticketId')) {
-      app.openRequesterTab()
+      return app.openRequesterTab()
     } else {
-      return client.invoke('routeTo', 'nav_bar', '', `../../tickets/${storage('ticketId')}/organization/tickets`)
+      return app.routeToNavBar('organization')
     }
   },
 
+  routeToNavBar: function (tabType) {
+    let path = (tabType === 'organization') ? 'organization/tickets' : 'requester/requested_tickets'
+
+    client.invoke('routeTo', 'nav_bar', '', `../../tickets/${storage('ticketId')}/${path}`)
+  },
+
   openRequesterTab: function () {
-    return client.invoke('routeTo', 'user', storage('requester').id)
+    client.invoke('routeTo', 'user', storage('requester').id)
   }
 }
 
