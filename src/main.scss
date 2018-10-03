@@ -80,27 +80,27 @@ i.icon_circle_arrow_left {
 
   &.new {
     background: #F5CA00;
-    color: #FFFFFF;
+    color: #703B15;
   }
   &.open {
-    background: #E82828;
+    background: #E82A2A;
     color: #FFFFFF;
   }
   &.solved {
-    background: #828282;
-    color: #FFFFFF;
+    background: #68737D;
+    color: #F8F9F9;
   }
   &.pending {
-    background: #59BBE0;
+    background: #259ECB;
     color: #FFFFFF;
   }
   &.hold {
     background: #2F3941;
-    color: #FFFFFF;
+    color: #F8F9F9;
   }
   &.closed {
     background: #D8DCDE;
-    color: #FFFFFF;
+    color: #F8F9F9;
   }
 }
 
