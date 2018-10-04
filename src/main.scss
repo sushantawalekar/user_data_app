@@ -5,6 +5,7 @@
 
 html, body {
   overflow: hidden;
+  padding: 0 3px;
 }
 
 .loader {
@@ -80,27 +81,27 @@ i.icon_circle_arrow_left {
 
   &.new {
     background: #F5CA00;
-    color: #FFFFFF;
+    color: #703B15;
   }
   &.open {
-    background: #E82828;
+    background: #E82A2A;
     color: #FFFFFF;
   }
   &.solved {
-    background: #828282;
-    color: #FFFFFF;
+    background: #68737D;
+    color: #F8F9F9; /* Grey-100 */
   }
   &.pending {
-    background: #59BBE0;
+    background: #259ECB;
     color: #FFFFFF;
   }
   &.hold {
-    background: #2F3941;
-    color: #FFFFFF;
+    background: #2F3941; /* Grey-800 */
+    color: #F8F9F9; /* Grey-100 */
   }
   &.closed {
-    background: #D8DCDE;
-    color: #FFFFFF;
+    background: #D8DCDE; /* Grey-300 */
+    color: #49545C; /* Grey-700 */
   }
 }
 
@@ -266,12 +267,13 @@ i.icon_circle_arrow_left {
     .counts {
       margin: 0px;
       margin-top: 30px;
+      display: flex;
+      justify-content: space-between;
 
       li {
         display: inline-block;
         font-size: 12px;
         color: #68737D;
-        width: 48px;
         line-height: 1.486;
 
         a {
