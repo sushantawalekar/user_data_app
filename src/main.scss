@@ -89,19 +89,19 @@ i.icon_circle_arrow_left {
   }
   &.solved {
     background: #68737D;
-    color: #F8F9F9;
+    color: #F8F9F9; /* Grey-100 */
   }
   &.pending {
     background: #259ECB;
     color: #FFFFFF;
   }
   &.hold {
-    background: #2F3941;
-    color: #F8F9F9;
+    background: #2F3941; /* Grey-800 */
+    color: #F8F9F9; /* Grey-100 */
   }
   &.closed {
-    background: #D8DCDE;
-    color: #F8F9F9;
+    background: #D8DCDE; /* Grey-300 */
+    color: #49545C; /* Grey-700 */
   }
 }
 
