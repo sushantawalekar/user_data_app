@@ -586,32 +586,29 @@ const app = {
     return restrictedFields
   },
 
+  goToTab: function (tabType) {
+    if (app.isPersistedTicket()) {
+      app.openTicketTab(tabType)
+    } else {
+      // Open redirection tab for new tickets
+      app.openTab(tabType)
+    }
+  },
+
+  isPersistedTicket: function () {
+    return storage('ticketId')
+  },
+
   // HACK for navigating to a url, since routeTo doesn't support this.
   // https://developer.zendesk.com/apps/docs/support-api/all_locations#routeto
-  goToRequester: function () {
-    if (!storage('ticketId')) {
-      return app.openRequesterTab()
-    } else {
-      return app.routeToNavBar('requester')
-    }
+  openTicketTab(ticketTab) {
+    let path = ticketTab === 'organization' ? 'tickets' : 'requested_tickets'
+    return client.invoke('routeTo', 'nav_bar', '', `../../tickets/${storage('ticketId')}/${ticketTab}/${path}`)
   },
 
-  goToOrganization: function () {
-    if (!storage('ticketId')) {
-      return app.openRequesterTab()
-    } else {
-      return app.routeToNavBar('organization')
-    }
-  },
-
-  routeToNavBar: function (tabType) {
-    let path = (tabType === 'organization') ? 'organization/tickets' : 'requester/requested_tickets'
-
-    client.invoke('routeTo', 'nav_bar', '', `../../tickets/${storage('ticketId')}/${path}`)
-  },
-
-  openRequesterTab: function () {
-    client.invoke('routeTo', 'user', storage('requester').id)
+  openTab(tabType) {
+    let path = tabType === 'organization' ? 'organization/tickets' : 'assigned_tickets'
+    return client.invoke('routeTo', 'nav_bar', '', `../../users/${storage('requester').id}/${path}`)
   }
 }
 
@@ -622,7 +619,7 @@ $(document).on('change', '.org_fields_activate', app.onActivateOrgFieldsChange)
 $(document).on('click', '.back', app.onBackClick)
 $(document).on('click', '.save', app.onSaveClick)
 $(document).on('mouseup', 'textarea', debounce(appResize, 300))
-$(document).on('click', '.card.user .counts a, .card.user .contacts .name a', app.goToRequester)
-$(document).on('click', '.card.org .counts a, .card.user .contacts .organization a, .card.org .contacts .name a', app.goToOrganization)
+$(document).on('click', '.card.user .counts a, .card.user .contacts .name a', () => app.goToTab('requester'))
+$(document).on('click', '.card.org .counts a, .card.user .contacts .organization a, .card.org .contacts .name a', () => app.goToTab('organization'))
 
 export default app
