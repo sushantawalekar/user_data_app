@@ -591,23 +591,23 @@ const app = {
       app.openTicketTab(tabType)
     } else {
       // Open redirection tab for new tickets
-      app.openTab(tabType)
+      app.openUserTab(tabType)
     }
   },
 
   isPersistedTicket: function () {
-    return storage('ticketId')
+    return !!storage('ticketId')
   },
 
   // HACK for navigating to a url, since routeTo doesn't support this.
   // https://developer.zendesk.com/apps/docs/support-api/all_locations#routeto
-  openTicketTab(ticketTab) {
-    let path = ticketTab === 'organization' ? 'tickets' : 'requested_tickets'
+  openTicketTab (ticketTab) {
+    const path = ticketTab === 'organization' ? 'tickets' : 'requested_tickets'
     return client.invoke('routeTo', 'nav_bar', '', `../../tickets/${storage('ticketId')}/${ticketTab}/${path}`)
   },
 
-  openTab(tabType) {
-    let path = tabType === 'organization' ? 'organization/tickets' : 'assigned_tickets'
+  openUserTab (tabType) {
+    const path = tabType === 'organization' ? 'organization/tickets' : 'assigned_tickets'
     return client.invoke('routeTo', 'nav_bar', '', `../../users/${storage('requester').id}/${path}`)
   }
 }
