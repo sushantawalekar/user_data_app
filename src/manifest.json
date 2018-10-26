@@ -1,5 +1,5 @@
 {
-  "name": "Zendesk User Data",
+  "name": "User Data App",
 
   "author": {
     "name": "Zendesk",
@@ -10,7 +10,7 @@
   "private": false,
   "singleInstall": true,
   "frameworkVersion": "2.0",
-  "version": "2.0.9",
+  "version": "2.0.10",
 
   "location": {
     "support": {

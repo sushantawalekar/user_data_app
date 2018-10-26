@@ -56,6 +56,7 @@ module.exports = (env = {}) => {
       new CopyWebpackPlugin([
         { from: 'src/manifest.json', to: '../', flatten: true },
         { from: 'src/images/dot.gif', to: '.', flatten: true },
+        { from: 'src/images/spinner.gif', to: '.', flatten: true },
         { from: 'src/images/logo.png', to: '.', flatten: true },
         { from: 'src/images/logo-small.png', to: '.', flatten: true },
         { from: 'src/images/screenshot*', to: '.', flatten: true },
