@@ -1,18 +1,35 @@
-import I18n from './i18n'
+import i18n from './i18n'
 
 const orgClient = window.ZAFClient.init()
-function Client () {}
-Client.prototype = orgClient
-const client = new Client()
+const eClient = Object.create(orgClient)
 
 function handleClientError (error) {
-  let errorMessage = I18n.t('client.get.error', { error: error.message })
+  let errorMessage = i18n.t('client.get.error', { error: error.message })
   console.error(errorMessage)
-  client.invoke('notify', errorMessage, 'error')
+  eClient.invoke('notify', errorMessage, 'error')
 }
 
-client.get = function (stringOrArray) {
-  if (typeof stringOrArray !== 'string' && !Array.isArray(stringOrArray)) { throw new Error('type for get not supported.') }
+const _cache = {}
+const tools = {
+  unqiue: function (obj) {
+    return Object.keys(obj).map((key) => {
+      const value = obj[key]
+      return (typeof value === 'object') ? tools.unqiue(value) : `${key}:${value}`
+    }).join(' ')
+  },
+
+  cache: function (key, value) {
+    if (value === undefined) {
+      return _cache[key]
+    } else {
+      _cache[key] = value
+      return value
+    }
+  }
+}
+
+eClient.get = function (stringOrArray) {
+  if (typeof stringOrArray !== 'string' && !Array.isArray(stringOrArray)) { throw new Error('Type for get not supported, get expects String or Array of Strings') }
 
   return orgClient.get(stringOrArray).then((data) => {
     let error, str, arr
@@ -48,4 +65,15 @@ client.get = function (stringOrArray) {
   })
 }
 
-export default client
+eClient.request = function (obj) {
+  const cached = !!obj.cachable
+  delete obj.cachable
+  const cacheName = tools.unqiue(obj)
+
+  let res
+  if (cached) res = tools.cache(cacheName) || tools.cache(cacheName, orgClient.request(obj))
+  else res = orgClient.request(obj)
+  return res
+}
+
+export default eClient
