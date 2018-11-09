@@ -53,6 +53,7 @@ const app = {
       storage('currentUser', currentUser)
       storage('requester', requester)
       storage('ticketId', ticketId)
+      storage('ticketOrg', ticketOrg)
       storage('orgEditable.general', currentUser.role === 'admin')
       storage('orgEditable.notes', true)
 
@@ -71,7 +72,11 @@ const app = {
 
       promises.push(app.getLocales())
       promises.push(ajax('getOrganizationFields').then(app.onGetOrganizationFieldsDone))
-      promises.push(ajax('getUserFields').then(app.onGetUserFieldsDone))
+      promises.push(ajax('getUserFields'))
+
+      Promise.all([promises[0], promises[4]]).then((data) => {
+        app.onGetUserFieldsDone(data[1])
+      })
 
       return Promise.all(promises)
     })
@@ -129,7 +134,7 @@ const app = {
 
       storage('orgEditable.general', role.configuration.organization_editing)
       storage('orgEditable.notes', role.configuration.organization_notes_editing)
-      storage('userEditable', role.configuration.end_user_profile_access === 'full')
+      storage('userEditable', app.isUserEditable(role.configuration.end_user_profile_access))
 
       each(storage('organizationFields'), (field) => {
         if (field.key === '##builtin_tags') {
@@ -141,6 +146,26 @@ const app = {
       })
       return data
     })
+  },
+
+  isUserEditable: function (right) {
+    if (right === 'edit-within-org') {
+      const currentUser = storage('currentUser')
+      const ticketOrg = storage('ticketOrg')
+      const requester = storage('requester')
+
+      if (requester.id === currentUser.id) return true
+
+      if (requester.role !== 'end-user' && typeof requester.role !== 'number') return false
+
+      const organization = find(currentUser.organizations, function (org) {
+        return org.id === ticketOrg.id
+      })
+
+      return !!organization
+    }
+
+    return ['full', 'edit'].indexOf(right) !== -1
   },
 
   getLocales: function () {

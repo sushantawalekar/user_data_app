@@ -44,7 +44,8 @@ export default {
 
   getUser: function (userId) {
     return {
-      url: `/api/v2/users/${userId}.json?include=identities,organizations`
+      url: `/api/v2/users/${userId}.json?include=identities,organizations`,
+      cachable: true
     }
   },
 
