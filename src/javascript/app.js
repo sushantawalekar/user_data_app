@@ -49,7 +49,6 @@ const app = {
     return client.get(['ticket.requester', 'ticket.id', 'ticket.organization', 'currentUser']).then((data) => {
       const [ requester, ticketId, ticketOrg, currentUser ] = data
       const promises = []
-      let getCustomRolesPromise
 
       storage('currentUser', currentUser)
       storage('requester', requester)
@@ -67,6 +66,7 @@ const app = {
       }
 
       // If not admin or agent
+      let getCustomRolesPromise
       if (['admin', 'agent'].indexOf(currentUser.role) === -1) {
         getCustomRolesPromise = app.getCustomRoles()
         promises.push(getCustomRolesPromise)
@@ -79,8 +79,8 @@ const app = {
 
       // We need to make sure getCustomRolesPromise is done, because it sets 'userEditable'.
       // getCustomRolesPromise can be undefined, but that's not a problem for Promise.all
-      Promise.all([getUserFieldsPromise, getCustomRolesPromise]).then((data) => {
-        app.onGetUserFieldsDone(data[0])
+      Promise.all([getUserFieldsPromise, getCustomRolesPromise]).then(([userFieldsData]) => {
+        app.onGetUserFieldsDone(userFieldsData)
       })
 
       return Promise.all(promises)
