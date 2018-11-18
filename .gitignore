@@ -3,3 +3,4 @@ dist/
 node_modules/
 src/translations/
 !src/translations/en.yml
+.zat
