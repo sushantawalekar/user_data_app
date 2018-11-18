@@ -66,16 +66,21 @@ const app = {
       }
 
       // If not admin or agent
+      let getCustomRolesPromise
       if (['admin', 'agent'].indexOf(currentUser.role) === -1) {
-        promises.push(app.getCustomRoles())
+        getCustomRolesPromise = app.getCustomRoles()
+        promises.push(getCustomRolesPromise)
       }
 
       promises.push(app.getLocales())
       promises.push(ajax('getOrganizationFields').then(app.onGetOrganizationFieldsDone))
-      promises.push(ajax('getUserFields'))
+      const getUserFieldsPromise = ajax('getUserFields')
+      promises.push(getUserFieldsPromise)
 
-      Promise.all([promises[0], promises[4]]).then((data) => {
-        app.onGetUserFieldsDone(data[1])
+      // We need to make sure getCustomRolesPromise is done, because it sets 'userEditable'.
+      // getCustomRolesPromise can be undefined, but that's not a problem for Promise.all
+      Promise.all([getUserFieldsPromise, getCustomRolesPromise]).then(([userFieldsData]) => {
+        app.onGetUserFieldsDone(userFieldsData)
       })
 
       return Promise.all(promises)
