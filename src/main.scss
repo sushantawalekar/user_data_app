@@ -80,24 +80,24 @@ i.icon_circle_arrow_left {
   border-radius: 3px;
 
   &.new {
-    background: #F5CA00;
-    color: #703B15;
+    background: #FFB648; /* Yellow-400 */
+    color: #703B15; /* Yellow-800 */
   }
   &.open {
-    background: #E82A2A;
+    background: #E82A2A; /* Crimson-400 */
     color: #FFFFFF;
   }
   &.solved {
-    background: #68737D;
-    color: #F8F9F9; /* Grey-100 */
+    background: #87929D; /* Grey-500 */
+    color: #FFFFFF;
   }
   &.pending {
-    background: #259ECB;
+    background: #3091EC; /* Azure-400 */
     color: #FFFFFF;
   }
   &.hold {
     background: #2F3941; /* Grey-800 */
-    color: #F8F9F9; /* Grey-100 */
+    color: #FFFFFF;
   }
   &.closed {
     background: #D8DCDE; /* Grey-300 */
