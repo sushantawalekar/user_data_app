@@ -3,6 +3,7 @@
 Zendesk User Data App
 ===============
 ![](https://samson.zende.sk/projects/user_data_app/stages/production.svg?token=84457be797bb7a1e00d1f57575d5112a)
+[![Build Status](https://travis-ci.com/zendesk/user_data_app.svg?token=VWF2awggx12xywZPsJnW&branch=master)](https://travis-ci.com/zendesk/user_data_app)
 
 This is the [User Data App](https://www.zendesk.com/apps/user-data) for Zendesk. The App displays relevant information about the user and their ticket, fields and organizations.
 

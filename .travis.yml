@@ -1,0 +1,14 @@
+language: node_js
+node_js:
+  - "8"
+before_install:
+  - bundle config zdrepo.jfrog.io $ARTIFACTORY_USERNAME:$ARTIFACTORY_API_KEY
+script:
+  - npm run lint && npm run build && npm run test
+  - bundle && bundle exec ruby ./validate_strings.rb
+sudo: false
+dist: trusty
+cache:
+  npm: true
+branches:
+  only: [master]
