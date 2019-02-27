@@ -296,3 +296,22 @@ export function parseNum (num) {
          (num >= 1e+4 && (num / 1e+3).toString().slice(0, 3).replace(/\.$/, '') + 'k') ||
          num.toString()
 }
+
+// search param can be used for testing
+export function parseQueryString (search = document.location.search) {
+  if (search.indexOf('?') === 0) search = search.slice(1)
+  const searchData = search.split('&')
+
+  return searchData.reduce((obj, data) => {
+    let [key, value] = data.split('=')
+    key = decodeURIComponent(key)
+    value = decodeURIComponent(value)
+
+    try {
+      value = JSON.parse(value)
+    } catch (err) {}
+
+    obj[key] = value
+    return obj
+  }, {})
+}
