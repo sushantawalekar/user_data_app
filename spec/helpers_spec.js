@@ -198,4 +198,43 @@ describe('Helpers', () => {
       })
     })
   })
+
+  describe('#parseQueryString', () => {
+    it('parses without leading ?', () => {
+      const result = helpers.parseQueryString('foo=bar')
+      assert.deepStrictEqual(result, {
+        foo: 'bar'
+      })
+    })
+
+    it('parses booleans', () => {
+      const result = helpers.parseQueryString('?bool_true=true&bool_false=false')
+      assert.deepStrictEqual(result, {
+        bool_true: true,
+        bool_false: false
+      })
+    })
+
+    it('parses numbers', () => {
+      const result = helpers.parseQueryString('?number=123&float=118.1')
+      assert.deepStrictEqual(result, {
+        number: 123,
+        float: 118.1
+      })
+    })
+
+    it('parses arrays', () => {
+      const result = helpers.parseQueryString('?arr=[1,2,"test",[true, false]]')
+      assert.deepStrictEqual(result, {
+        arr: [1, 2, 'test', [true, false]]
+      })
+    })
+
+    it('parses booleans', () => {
+      const result = helpers.parseQueryString('?obj={"foo":"bar","num":123,"bool":true}')
+      assert.deepStrictEqual(result, {
+        obj: { foo: 'bar', num: 123, bool: true }
+      })
+    })
+  })
 })
