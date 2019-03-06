@@ -1,4 +1,4 @@
-import { ajax, urlify, appResize, localStorage, storage, setting, parseNum } from './lib/helpers'
+import { ajax, urlify, appResize, localStorage, storage, setting, parseNum, parseQueryString } from './lib/helpers'
 import I18n from './lib/i18n'
 import client from './lib/client'
 
@@ -392,7 +392,9 @@ const app = {
 
   makeTicketsLinks: function (counters) {
     const links = {}
-    const $tag = $('<div>').append($('<a>').attr('href', 'javascript:void(0)'))
+    const queryData = parseQueryString()
+    const link = `${queryData.origin}/agent/#/tickets/${storage('ticketId')}/requester/requested_tickets`
+    const $tag = $('<div>').append($('<a>').attr('href', link))
     each(counters, function (value, key) {
       if (value && value !== '-') {
         $tag.find('a').html(value)
@@ -616,7 +618,8 @@ const app = {
     return restrictedFields
   },
 
-  goToTab: function (tabType) {
+  goToTab: function (event, tabType) {
+    event.preventDefault()
     if (app.isPersistedTicket()) {
       app.openTicketTab(tabType)
     } else {
@@ -649,7 +652,7 @@ $(document).on('change', '.org_fields_activate', app.onActivateOrgFieldsChange)
 $(document).on('click', '.back', app.onBackClick)
 $(document).on('click', '.save', app.onSaveClick)
 $(document).on('mouseup', 'textarea', debounce(appResize, 300))
-$(document).on('click', '.card.user .counts a, .card.user .contacts .name a', () => app.goToTab('requester'))
-$(document).on('click', '.card.org .counts a, .card.user .contacts .organization a, .card.org .contacts .name a', () => app.goToTab('organization'))
+$(document).on('click', '.card.user .counts a, .card.user .contacts .name a', (event) => app.goToTab(event, 'requester'))
+$(document).on('click', '.card.org .counts a, .card.user .contacts .organization a, .card.org .contacts .name a', (event) => app.goToTab(event, 'organization'))
 
 export default app
