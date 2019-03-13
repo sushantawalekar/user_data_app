@@ -371,12 +371,12 @@ const app = {
       ticketId: storage('ticketId'),
       isAdmin: currentUser.role === 'admin',
       user: storage('user'),
-      tickets: app.makeTicketsLinks(storage('ticketsCounters')),
+      tickets: app.makeTicketsLinks('requester', storage('ticketsCounters')),
       fields: app.fieldsForCurrentUser(),
       orgFields: app.fieldsForCurrentOrg(),
       orgFieldsActivated: storage('user') && setting('orgFieldsActivated') && storage('user').organization,
       org: storage('user') && storage('user').organization,
-      orgTickets: app.makeTicketsLinks(storage('orgTicketsCounters'))
+      orgTickets: app.makeTicketsLinks('organization', storage('orgTicketsCounters'))
     })
 
     $('[data-main]').html(view)
