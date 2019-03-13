@@ -390,20 +390,30 @@ const app = {
     }
   },
 
-  makeTicketsLinks: function (counters) {
-    const links = {}
-    const queryData = parseQueryString()
-    const link = `${queryData.origin}/agent/#/tickets/${storage('ticketId')}/requester/requested_tickets`
-    const $tag = $('<div>').append($('<a>').attr('href', link))
-    each(counters, function (value, key) {
-      if (value && value !== '-') {
-        $tag.find('a').html(value)
-        links[key] = $tag.html()
-      } else {
-        links[key] = value
-      }
+  makeTicketsLinks: function (type, counters) {
+    const ticketId = storage('ticketId')
+    const requesterId = storage('requester') && storage('requester').id
+    const orgId = storage('ticketOrg') && storage('ticketOrg').id
+
+    const origin = parseQueryString().origin
+    const base = `${origin}/agent`
+
+    const user = (ticketId) ? `tickets/${ticketId}/requester/requested_tickets` : `users/${requesterId}/requested_tickets`
+    const org = (ticketId) ? `tickets/${ticketId}/organization/tickets` : `organizations/${orgId}/tickets`
+
+    const links = Object.keys(counters).reduce((memo, status) => {
+      const value = counters[status]
+      if (!value || value === '0' || value === '-') return memo
+
+      memo[status] = {
+        href: (type === 'requester') ? `${base}/${user}` : `${base}/${org}`,
+        value }
+      return memo
+    }, {
+      user: { href: `${base}/${user}` },
+      org: { href: `${base}/${org}` }
     })
-    appResize()
+
     return links
   },
 
