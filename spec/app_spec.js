@@ -125,6 +125,79 @@ describe('App', () => {
     })
   })
 
+  describe('#makeTicketsLinks', () => {
+    before(() => {
+      sinon.stub(helpers, 'parseQueryString').callsFake(() => {
+        return { origin: 'https://zd.com' }
+      })
+      helpers.storage('ticketId', 100)
+    })
+
+    after(() => {
+      helpers.parseQueryString.restore()
+    })
+
+    describe('when on a existing ticket with an ID', () => {
+      before(() => {
+        helpers.storage('ticketId', 100)
+        helpers.storage('requester', {id: 200})
+        helpers.storage('ticketOrg', {id: 200})
+      })
+
+      it('generates links for user', () => {
+        const links = app.makeTicketsLinks('requester', { number: 3 })
+        const expected = {
+          user: { href: 'https://zd.com/agent/tickets/100/requester/requested_tickets' },
+          org: { href: 'https://zd.com/agent/tickets/100/organization/tickets' },
+          number: { href: 'https://zd.com/agent/tickets/100/requester/requested_tickets', value: 3 }
+        }
+
+        assert.deepStrictEqual(links, expected)
+      })
+
+      it('generates links for organization', () => {
+        const links = app.makeTicketsLinks('organization', { number: 5 })
+        const expected = {
+          user: { href: 'https://zd.com/agent/tickets/100/requester/requested_tickets' },
+          org: { href: 'https://zd.com/agent/tickets/100/organization/tickets' },
+          number: { href: 'https://zd.com/agent/tickets/100/organization/tickets', value: 5 }
+        }
+
+        assert.deepStrictEqual(links, expected)
+      })
+    })
+
+    describe('when on a new ticket', () => {
+      before(() => {
+        helpers.storage('ticketId', false)
+        helpers.storage('requester', {id: 200})
+        helpers.storage('ticketOrg', {id: 300})
+      })
+
+      it('generates links for user', () => {
+        const links = app.makeTicketsLinks('requester', { number: 7 })
+        const expected = {
+          user: { href: 'https://zd.com/agent/users/200/requested_tickets' },
+          org: { href: 'https://zd.com/agent/organizations/300/tickets' },
+          number: { href: 'https://zd.com/agent/users/200/requested_tickets', value: 7 }
+        }
+
+        assert.deepStrictEqual(links, expected)
+      })
+
+      it('generates links for organization', () => {
+        const links = app.makeTicketsLinks('organization', { number: 9 })
+        const expected = {
+          user: { href: 'https://zd.com/agent/users/200/requested_tickets' },
+          org: { href: 'https://zd.com/agent/organizations/300/tickets' },
+          number: { href: 'https://zd.com/agent/organizations/300/tickets', value: 9 }
+        }
+
+        assert.deepStrictEqual(links, expected)
+      })
+    })
+  })
+
   describe('link actions', () => {
     let invokeSpy
 
