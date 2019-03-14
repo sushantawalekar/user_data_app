@@ -371,12 +371,12 @@ const app = {
       ticketId: storage('ticketId'),
       isAdmin: currentUser.role === 'admin',
       user: storage('user'),
-      tickets: app.makeTicketsLinks(storage('ticketsCounters')),
+      tickets: app.makeTicketsLinks('requester', storage('ticketsCounters')),
       fields: app.fieldsForCurrentUser(),
       orgFields: app.fieldsForCurrentOrg(),
       orgFieldsActivated: storage('user') && setting('orgFieldsActivated') && storage('user').organization,
       org: storage('user') && storage('user').organization,
-      orgTickets: app.makeTicketsLinks(storage('orgTicketsCounters'))
+      orgTickets: app.makeTicketsLinks('organization', storage('orgTicketsCounters'))
     })
 
     $('[data-main]').html(view)
@@ -390,20 +390,37 @@ const app = {
     }
   },
 
-  makeTicketsLinks: function (counters) {
-    const links = {}
-    const queryData = parseQueryString()
-    const link = `${queryData.origin}/agent/#/tickets/${storage('ticketId')}/requester/requested_tickets`
-    const $tag = $('<div>').append($('<a>').attr('href', link))
-    each(counters, function (value, key) {
-      if (value && value !== '-') {
-        $tag.find('a').html(value)
-        links[key] = $tag.html()
-      } else {
-        links[key] = value
+  makeTicketsLinks: function (type, counters = {}) {
+    const ticketId = storage('ticketId')
+    const requesterId = storage('requester') && storage('requester').id
+    const orgId = storage('ticketOrg') && storage('ticketOrg').id
+
+    const origin = parseQueryString().origin
+    const base = `${origin}/agent`
+
+    const user = (ticketId) ? `tickets/${ticketId}/requester/requested_tickets` : `users/${requesterId}/requested_tickets`
+    const org = (ticketId) ? `tickets/${ticketId}/organization/tickets` : `organizations/${orgId}/tickets`
+
+    const links = Object.keys(counters).reduce((memo, status) => {
+      const value = counters[status]
+      if (!value || value === '0' || value === '-') return memo
+
+      const paths = {
+        requester: `${base}/${user}`,
+        organization: `${base}/${org}`
       }
+
+      memo[status] = {
+        href: paths[type],
+        value
+      }
+
+      return memo
+    }, {
+      user: { href: `${base}/${user}` },
+      org: { href: `${base}/${org}` }
     })
-    appResize()
+
     return links
   },
 
@@ -618,30 +635,18 @@ const app = {
     return restrictedFields
   },
 
-  goToTab: function (event, tabType) {
-    event.preventDefault()
-    if (app.isPersistedTicket()) {
-      app.openTicketTab(tabType)
-    } else {
-      // Open redirection tab for new tickets
-      app.openUserTab(tabType)
-    }
-  },
-
-  isPersistedTicket: function () {
-    return !!storage('ticketId')
-  },
-
   // HACK for navigating to a url, since routeTo doesn't support this.
   // https://developer.zendesk.com/apps/docs/support-api/all_locations#routeto
-  openTicketTab (ticketTab) {
-    const path = ticketTab === 'organization' ? 'tickets' : 'requested_tickets'
-    return client.invoke('routeTo', 'nav_bar', '', `../../tickets/${storage('ticketId')}/${ticketTab}/${path}`)
-  },
+  goToTab: function (event, tabType) {
+    const isMeta = event.metaKey || event.ctrlKey
+    if (isMeta) return
 
-  openUserTab (tabType) {
-    const path = tabType === 'organization' ? 'organization/tickets' : 'assigned_tickets'
-    return client.invoke('routeTo', 'nav_bar', '', `../../users/${storage('requester').id}/${path}`)
+    event.preventDefault()
+    const links = app.makeTicketsLinks(tabType)
+    const href = (tabType === 'requester') ? links.user.href : links.org.href
+    const url = href.replace(/.*\/agent\//, '../../')
+
+    return client.invoke('routeTo', 'nav_bar', '', url)
   }
 }
 

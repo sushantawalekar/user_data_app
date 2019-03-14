@@ -24,12 +24,12 @@
       {{/if}}
 
       <div class="contacts">
-        <div class="name"><a href="javascript:void(0)">{{user.name}}</a></div>
+        <div class="name"><a href="{{tickets.user.href}}">{{user.name}}</a></div>
         <div class="email">{{user.email}}</div>
         <div class="phone">{{user.phone}}</div>
         {{#if user.organization}}
           <div class="organization">
-            <a href="javascript:void(0)">{{user.organization.name}}</a>
+            <a href="{{tickets.org.href}}">{{user.organization.name}}</a>
           </div>
         {{/if}}
       </div>
@@ -39,27 +39,27 @@
       <ul class="counts">
         <li>
           <span class="ticket_status_label new">{{t "ticket_status.new"}}</span>
-          <span class="count new">{{{tickets.new}}}</span>
+          <span class="count new">{{#if tickets.new}}<a href="{{tickets.new.href}}">{{tickets.new.value}}</a>{{else}}-{{/if}}</span>
         </li>
         <li>
           <span class="ticket_status_label open">{{t "ticket_status.open"}}</span>
-          <span class="count open">{{{tickets.open}}}</span>
+          <span class="count open">{{#if tickets.open}}<a href="{{tickets.open.href}}">{{tickets.open.value}}</a>{{else}}-{{/if}}</span>
         </li>
         <li>
           <span class="ticket_status_label pending">{{t "ticket_status.pending"}}</span>
-          <span class="count pending">{{{tickets.pending}}}</span>
+          <span class="count pending">{{#if tickets.pending}}<a href="{{tickets.pending.href}}">{{tickets.pending.value}}</a>{{else}}-{{/if}}</span>
         </li>
         <li>
           <span class="ticket_status_label hold">{{t "ticket_status.hold"}}</span>
-          <span class="count hold">{{{tickets.hold}}}</span>
+          <span class="count hold">{{#if tickets.hold}}<a href="{{tickets.hold.href}}">{{tickets.hold.value}}</a>{{else}}-{{/if}}</span>
         </li>
         <li>
           <span class="ticket_status_label solved">{{t "ticket_status.solved"}}</span>
-          <span class="count solved">{{{tickets.solved}}}</span>
+          <span class="count solved">{{#if tickets.solved}}<a href="{{tickets.solved.href}}">{{tickets.solved.value}}</a>{{else}}-{{/if}}</span>
         </li>
         <li>
           <span class="ticket_status_label closed">{{t "ticket_status.closed"}}</span>
-          <span class="count closed">{{{tickets.closed}}}</span>
+          <span class="count closed">{{#if tickets.closed}}<a href="{{tickets.closed.href}}">{{tickets.closed.value}}</a>{{else}}-{{/if}}</span>
         </li>
       </ul>
     </div>
@@ -96,7 +96,7 @@
           {{/if}}
 
           <div class="contacts">
-            <div class="name"><a href="javascript:void(0)">{{org.name}}</a></div>
+            <div class="name"><a href="{{tickets.org.href}}">{{org.name}}</a></div>
             <div class="email">{{org.email}}</div>
           </div>
         </div>
@@ -105,27 +105,27 @@
           <ul class="counts">
             <li>
               <span class="ticket_status_label new">{{t "ticket_status.new"}}</span>
-              <span class="count new">{{{orgTickets.new}}}</span>
+              <span class="count new">{{#if orgTickets.new}}<a href="{{orgTickets.new.href}}">{{orgTickets.new.value}}</a>{{else}}-{{/if}}</span>
             </li>
             <li>
               <span class="ticket_status_label open">{{t "ticket_status.open"}}</span>
-              <span class="count open">{{{orgTickets.open}}}</span>
+              <span class="count open">{{#if orgTickets.open}}<a href="{{orgTickets.open.href}}">{{orgTickets.open.value}}</a>{{else}}-{{/if}}</span>
             </li>
             <li>
               <span class="ticket_status_label pending">{{t "ticket_status.pending"}}</span>
-              <span class="count pending">{{{orgTickets.pending}}}</span>
+              <span class="count pending">{{#if orgTickets.pending}}<a href="{{orgTickets.pending.href}}">{{orgTickets.pending.value}}</a>{{else}}-{{/if}}</span>
             </li>
             <li>
               <span class="ticket_status_label hold">{{t "ticket_status.hold"}}</span>
-              <span class="count hold">{{{orgTickets.hold}}}</span>
+              <span class="count hold">{{#if orgTickets.hold}}<a href="{{orgTickets.hold.href}}">{{orgTickets.hold.value}}</a>{{else}}-{{/if}}</span>
             </li>
             <li>
               <span class="ticket_status_label solved">{{t "ticket_status.solved"}}</span>
-              <span class="count solved">{{{orgTickets.solved}}}</span>
+              <span class="count solved">{{#if orgTickets.solved}}<a href="{{orgTickets.solved.href}}">{{orgTickets.solved.value}}</a>{{else}}-{{/if}}</span>
             </li>
             <li>
               <span class="ticket_status_label closed">{{t "ticket_status.closed"}}</span>
-              <span class="count closed">{{{orgTickets.closed}}}</span>
+              <span class="count closed">{{#if orgTickets.closed}}<a href="{{orgTickets.closed.href}}">{{orgTickets.closed.value}}</a>{{else}}-{{/if}}</span>
             </li>
           </ul>
         </div>
