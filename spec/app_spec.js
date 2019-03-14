@@ -137,6 +137,24 @@ describe('App', () => {
       helpers.parseQueryString.restore()
     })
 
+    describe('running the makeTicketsLinks', () => {
+      before(() => {
+        helpers.storage('ticketId', null)
+        helpers.storage('requester', {id: 100})
+        helpers.storage('ticketOrg', {id: 200})
+      })
+
+      it('returns requester and organization links', () => {
+        const links = app.makeTicketsLinks('requester')
+        const expected = {
+          user: { href: 'https://zd.com/agent/users/100/requested_tickets' },
+          org: { href: 'https://zd.com/agent/organizations/200/tickets' }
+        }
+
+        assert.deepStrictEqual(links, expected)
+      })
+    })
+
     describe('when on a existing ticket with an ID', () => {
       before(() => {
         helpers.storage('ticketId', 100)

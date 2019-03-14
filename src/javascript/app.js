@@ -390,7 +390,7 @@ const app = {
     }
   },
 
-  makeTicketsLinks: function (type, counters) {
+  makeTicketsLinks: function (type, counters = {}) {
     const ticketId = storage('ticketId')
     const requesterId = storage('requester') && storage('requester').id
     const orgId = storage('ticketOrg') && storage('ticketOrg').id
@@ -405,9 +405,16 @@ const app = {
       const value = counters[status]
       if (!value || value === '0' || value === '-') return memo
 
+      const paths = {
+        requester: `${base}/${user}`,
+        organization: `${base}/${org}`
+      }
+
       memo[status] = {
-        href: (type === 'requester') ? `${base}/${user}` : `${base}/${org}`,
-        value }
+        href: paths[type],
+        value
+      }
+
       return memo
     }, {
       user: { href: `${base}/${user}` },
@@ -635,7 +642,7 @@ const app = {
     if (isMeta) return
 
     event.preventDefault()
-    const links = app.makeTicketsLinks(tabType, { numbers: 1 })
+    const links = app.makeTicketsLinks(tabType)
     const href = (tabType === 'requester') ? links.user.href : links.org.href
     const url = href.replace(/.*\/agent\//, '../../')
 
