@@ -4,7 +4,8 @@ node_js:
 before_install:
   - bundle config zdrepo.jfrog.io $ARTIFACTORY_USERNAME:$ARTIFACTORY_API_KEY
 script:
-  - npm run lint && npm run build && npm run test
+  - npm run lint
+  - npm run test
   - bundle && bundle exec ruby ./validate_strings.rb
 sudo: false
 dist: trusty
