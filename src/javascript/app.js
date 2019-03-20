@@ -46,8 +46,9 @@ const app = {
   },
 
   getInformation: function () {
-    return client.get(['ticket.requester', 'ticket.id', 'ticket.organization', 'currentUser']).then((data) => {
-      const [ requester, ticketId, ticketOrg, currentUser ] = data
+    return client.get(['ticket.requester', 'ticket.id', 'ticket.organization', 'currentUser', 'currentUser.organizations']).then((data) => {
+      const [ requester, ticketId, ticketOrg, currentUser, currentUserOrganizations ] = data
+      currentUser.organizations = currentUserOrganizations
       const promises = []
 
       storage('currentUser', currentUser)
