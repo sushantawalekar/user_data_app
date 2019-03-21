@@ -3,36 +3,43 @@ import { toArray } from 'lodash'
 
 export default {
   getLocales: {
-    url: '/api/v2/locales.json'
+    url: '/api/v2/locales.json',
+    cachable: true
   },
 
   getOrganizationFields: {
-    url: '/api/v2/organization_fields.json'
+    url: '/api/v2/organization_fields.json',
+    cachable: true
   },
 
   getCustomRoles: {
-    url: '/api/v2/custom_roles.json'
+    url: '/api/v2/custom_roles.json',
+    cachable: true
   },
 
   getUserFields: {
-    url: '/api/v2/user_fields.json'
+    url: '/api/v2/user_fields.json',
+    cachable: true
   },
 
   getOrganizationTickets: function (orgId, page = 1) {
     return {
-      url: `/api/v2/organizations/${orgId}/tickets.json?page=${page}`
+      url: `/api/v2/organizations/${orgId}/tickets.json?page=${page}`,
+      cachable: true
     }
   },
 
   getTicketAudits: function (id) {
     return {
-      url: `/api/v2/tickets/${id}/audits.json`
+      url: `/api/v2/tickets/${id}/audits.json`,
+      cachable: true
     }
   },
 
   getTickets: function (userId, page = 1) {
     return {
-      url: `/api/v2/users/${userId}/tickets/requested.json?page=${page}`
+      url: `/api/v2/users/${userId}/tickets/requested.json?page=${page}`,
+      cachable: true
     }
   },
 
