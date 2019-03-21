@@ -1,10 +1,10 @@
+import client from './client'
 import i18n from './i18n'
 
-const orgClient = window.ZAFClient.init()
-const eClient = Object.create(orgClient)
+const eClient = Object.create(client)
 
 function handleClientError (error) {
-  let errorMessage = i18n.t('client.get.error', { error: error.message })
+  const errorMessage = i18n.t('client.get.error', { error: error.message })
   console.error(errorMessage)
   eClient.invoke('notify', errorMessage, 'error')
 }
@@ -31,7 +31,7 @@ const tools = {
 eClient.get = function (stringOrArray) {
   if (typeof stringOrArray !== 'string' && !Array.isArray(stringOrArray)) { throw new Error('Type for get not supported, get expects String or Array of Strings') }
 
-  return orgClient.get(stringOrArray).then((data) => {
+  return client.get(stringOrArray).then((data) => {
     let error, str, arr
 
     if (typeof stringOrArray === 'string') {
@@ -71,8 +71,8 @@ eClient.request = function (obj) {
   const cacheName = tools.unqiue(obj)
 
   let res
-  if (cached) res = tools.cache(cacheName) || tools.cache(cacheName, orgClient.request(obj))
-  else res = orgClient.request(obj)
+  if (cached) res = tools.cache(cacheName) || tools.cache(cacheName, client.request(obj))
+  else res = client.request(obj)
   return res
 }
 
