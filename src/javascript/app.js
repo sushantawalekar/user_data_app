@@ -32,7 +32,6 @@ const app = {
     storage('locales', null)
     storage('organizationFields', null)
     storage('userFields', null)
-    storage('userEditable', true)
 
     app.getInformation().then(() => {
       app.fillEmptyStatuses(storage('ticketsCounters'))
@@ -79,9 +78,9 @@ const app = {
       const getUserFieldsPromise = ajax('getUserFields')
       promises.push(getUserFieldsPromise)
 
-      // We need to make sure getCustomRolesPromise is done, because it sets 'userEditable'.
-      // getCustomRolesPromise can be undefined, but that's not a problem for Promise.all
-      Promise.all([getUserFieldsPromise, getCustomRolesPromise]).then(([userFieldsData]) => {
+      // We need to make sure all promiss are done, because they set certain storage values.
+      Promise.all(promises).then((data) => {
+        const userFieldsData = data.pop()
         app.onGetUserFieldsDone(userFieldsData)
       })
 
@@ -141,7 +140,6 @@ const app = {
 
       storage('orgEditable.general', role.configuration.organization_editing)
       storage('orgEditable.notes', role.configuration.organization_notes_editing)
-      storage('userEditable', app.isUserEditable(role.configuration.end_user_profile_access))
 
       each(storage('organizationFields'), (field) => {
         if (field.key === '##builtin_tags') {
@@ -587,7 +585,7 @@ const app = {
         description: '',
         position: Number.MAX_SAFE_INTEGER - 1,
         active: true,
-        editable: storage('userEditable')
+        editable: app.isUserEditable()
       },
       {
         key: '##builtin_notes',
@@ -595,7 +593,7 @@ const app = {
         description: '',
         position: Number.MAX_SAFE_INTEGER,
         active: true,
-        editable: storage('userEditable')
+        editable: app.isUserEditable()
       }
     ].concat(data.user_fields)
 
