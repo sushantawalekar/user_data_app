@@ -1,6 +1,6 @@
 import { ajax, urlify, appResize, localStorage, storage, setting, parseNum, parseQueryString } from './lib/helpers'
 import I18n from './lib/i18n'
-import client from './lib/client'
+import eClient from './lib/extended_client'
 
 import renderAdmin from '../templates/admin.hdbs'
 import renderDisplay from '../templates/display.hdbs'
@@ -46,7 +46,7 @@ const app = {
   },
 
   getInformation: function () {
-    return client.get(['ticket.requester', 'ticket.id', 'ticket.organization', 'currentUser', 'currentUser.organizations']).then((data) => {
+    return eClient.get(['ticket.requester', 'ticket.id', 'ticket.organization', 'currentUser', 'currentUser.organizations']).then((data) => {
       const [ requester, ticketId, ticketOrg, currentUser, currentUserOrganizations ] = data
       currentUser.organizations = currentUserOrganizations
       const promises = []
@@ -475,7 +475,7 @@ const app = {
 
     // Execute request
     ajax('updateNotesOrDetails', type, id, data).then(function () {
-      client.invoke('notify', (I18n.t('update_' + typeSingular + '_done')))
+      eClient.invoke('notify', (I18n.t('update_' + typeSingular + '_done')))
     })
   }, 1500),
 
@@ -627,7 +627,7 @@ const app = {
     const href = (tabType === 'requester') ? links.user.href : links.org.href
     const url = href.replace(/.*\/agent\//, '../../')
 
-    return client.invoke('routeTo', 'nav_bar', '', url)
+    return eClient.invoke('routeTo', 'nav_bar', '', url)
   }
 }
 

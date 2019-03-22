@@ -1,5 +1,5 @@
 import requests from './requests'
-import client from './client'
+import eClient from './extended_client'
 
 const MAX_PAGES = 10
 
@@ -9,7 +9,7 @@ export function ajax (...args) {
   const obj = typeof funcOrObj === 'function' ? funcOrObj.apply(window, args) : funcOrObj
   if (!obj) return Promise.reject(new Error(`no such request: "${funcName}"`))
   if (!obj.url) return Promise.resolve()
-  return client.request(obj)
+  return eClient.request(obj)
 }
 
 /**
@@ -32,7 +32,7 @@ export function ajaxPaging (...args) {
         lastNextPage = data.next_page
         pages++
 
-        client.request({
+        eClient.request({
           url: data.next_page
         }).then(done).catch(fail)
       } else {
@@ -50,7 +50,7 @@ export function ajaxPaging (...args) {
 
         lastNextPage = null
 
-        client.request({
+        eClient.request({
           url: nextPage
         }).then(done).catch(fail)
       } else {
@@ -101,7 +101,7 @@ export function urlify (message, hostname) {
 
 export function appResize (height = 0) {
   let newHeight = height || Math.max(document.body.offsetHeight, 86)
-  client.invoke('resize', { height: newHeight })
+  eClient.invoke('resize', { height: newHeight })
 }
 
 export function templatingLoop (set, getTemplate) {
@@ -275,12 +275,12 @@ export function setMainClass (name) {
 }
 
 export function createModal () {
-  return client.invoke('instances.create', {
+  return eClient.invoke('instances.create', {
     location: 'modal',
     url: 'assets/modal.html'
   }).then((modalContext) => {
     const instanceGuid = modalContext['instances.create'][0].instanceGuid
-    const modalClient = client.instance(instanceGuid)
+    const modalClient = eClient.instance(instanceGuid)
 
     return new Promise((resolve) => {
       modalClient.on('model.done', () => {

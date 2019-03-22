@@ -1,15 +1,15 @@
 import app from './app'
-import client from './lib/client'
+import eClient from './lib/extended_client'
 import { storage, setting } from './lib/helpers'
 
-client.on('app.registered', function (context) {
+eClient.on('app.registered', function (context) {
   const installationId = context.metadata.installationId
   storage('installationId', installationId)
 
-  client.get('currentUser').then((currentUser) => {
+  eClient.get('currentUser').then((currentUser) => {
     return currentUser.role === 'admin'
   }).then((isAdmin) => {
-    return (isAdmin) ? client.request(`/api/v2/apps/installations/${installationId}.json`) : Promise.reject(new Error('not an agent'))
+    return (isAdmin) ? eClient.request(`/api/v2/apps/installations/${installationId}.json`) : Promise.reject(new Error('not an agent'))
   }).then((data) => {
     return data.settings
   }).catch(() => {
@@ -28,4 +28,4 @@ client.on('app.registered', function (context) {
   })
 })
 
-client.on('ticket.requester.email.changed', app.onRequesterEmailChanged)
+eClient.on('ticket.requester.email.changed', app.onRequesterEmailChanged)
