@@ -154,24 +154,9 @@ const app = {
     })
   },
 
-  isUserEditable: function (right) {
-    if (right === 'edit-within-org') {
-      const currentUser = storage('currentUser')
-      const ticketOrg = storage('ticketOrg')
-      const requester = storage('requester')
-
-      if (requester.id === currentUser.id) return true
-
-      if (requester.role !== 'end-user' && typeof requester.role !== 'number') return false
-
-      const organization = find(currentUser.organizations, function (org) {
-        return org.id === ticketOrg.id
-      })
-
-      return !!organization
-    }
-
-    return ['full', 'edit'].indexOf(right) !== -1
+  isUserEditable: function () {
+    const user = storage('user')
+    return user.abilities && user.abilities.can_edit
   },
 
   getLocales: function () {
