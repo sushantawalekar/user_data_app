@@ -39,6 +39,7 @@ const app = {
       app.fillEmptyStatuses(storage('orgTicketsCounters'))
       app.showDisplay()
     }).catch((err) => {
+      console.error(err)
       const view = (err.message === 'no requester') ? renderNoRequester() : errorMessage({ msg: err.message })
       $('[data-main]').html(view)
       appResize()

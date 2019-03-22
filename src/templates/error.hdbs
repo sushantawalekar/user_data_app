@@ -1,5 +1,5 @@
 <div class="admin" style="display: none"></div>
 
-<div class="error_message">
+<div class="c-callout c-callout--error">
   {{t "client.get.error" error=msg}}
 </div>

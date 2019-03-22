@@ -16,6 +16,7 @@
   "dependencies": {
     "@zendeskgarden/css-bedrock": "^7.0.2",
     "@zendeskgarden/css-buttons": "^6.0.2",
+    "@zendeskgarden/css-callouts": "^3.3.2",
     "@zendeskgarden/css-forms": "^6.0.4",
     "@zendeskgarden/css-tags": "^4.0.3",
     "babel-core": "^6.26.0",

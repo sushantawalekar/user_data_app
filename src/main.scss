@@ -2,6 +2,7 @@
 @import '~@zendeskgarden/css-tags';
 @import '~@zendeskgarden/css-forms';
 @import '~@zendeskgarden/css-buttons';
+@import '~@zendeskgarden/css-callouts';
 
 html, body {
   overflow: hidden;
@@ -20,7 +21,7 @@ html, body {
   color: #333;
 }
 
-.no_requester, .error_message {
+.no_requester {
   text-align: center;
 }
 
