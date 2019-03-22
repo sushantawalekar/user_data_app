@@ -3,7 +3,8 @@ import eClient from './lib/extended_client'
 import { storage, setting } from './lib/helpers'
 
 eClient.on('app.registered', function (context) {
-  const installationId = context.metadata.installationId
+  const { appId, installationId } = context.metadata
+  storage('appId', appId)
   storage('installationId', installationId)
 
   eClient.get('currentUser').then((currentUser) => {
