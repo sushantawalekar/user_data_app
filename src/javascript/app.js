@@ -32,13 +32,13 @@ const app = {
     storage('locales', null)
     storage('organizationFields', null)
     storage('userFields', null)
-    storage('userEditable', true)
 
     app.getInformation().then(() => {
       app.fillEmptyStatuses(storage('ticketsCounters'))
       app.fillEmptyStatuses(storage('orgTicketsCounters'))
       app.showDisplay()
     }).catch((err) => {
+      console.error(err)
       const view = (err.message === 'no requester') ? renderNoRequester() : errorMessage({ msg: err.message })
       $('[data-main]').html(view)
       appResize()
@@ -60,11 +60,10 @@ const app = {
 
       I18n.loadTranslations(currentUser.locale)
 
-      if (requester) {
-        promises.push(app.getUserInformation(ticketOrg))
-      } else {
-        return Promise.reject(new Error('no requester'))
-      }
+      if (!requester) return Promise.reject(new Error('no requester'))
+
+      promises.push(ajax('getUserFields'))
+      promises.push(app.getUserInformation(ticketOrg))
 
       // If not admin or agent
       let getCustomRolesPromise
@@ -75,12 +74,9 @@ const app = {
 
       promises.push(app.getLocales())
       promises.push(ajax('getOrganizationFields').then(app.onGetOrganizationFieldsDone))
-      const getUserFieldsPromise = ajax('getUserFields')
-      promises.push(getUserFieldsPromise)
 
-      // We need to make sure getCustomRolesPromise is done, because it sets 'userEditable'.
-      // getCustomRolesPromise can be undefined, but that's not a problem for Promise.all
-      Promise.all([getUserFieldsPromise, getCustomRolesPromise]).then(([userFieldsData]) => {
+      // We need to make sure all promiss are done, because they set certain storage values.
+      Promise.all(promises).then(([userFieldsData]) => {
         app.onGetUserFieldsDone(userFieldsData)
       })
 
@@ -140,7 +136,6 @@ const app = {
 
       storage('orgEditable.general', role.configuration.organization_editing)
       storage('orgEditable.notes', role.configuration.organization_notes_editing)
-      storage('userEditable', app.isUserEditable(role.configuration.end_user_profile_access))
 
       each(storage('organizationFields'), (field) => {
         if (field.key === '##builtin_tags') {
@@ -154,24 +149,9 @@ const app = {
     })
   },
 
-  isUserEditable: function (right) {
-    if (right === 'edit-within-org') {
-      const currentUser = storage('currentUser')
-      const ticketOrg = storage('ticketOrg')
-      const requester = storage('requester')
-
-      if (requester.id === currentUser.id) return true
-
-      if (requester.role !== 'end-user' && typeof requester.role !== 'number') return false
-
-      const organization = find(currentUser.organizations, function (org) {
-        return org.id === ticketOrg.id
-      })
-
-      return !!organization
-    }
-
-    return ['full', 'edit'].indexOf(right) !== -1
+  isUserEditable: function () {
+    const user = storage('user')
+    return user.abilities && user.abilities.can_edit
   },
 
   getLocales: function () {
@@ -601,7 +581,7 @@ const app = {
         description: '',
         position: Number.MAX_SAFE_INTEGER - 1,
         active: true,
-        editable: storage('userEditable')
+        editable: app.isUserEditable()
       },
       {
         key: '##builtin_notes',
@@ -609,7 +589,7 @@ const app = {
         description: '',
         position: Number.MAX_SAFE_INTEGER,
         active: true,
-        editable: storage('userEditable')
+        editable: app.isUserEditable()
       }
     ].concat(data.user_fields)
 

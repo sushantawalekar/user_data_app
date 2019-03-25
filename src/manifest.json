@@ -14,8 +14,12 @@
 
   "location": {
     "support": {
-      "ticket_sidebar": "assets/ticket_sidebar.html",
-      "new_ticket_sidebar": "assets/ticket_sidebar.html"
+      "ticket_sidebar": {
+        "url": "assets/ticket_sidebar.html"
+      },
+      "new_ticket_sidebar": {
+        "url": "assets/ticket_sidebar.html"
+      }
     }
   },
 
