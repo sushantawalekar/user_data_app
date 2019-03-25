@@ -50,7 +50,6 @@ const app = {
       currentUser.organizations = currentUserOrganizations
       const promises = []
 
-      storage('ticketId', ticketId)
       storage('ticketOrg', ticketOrg)
       storage('orgEditable.general', currentUser.role === 'admin')
       storage('orgEditable.notes', true)
@@ -81,9 +80,11 @@ const app = {
   },
 
   getUserInformation: function (ticketOrg) {
-    return eClient.get('ticket.requester').then((requester) => {
-      return ajax('getUser', requester.id)
-    }).then((data) => {
+    return eClient.get(['ticket.requester', 'ticket.id']).then(([requester, ticketId]) => {
+      return ajax('getUser', requester.id).then((userData) => {
+        return [requester, ticketId, userData]
+      })
+    }).then(([requester, ticketId, data]) => {
       const promises = []
       const user = data.user
 
@@ -111,7 +112,7 @@ const app = {
         promises.push(app.getTickets('organization', data.user.organization_id))
       }
 
-      if (storage('ticketId')) {
+      if (ticketId) {
         promises.push(app.getTicketAudits())
       }
 
@@ -163,7 +164,9 @@ const app = {
   },
 
   getTicketAudits: function () {
-    return ajax('getTicketAudits', storage('ticketId')).then((data) => {
+    return eClient.get('ticket.id').then((ticketId) => {
+      return ajax('getTicketAudits', ticketId)
+    }).then((data) => {
       each(data.audits, (audit) => {
         each(audit.events, (e) => {
           if (app.auditEventIsSpoke(e)) {
@@ -346,13 +349,13 @@ const app = {
 
   showDisplay: function () {
     return Promise.all([
-      eClient.get(['currentUser', 'ticket.requester']),
+      eClient.get(['currentUser', 'ticket.requester', 'ticket.id']),
       app.getLocales(),
       app.makeTicketsLinks('requester', storage('ticketsCounters')),
       app.makeTicketsLinks('organization', storage('orgTicketsCounters'))
-    ]).then(([[currentUser, requester], locales, requesterCounters, orgCounters]) => {
+    ]).then(([[currentUser, requester, ticketId], locales, requesterCounters, orgCounters]) => {
       const view = renderDisplay({
-        ticketId: storage('ticketId'),
+        ticketId: ticketId,
         isAdmin: currentUser.role === 'admin',
         user: storage('user'),
         tickets: requesterCounters,
@@ -377,9 +380,8 @@ const app = {
 
   makeTicketsLinks: function (type, counters = {}) {
     return Promise.all([
-      eClient.get('ticket.requester')
-    ]).then(([requester]) => {
-      const ticketId = storage('ticketId')
+      eClient.get(['ticket.requester', 'ticket.id'])
+    ]).then(([[requester, ticketId]]) => {
       const requesterId = requester.id
       const orgId = storage('ticketOrg') && storage('ticketOrg').id
 
