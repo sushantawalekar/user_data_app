@@ -60,11 +60,10 @@ const app = {
 
       I18n.loadTranslations(currentUser.locale)
 
-      if (requester) {
-        promises.push(app.getUserInformation(ticketOrg))
-      } else {
-        return Promise.reject(new Error('no requester'))
-      }
+      if (!requester) return Promise.reject(new Error('no requester'))
+
+      promises.push(ajax('getUserFields'))
+      promises.push(app.getUserInformation(ticketOrg))
 
       // If not admin or agent
       let getCustomRolesPromise
@@ -75,12 +74,9 @@ const app = {
 
       promises.push(app.getLocales())
       promises.push(ajax('getOrganizationFields').then(app.onGetOrganizationFieldsDone))
-      const getUserFieldsPromise = ajax('getUserFields')
-      promises.push(getUserFieldsPromise)
 
       // We need to make sure all promiss are done, because they set certain storage values.
-      Promise.all(promises).then((data) => {
-        const userFieldsData = data.pop()
+      Promise.all(promises).then(([userFieldsData]) => {
         app.onGetUserFieldsDone(userFieldsData)
       })
 
