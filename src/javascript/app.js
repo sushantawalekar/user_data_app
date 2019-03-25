@@ -50,7 +50,6 @@ const app = {
       currentUser.organizations = currentUserOrganizations
       const promises = []
 
-      storage('requester', requester)
       storage('ticketId', ticketId)
       storage('ticketOrg', ticketOrg)
       storage('orgEditable.general', currentUser.role === 'admin')
@@ -82,9 +81,9 @@ const app = {
   },
 
   getUserInformation: function (ticketOrg) {
-    const requester = storage('requester')
-
-    return ajax('getUser', requester.id).then((data) => {
+    return eClient.get('ticket.requester').then((requester) => {
+      return ajax('getUser', requester.id)
+    }).then((data) => {
       const promises = []
       const user = data.user
 
@@ -347,19 +346,21 @@ const app = {
 
   showDisplay: function () {
     return Promise.all([
-      eClient.get('currentUser'),
-      app.getLocales()
-    ]).then(([currentUser, locales]) => {
+      eClient.get(['currentUser', 'ticket.requester']),
+      app.getLocales(),
+      app.makeTicketsLinks('requester', storage('ticketsCounters')),
+      app.makeTicketsLinks('organization', storage('orgTicketsCounters'))
+    ]).then(([[currentUser, requester], locales, requesterCounters, orgCounters]) => {
       const view = renderDisplay({
         ticketId: storage('ticketId'),
         isAdmin: currentUser.role === 'admin',
         user: storage('user'),
-        tickets: app.makeTicketsLinks('requester', storage('ticketsCounters')),
+        tickets: requesterCounters,
         fields: app.fieldsForCurrentUser(currentUser, locales),
         orgFields: app.fieldsForCurrentOrg(currentUser, locales),
         orgFieldsActivated: storage('user') && setting('orgFieldsActivated') && storage('user').organization,
         org: storage('user') && storage('user').organization,
-        orgTickets: app.makeTicketsLinks('organization', storage('orgTicketsCounters'))
+        orgTickets: orgCounters
       })
 
       $('[data-main]').html(view)
@@ -375,45 +376,49 @@ const app = {
   },
 
   makeTicketsLinks: function (type, counters = {}) {
-    const ticketId = storage('ticketId')
-    const requesterId = storage('requester') && storage('requester').id
-    const orgId = storage('ticketOrg') && storage('ticketOrg').id
+    return Promise.all([
+      eClient.get('ticket.requester')
+    ]).then(([requester]) => {
+      const ticketId = storage('ticketId')
+      const requesterId = requester.id
+      const orgId = storage('ticketOrg') && storage('ticketOrg').id
 
-    const origin = parseQueryString().origin
-    const base = `${origin}/agent`
+      const origin = parseQueryString().origin
+      const base = `${origin}/agent`
 
-    const user = (ticketId) ? `tickets/${ticketId}/requester/requested_tickets` : `users/${requesterId}/requested_tickets`
-    const org = (ticketId) ? `tickets/${ticketId}/organization/tickets` : `organizations/${orgId}/tickets`
+      const user = (ticketId) ? `tickets/${ticketId}/requester/requested_tickets` : `users/${requesterId}/requested_tickets`
+      const org = (ticketId) ? `tickets/${ticketId}/organization/tickets` : `organizations/${orgId}/tickets`
 
-    const links = Object.keys(counters).reduce((memo, status) => {
-      const value = counters[status]
-      if (!value || value === '0' || value === '-') return memo
+      const links = Object.keys(counters).reduce((memo, status) => {
+        const value = counters[status]
+        if (!value || value === '0' || value === '-') return memo
 
-      const paths = {
-        requester: `${base}/${user}`,
-        organization: `${base}/${org}`
-      }
+        const paths = {
+          requester: `${base}/${user}`,
+          organization: `${base}/${org}`
+        }
 
-      memo[status] = {
-        href: paths[type],
-        value
-      }
+        memo[status] = {
+          href: paths[type],
+          value
+        }
 
-      return memo
-    }, {
-      user: { href: `${base}/${user}` },
-      org: { href: `${base}/${org}` }
+        return memo
+      }, {
+        user: { href: `${base}/${user}` },
+        org: { href: `${base}/${org}` }
+      })
+
+      return links
     })
-
-    return links
   },
 
   onRequesterEmailChanged: function (email) {
-    const requester = storage('requester') || {}
-
-    if (email && requester.email !== email) {
-      app.init()
-    }
+    return eClient.get('ticket.requester').then((requester) => {
+      if (email && requester.email !== email) {
+        app.init()
+      }
+    })
   },
 
   onClickExpandBar: function (event, immediate) {
@@ -459,26 +464,27 @@ const app = {
   },
 
   onNotesOrDetailsChanged: debounce(function (e) {
-    const $textarea = $(e.currentTarget)
-    const $textareas = $textarea.parent().parent().find('[data-editable =true] textarea')
-    const type = $textarea.data('fieldType')
-    const typeSingular = type.slice(0, -1)
-    const data = {}
-    const requester = storage('requester')
-    const id = type === 'organizations' ? storage('user').organization.id : requester.id
+    return eClient.get('ticket.requester').then((requester) => {
+      const $textarea = $(e.currentTarget)
+      const $textareas = $textarea.parent().parent().find('[data-editable =true] textarea')
+      const type = $textarea.data('fieldType')
+      const typeSingular = type.slice(0, -1)
+      const data = {}
+      const id = type === 'organizations' ? storage('user').organization.id : requester.id
 
-    // Build the data object, with the valid resource name and data
-    data[typeSingular] = {}
-    $textareas.each(function (index, element) {
-      const $element = $(element)
-      const fieldName = $element.data('fieldName')
+      // Build the data object, with the valid resource name and data
+      data[typeSingular] = {}
+      $textareas.each(function (index, element) {
+        const $element = $(element)
+        const fieldName = $element.data('fieldName')
 
-      data[typeSingular][fieldName] = $element.val()
-    })
+        data[typeSingular][fieldName] = $element.val()
+      })
 
-    // Execute request
-    ajax('updateNotesOrDetails', type, id, data).then(function () {
-      eClient.invoke('notify', (I18n.t('update_' + typeSingular + '_done')))
+      // Execute request
+      return ajax('updateNotesOrDetails', type, id, data).then(function () {
+        eClient.invoke('notify', (I18n.t('update_' + typeSingular + '_done')))
+      })
     })
   }, 1500),
 
@@ -626,11 +632,13 @@ const app = {
     if (isMeta) return
 
     event.preventDefault()
-    const links = app.makeTicketsLinks(tabType)
-    const href = (tabType === 'requester') ? links.user.href : links.org.href
-    const url = href.replace(/.*\/agent\//, '../../')
 
-    return eClient.invoke('routeTo', 'nav_bar', '', url)
+    return app.makeTicketsLinks(tabType).then((links) => {
+      const href = (tabType === 'requester') ? links.user.href : links.org.href
+      const url = href.replace(/.*\/agent\//, '../../')
+
+      return eClient.invoke('routeTo', 'nav_bar', '', url)
+    })
   }
 }
 
