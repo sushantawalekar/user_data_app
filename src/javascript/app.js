@@ -50,7 +50,6 @@ const app = {
       currentUser.organizations = currentUserOrganizations
       const promises = []
 
-      storage('currentUser', currentUser)
       storage('requester', requester)
       storage('ticketId', ticketId)
       storage('ticketOrg', ticketOrg)
@@ -124,8 +123,10 @@ const app = {
   },
 
   getCustomRoles: function () {
-    return ajax('getCustomRoles').then((data) => {
-      const currentUser = storage('currentUser')
+    return Promise.all([
+      ajax('getCustomRoles'),
+      eClient.get('currentUser')
+    ]).then(([data, currentUser]) => {
       const roles = data.custom_roles
 
       const role = find(roles, (role) => {
@@ -240,7 +241,7 @@ const app = {
     return res
   },
 
-  formatFields: function (target, fields, selected, values, locales) {
+  formatFields: function (target, fields, selected, values, currentUser, locales) {
     return compact(map(selected, function (key) {
       const field = find(fields, function (field) {
         return field.key === key
@@ -284,7 +285,7 @@ const app = {
         }
 
         if (field.type === 'date') {
-          result.value = (result.value ? app.toLocaleDate(result.value) : '')
+          result.value = (result.value ? app.toLocaleDate(result.value, currentUser.timeZone.offset, currentUser.locale) : '')
         } else if (field.type === 'dropdown' && field.custom_field_options) {
           const option = find(field.custom_field_options, function (option) {
             return option.value === result.value
@@ -299,24 +300,26 @@ const app = {
     }))
   },
 
-  fieldsForCurrentUser: function (locales) {
+  fieldsForCurrentUser: function (currentUser, locales) {
     if (!storage('user')) { return {} }
     return app.formatFields(
       storage('user'),
       storage('userFields'),
       setting('selectedFields') ? JSON.parse(setting('selectedFields')) : ['##builtin_tags', '##builtin_details', '##builtin_notes'],
       storage('user').user_fields,
+      currentUser,
       locales
     )
   },
 
-  fieldsForCurrentOrg: function (locales) {
+  fieldsForCurrentOrg: function (currentUser, locales) {
     if (!storage('user') || !storage('user').organization) { return {} }
     return app.formatFields(
       storage('user').organization,
       storage('organizationFields'),
       setting('orgFields') ? JSON.parse(setting('orgFields')) : [],
       storage('user').organization.organization_fields,
+      currentUser,
       locales
     )
   },
@@ -334,13 +337,12 @@ const app = {
     return setting('hideEmptyFields') && !field.value && !field.editable
   },
 
-  toLocaleDate: function (date) {
-    const currentUser = storage('currentUser')
-    const userTimeZoneOffset = currentUser.timeZone.offset * MINUTES_TO_MILLISECONDS // offset in milliseconds
+  toLocaleDate: function (date, timeZoneOffset, locale) {
+    const userTimeZoneOffset = timeZoneOffset * MINUTES_TO_MILLISECONDS // offset in milliseconds
     const utcTimestamp = new Date(date).getTime()
     const localDate = new Date(utcTimestamp + userTimeZoneOffset)
 
-    return localDate.toLocaleDateString(currentUser.locale)
+    return localDate.toLocaleDateString(locale)
   },
 
   showDisplay: function () {
@@ -353,8 +355,8 @@ const app = {
         isAdmin: currentUser.role === 'admin',
         user: storage('user'),
         tickets: app.makeTicketsLinks('requester', storage('ticketsCounters')),
-        fields: app.fieldsForCurrentUser(locales),
-        orgFields: app.fieldsForCurrentOrg(locales),
+        fields: app.fieldsForCurrentUser(currentUser, locales),
+        orgFields: app.fieldsForCurrentOrg(currentUser, locales),
         orgFieldsActivated: storage('user') && setting('orgFieldsActivated') && storage('user').organization,
         org: storage('user') && storage('user').organization,
         orgTickets: app.makeTicketsLinks('organization', storage('orgTicketsCounters'))
