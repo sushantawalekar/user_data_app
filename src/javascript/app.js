@@ -90,10 +90,6 @@ const app = {
       promises.push(user)
       storage('user', user)
 
-      if (ticketId) {
-        promises.push(app.getTicketAudits())
-      }
-
       return Promise.all(promises)
     })
   },
@@ -176,22 +172,20 @@ const app = {
     return eClient.get('ticket.id').then((ticketId) => {
       return ajax('getTicketAudits', ticketId)
     }).then((data) => {
-      each(data.audits, (audit) => {
+      let spokeData
+
+      each(data.audits.audits, (audit) => {
         each(audit.events, (e) => {
           if (app.auditEventIsSpoke(e)) {
-            const spokeData = app.spokeData(e)
-
-            if (spokeData) {
-              storage('spokeData', spokeData)
-              const user = storage('user')
-              user.email = spokeData.email
-              storage('user', user)
-              app.displaySpoke()
-            }
+            spokeData = app.spokeData(e)
           }
         })
       })
-      return data.audits
+
+      return {
+        audits: data.audits,
+        spokeData
+      }
     })
   },
 
@@ -395,9 +389,8 @@ const app = {
       $('[data-main]').html(view)
       appResize()
 
-      if (storage('spokeData')) {
-        app.displaySpoke()
-      }
+      app.displaySpoke()
+
       if (localStorage('expanded')) {
         app.onClickExpandBar({}, true)
       }
@@ -528,9 +521,13 @@ const app = {
   },
 
   displaySpoke: function () {
-    const html = renderSpoke(storage('spokeData'))
-    $('.spoke').html(html)
-    appResize()
+    app.getTicketAudits().then(({spokeData}) => {
+      if (!spokeData) return
+
+      const html = renderSpoke(spokeData)
+      $('.spoke').html(html)
+      appResize()
+    })
   },
 
   auditEventIsSpoke: function (event) {
