@@ -29,7 +29,6 @@ const app = {
     storage('ticketsCounters', {})
     storage('orgTicketsCounters', {})
     storage('user', null)
-    storage('organizationFields', null)
     storage('userFields', null)
 
     app.getInformation().then(() => {
@@ -66,8 +65,6 @@ const app = {
         getCustomRolesPromise = app.getCustomRoles()
         promises.push(getCustomRolesPromise)
       }
-
-      promises.push(ajax('getOrganizationFields').then(app.onGetOrganizationFieldsDone))
 
       // We need to make sure all promiss are done, because they set certain storage values.
       Promise.all(promises).then(([userFieldsData]) => {
@@ -124,8 +121,9 @@ const app = {
   getCustomRoles: function () {
     return Promise.all([
       ajax('getCustomRoles'),
-      eClient.get('currentUser')
-    ]).then(([data, currentUser]) => {
+      eClient.get('currentUser'),
+      app.getOrganizationFields()
+    ]).then(([data, currentUser, organizationFields]) => {
       const roles = data.custom_roles
 
       const role = find(roles, (role) => {
@@ -135,7 +133,7 @@ const app = {
       storage('orgEditable.general', role.configuration.organization_editing)
       storage('orgEditable.notes', role.configuration.organization_notes_editing)
 
-      each(storage('organizationFields'), (field) => {
+      each(organizationFields, (field) => {
         if (field.key === '##builtin_tags') {
         } else if (field.key === '##builtin_notes') {
           field.editable = storage('orgEditable.notes')
@@ -313,11 +311,11 @@ const app = {
     )
   },
 
-  fieldsForCurrentOrg: function (currentUser, locales) {
+  fieldsForCurrentOrg: function (currentUser, locales, organizationFields) {
     if (!storage('user') || !storage('user').organization) { return {} }
     return app.formatFields(
       storage('user').organization,
-      storage('organizationFields'),
+      organizationFields,
       setting('orgFields') ? JSON.parse(setting('orgFields')) : [],
       storage('user').organization.organization_fields,
       currentUser,
@@ -350,16 +348,17 @@ const app = {
     return Promise.all([
       eClient.get(['currentUser', 'ticket.requester', 'ticket.id']),
       app.getLocales(),
+      app.getOrganizationFields(),
       app.makeTicketsLinks('requester', storage('ticketsCounters')),
       app.makeTicketsLinks('organization', storage('orgTicketsCounters'))
-    ]).then(([[currentUser, requester, ticketId], locales, requesterCounters, orgCounters]) => {
+    ]).then(([[currentUser, requester, ticketId], locales, organizationFields, requesterCounters, orgCounters]) => {
       const view = renderDisplay({
         ticketId: ticketId,
         isAdmin: currentUser.role === 'admin',
         user: storage('user'),
         tickets: requesterCounters,
         fields: app.fieldsForCurrentUser(currentUser, locales),
-        orgFields: app.fieldsForCurrentOrg(currentUser, locales),
+        orgFields: app.fieldsForCurrentOrg(currentUser, locales, organizationFields),
         orgFieldsActivated: storage('user') && setting('orgFieldsActivated') && storage('user').organization,
         org: storage('user') && storage('user').organization,
         orgTickets: orgCounters
@@ -433,15 +432,19 @@ const app = {
   },
 
   onCogClick: function () {
-    const html = renderAdmin({
-      fields: storage('userFields'),
-      orgFields: storage('organizationFields'),
-      orgFieldsActivated: setting('orgFieldsActivated'),
-      hideEmptyFields: setting('hideEmptyFields')
+    return Promise.all([
+      app.getOrganizationFields()
+    ]).then(([organizationFields]) => {
+      const html = renderAdmin({
+        fields: storage('userFields'),
+        orgFields: organizationFields,
+        orgFieldsActivated: setting('orgFieldsActivated'),
+        hideEmptyFields: setting('hideEmptyFields')
+      })
+      $('.admin').html(html).show()
+      $('.whole').hide()
+      appResize()
     })
-    $('.admin').html(html).show()
-    $('.whole').hide()
-    appResize()
   },
 
   onBackClick: function () {
@@ -520,52 +523,58 @@ const app = {
     }
   },
 
-  onGetOrganizationFieldsDone: function (data) {
-    const fields = [
-      {
-        key: '##builtin_tags',
-        title: I18n.t('tags'),
-        description: '',
-        position: 0,
-        active: true
-      },
-      {
-        key: '##builtin_details',
-        title: I18n.t('details'),
-        description: '',
-        position: Number.MAX_SAFE_INTEGER - 1,
-        active: true,
-        editable: storage('orgEditable.general')
-      },
-      {
-        key: '##builtin_notes',
-        title: I18n.t('notes'),
-        description: '',
-        position: Number.MAX_SAFE_INTEGER,
-        active: true,
-        editable: storage('orgEditable.notes')
-      }
-    ].concat(data.organization_fields)
+  getOrganizationFields: function () {
+    const organizationFields = storage('organizationFields')
+    if (organizationFields !== undefined) return Promise.resolve(organizationFields)
 
-    const activeFields = filter(fields, function (field) {
-      return field.active
+    return ajax('getOrganizationFields').then((data) => {
+      const fields = [
+        {
+          key: '##builtin_tags',
+          title: I18n.t('tags'),
+          description: '',
+          position: 0,
+          active: true
+        },
+        {
+          key: '##builtin_details',
+          title: I18n.t('details'),
+          description: '',
+          position: Number.MAX_SAFE_INTEGER - 1,
+          active: true,
+          editable: storage('orgEditable.general')
+        },
+        {
+          key: '##builtin_notes',
+          title: I18n.t('notes'),
+          description: '',
+          position: Number.MAX_SAFE_INTEGER,
+          active: true,
+          editable: storage('orgEditable.notes')
+        }
+      ].concat(data.organization_fields)
+
+      const activeFields = filter(fields, function (field) {
+        return field.active
+      })
+
+      const restrictedFields = map(activeFields, (field) => {
+        return {
+          key: field.key,
+          title: field.title,
+          description: field.description,
+          custom_field_options: field.custom_field_options,
+          position: field.position,
+          selected: includes(setting('orgFields') ? JSON.parse(setting('orgFields')) : [], field.key),
+          editable: field.editable,
+          type: field.type
+        }
+      })
+
+      const organizationFields = sortBy(restrictedFields, 'position')
+      storage('organizationFields', organizationFields)
+      return organizationFields
     })
-
-    const restrictedFields = map(activeFields, (field) => {
-      return {
-        key: field.key,
-        title: field.title,
-        description: field.description,
-        custom_field_options: field.custom_field_options,
-        position: field.position,
-        selected: includes(setting('orgFields') ? JSON.parse(setting('orgFields')) : [], field.key),
-        editable: field.editable,
-        type: field.type
-      }
-    })
-
-    storage('organizationFields', sortBy(restrictedFields, 'position'))
-    return restrictedFields
   },
 
   onGetUserFieldsDone: function (data) {
