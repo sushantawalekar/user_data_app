@@ -31,8 +31,6 @@ const app = {
     storage('user', null)
 
     app.getInformation().then(() => {
-      app.fillEmptyStatuses(storage('ticketsCounters'))
-      app.fillEmptyStatuses(storage('orgTicketsCounters'))
       app.showDisplay()
     }).catch((err) => {
       console.error(err)
@@ -199,7 +197,7 @@ const app = {
         return app.getTicketsThroughSearch(`${type}:${id}`)
       }
     }).then((data) => {
-      const res = app.processTicketData(data)
+      const res = app.fillEmptyStatuses( app.processTicketData(data) )
       storage(TYPES[type].storage, res)
       return res
     })
@@ -317,12 +315,10 @@ const app = {
   },
 
   fillEmptyStatuses: function (list) {
-    return reduce(TICKET_STATUSES, function (list, key) {
-      if (!list[key]) {
-        list[key] = '-'
-      }
-      return list
-    }, list)
+    return reduce(TICKET_STATUSES, function (memo, status) {
+      memo[status] = list[status] ? list[status] : '-'
+      return memo
+    }, {})
   },
 
   couldHideField: function (field) {
