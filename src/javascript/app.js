@@ -44,9 +44,6 @@ const app = {
       currentUser.organizations = currentUserOrganizations
       const promises = []
 
-      storage('orgEditable.general', currentUser.role === 'admin')
-      storage('orgEditable.notes', true)
-
       I18n.loadTranslations(currentUser.locale)
 
       if (!requester) return Promise.reject(new Error('no requester'))
@@ -113,17 +110,15 @@ const app = {
         return role.id === currentUser.role
       })
 
-      storage('orgEditable.general', role.configuration.organization_editing)
-      storage('orgEditable.notes', role.configuration.organization_notes_editing)
-
       each(organizationFields, (field) => {
         if (field.key === '##builtin_tags') {
         } else if (field.key === '##builtin_notes') {
-          field.editable = storage('orgEditable.notes')
+          field.editable = role.configuration.organization_notes_editing
         } else {
-          field.editable = storage('orgEditable.general')
+          field.editable = role.configuration.organization_editing
         }
       })
+
       return data
     })
   },
@@ -131,6 +126,40 @@ const app = {
   isUserEditable: function () {
     const user = storage('user')
     return user.abilities && user.abilities.can_edit
+  },
+
+  isOrganizationEditable: function () {
+    return eClient.get('currentUser.role').then((currentUserRole) => {
+      if (currentUserRole === 'admin') return true
+
+      if (['admin', 'agent'].indexOf(currentUserRole) === -1) {
+        return app.getCustomRoles().then(({roles}) => {
+          const role = find(roles, (role) => {
+            return role.id === currentUserRole
+          })
+
+          return role && role.configuration.organization_editing
+        })
+      }
+
+      return false
+    })
+  },
+
+  isOrganizationNotesEditable: function () {
+    return eClient.get('currentUser.role').then((currentUserRole) => {
+      if (['admin', 'agent'].indexOf(currentUserRole) === -1) {
+        return app.getCustomRoles().then(({roles}) => {
+          const role = find(roles, (role) => {
+            return role.id === currentUserRole
+          })
+
+          return role && role.configuration.organization_notes_editing
+        })
+      }
+
+      return true
+    })
   },
 
   getLocales: function () {
@@ -527,7 +556,11 @@ const app = {
     const organizationFields = storage('organizationFields')
     if (organizationFields !== undefined) return Promise.resolve(organizationFields)
 
-    return ajax('getOrganizationFields').then((data) => {
+    return Promise.all([
+      ajax('getOrganizationFields'),
+      app.isOrganizationEditable(),
+      app.isOrganizationNotesEditable()
+    ]).then(([data, isOrganizationEditable, isOrganizationNotesEditable]) => {
       const fields = [
         {
           key: '##builtin_tags',
@@ -542,7 +575,7 @@ const app = {
           description: '',
           position: Number.MAX_SAFE_INTEGER - 1,
           active: true,
-          editable: storage('orgEditable.general')
+          editable: isOrganizationEditable
         },
         {
           key: '##builtin_notes',
@@ -550,7 +583,7 @@ const app = {
           description: '',
           position: Number.MAX_SAFE_INTEGER,
           active: true,
-          editable: storage('orgEditable.notes')
+          editable: isOrganizationNotesEditable
         }
       ].concat(data.organization_fields)
 
