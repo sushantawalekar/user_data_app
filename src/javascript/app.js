@@ -29,7 +29,6 @@ const app = {
     storage('ticketsCounters', {})
     storage('orgTicketsCounters', {})
     storage('user', null)
-    storage('userFields', null)
 
     app.getInformation().then(() => {
       app.fillEmptyStatuses(storage('ticketsCounters'))
@@ -56,7 +55,6 @@ const app = {
 
       if (!requester) return Promise.reject(new Error('no requester'))
 
-      promises.push(ajax('getUserFields'))
       promises.push(app.getUserInformation())
 
       // If not admin or agent
@@ -65,11 +63,6 @@ const app = {
         getCustomRolesPromise = app.getCustomRoles()
         promises.push(getCustomRolesPromise)
       }
-
-      // We need to make sure all promiss are done, because they set certain storage values.
-      Promise.all(promises).then(([userFieldsData]) => {
-        app.onGetUserFieldsDone(userFieldsData)
-      })
 
       return Promise.all(promises)
     })
@@ -299,11 +292,11 @@ const app = {
     }))
   },
 
-  fieldsForCurrentUser: function (currentUser, locales) {
+  fieldsForCurrentUser: function (currentUser, locales, userFields) {
     if (!storage('user')) { return {} }
     return app.formatFields(
       storage('user'),
-      storage('userFields'),
+      userFields,
       setting('selectedFields') ? JSON.parse(setting('selectedFields')) : ['##builtin_tags', '##builtin_details', '##builtin_notes'],
       storage('user').user_fields,
       currentUser,
@@ -348,16 +341,17 @@ const app = {
     return Promise.all([
       eClient.get(['currentUser', 'ticket.requester', 'ticket.id']),
       app.getLocales(),
+      app.getUserFields(),
       app.getOrganizationFields(),
       app.makeTicketsLinks('requester', storage('ticketsCounters')),
       app.makeTicketsLinks('organization', storage('orgTicketsCounters'))
-    ]).then(([[currentUser, requester, ticketId], locales, organizationFields, requesterCounters, orgCounters]) => {
+    ]).then(([[currentUser, requester, ticketId], locales, userFields, organizationFields, requesterCounters, orgCounters]) => {
       const view = renderDisplay({
         ticketId: ticketId,
         isAdmin: currentUser.role === 'admin',
         user: storage('user'),
         tickets: requesterCounters,
-        fields: app.fieldsForCurrentUser(currentUser, locales),
+        fields: app.fieldsForCurrentUser(currentUser, locales, userFields),
         orgFields: app.fieldsForCurrentOrg(currentUser, locales, organizationFields),
         orgFieldsActivated: storage('user') && setting('orgFieldsActivated') && storage('user').organization,
         org: storage('user') && storage('user').organization,
@@ -433,10 +427,11 @@ const app = {
 
   onCogClick: function () {
     return Promise.all([
-      app.getOrganizationFields()
-    ]).then(([organizationFields]) => {
+      app.getOrganizationFields(),
+      app.getUserFields()
+    ]).then(([organizationFields, userFields]) => {
       const html = renderAdmin({
-        fields: storage('userFields'),
+        fields: userFields,
         orgFields: organizationFields,
         orgFieldsActivated: setting('orgFieldsActivated'),
         hideEmptyFields: setting('hideEmptyFields')
@@ -577,61 +572,67 @@ const app = {
     })
   },
 
-  onGetUserFieldsDone: function (data) {
-    const fields = [
-      {
-        key: '##builtin_tags',
-        title: I18n.t('tags'),
-        description: '',
-        position: 0,
-        active: true
-      },
-      {
-        key: '##builtin_locale',
-        title: I18n.t('locale'),
-        description: '',
-        position: 1,
-        active: true
-      },
-      {
-        key: '##builtin_details',
-        title: I18n.t('details'),
-        description: '',
-        position: Number.MAX_SAFE_INTEGER - 1,
-        active: true,
-        editable: app.isUserEditable()
-      },
-      {
-        key: '##builtin_notes',
-        title: I18n.t('notes'),
-        description: '',
-        position: Number.MAX_SAFE_INTEGER,
-        active: true,
-        editable: app.isUserEditable()
-      }
-    ].concat(data.user_fields)
+  getUserFields: function () {
+    const userFields = storage('userFields')
+    if (userFields !== undefined) return Promise.resolve(userFields)
 
-    const activeFields = filter(fields, function (field) {
-      return field.active
+    return ajax('getUserFields').then((data) => {
+      const fields = [
+        {
+          key: '##builtin_tags',
+          title: I18n.t('tags'),
+          description: '',
+          position: 0,
+          active: true
+        },
+        {
+          key: '##builtin_locale',
+          title: I18n.t('locale'),
+          description: '',
+          position: 1,
+          active: true
+        },
+        {
+          key: '##builtin_details',
+          title: I18n.t('details'),
+          description: '',
+          position: Number.MAX_SAFE_INTEGER - 1,
+          active: true,
+          editable: app.isUserEditable()
+        },
+        {
+          key: '##builtin_notes',
+          title: I18n.t('notes'),
+          description: '',
+          position: Number.MAX_SAFE_INTEGER,
+          active: true,
+          editable: app.isUserEditable()
+        }
+      ].concat(data.user_fields)
+
+      const activeFields = filter(fields, function (field) {
+        return field.active
+      })
+
+      const restrictedFields = map(activeFields, (field) => {
+        return {
+          key: field.key,
+          title: field.title,
+          description: field.description,
+          position: field.position,
+          selected: includes(setting('selectedFields')
+            ? JSON.parse(setting('selectedFields'))
+            : ['##builtin_tags', '##builtin_details', '##builtin_notes'], field.key),
+          editable: field.editable,
+          type: field.type,
+          custom_field_options: field.custom_field_options
+        }
+      })
+
+      const userFields = sortBy(restrictedFields, 'position')
+      storage('userFields', userFields)
+      return userFields
     })
-
-    const restrictedFields = map(activeFields, (field) => {
-      return {
-        key: field.key,
-        title: field.title,
-        description: field.description,
-        position: field.position,
-        selected: includes(setting('selectedFields')
-          ? JSON.parse(setting('selectedFields'))
-          : ['##builtin_tags', '##builtin_details', '##builtin_notes'], field.key),
-        editable: field.editable,
-        type: field.type,
-        custom_field_options: field.custom_field_options
-      }
-    })
-
-    storage('userFields', sortBy(restrictedFields, 'position'))
-    return restrictedFields
   },
 
   // HACK for navigating to a url, since routeTo doesn't support this.
