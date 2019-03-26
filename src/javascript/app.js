@@ -26,8 +26,6 @@ const MINUTES_TO_MILLISECONDS = 60000
 
 const app = {
   init: function () {
-    storage('user', null)
-
     app.getInformation().then(() => {
       app.showDisplay()
     }).catch((err) => {
@@ -70,6 +68,23 @@ const app = {
       const promises = []
       const user = data.user
 
+      promises.push(user)
+
+      return Promise.all(promises)
+    })
+  },
+
+  getUser: function () {
+    const user = storage('user')
+    if (user !== undefined) return Promise.resolve(user)
+
+    return eClient.get(['ticket.requester', 'ticket.organization']).then(([requester, ticketOrganization]) => {
+      return ajax('getUser', requester.id).then((data) => {
+        return [requester, ticketOrganization, data]
+      })
+    }).then(([requester, ticketOrganization, data]) => {
+      const user = data.user
+
       user.identities = data.identities.filter(function (ident) {
         return includes(['twitter', 'facebook'], ident.type)
       }).map(function (ident) {
@@ -87,10 +102,9 @@ const app = {
           return org.id === ticketOrganization.id
         })
       }
-      promises.push(user)
-      storage('user', user)
 
-      return Promise.all(promises)
+      storage('user', user)
+      return user
     })
   },
 
@@ -119,8 +133,7 @@ const app = {
     })
   },
 
-  isUserEditable: function () {
-    const user = storage('user')
+  isUserEditable: function (user) {
     return user.abilities && user.abilities.can_edit
   },
 
@@ -308,25 +321,25 @@ const app = {
     }))
   },
 
-  fieldsForCurrentUser: function (currentUser, locales, userFields) {
-    if (!storage('user')) { return {} }
+  fieldsForCurrentUser: function (currentUser, locales, user, userFields) {
+    if (!user) { return {} }
     return app.formatFields(
-      storage('user'),
+      user,
       userFields,
       setting('selectedFields') ? JSON.parse(setting('selectedFields')) : ['##builtin_tags', '##builtin_details', '##builtin_notes'],
-      storage('user').user_fields,
+      user.user_fields,
       currentUser,
       locales
     )
   },
 
-  fieldsForCurrentOrg: function (currentUser, locales, organizationFields) {
-    if (!storage('user') || !storage('user').organization) { return {} }
+  fieldsForCurrentOrg: function (currentUser, locales, user, organizationFields) {
+    if (!user || !user.organization) { return {} }
     return app.formatFields(
-      storage('user').organization,
+      user.organization,
       organizationFields,
       setting('orgFields') ? JSON.parse(setting('orgFields')) : [],
-      storage('user').organization.organization_fields,
+      user.organization.organization_fields,
       currentUser,
       locales
     )
@@ -367,22 +380,23 @@ const app = {
 
     }).then(([currentUser, requester, ticketId, locales, userFields, organizationFields, requesterCounters, organizationCounters]) => {
       return Promise.all([
+        app.getUser(),
         app.makeTicketsLinks('requester', requesterCounters),
         app.makeTicketsLinks('requester', organizationCounters)
-      ]).then(([requesterCounterLinks, organizationCounterLinks]) => {
-        return [currentUser, requester, ticketId, locales, userFields, organizationFields, requesterCounterLinks, organizationCounterLinks]
+      ]).then(([user, requesterCounterLinks, organizationCounterLinks]) => {
+        return [currentUser, requester, ticketId, locales, user, userFields, organizationFields, requesterCounterLinks, organizationCounterLinks]
       })
 
-    }).then(([currentUser, requester, ticketId, locales, userFields, organizationFields, requesterCounterLinks, organizationCounterLinks]) => {
+    }).then(([currentUser, requester, ticketId, locales, user, userFields, organizationFields, requesterCounterLinks, organizationCounterLinks]) => {
       const view = renderDisplay({
         ticketId: ticketId,
         isAdmin: currentUser.role === 'admin',
-        user: storage('user'),
+        user: user,
         tickets: requesterCounterLinks,
-        fields: app.fieldsForCurrentUser(currentUser, locales, userFields),
-        orgFields: app.fieldsForCurrentOrg(currentUser, locales, organizationFields),
-        orgFieldsActivated: storage('user') && setting('orgFieldsActivated') && storage('user').organization,
-        org: storage('user') && storage('user').organization,
+        fields: app.fieldsForCurrentUser(currentUser, locales, user, userFields),
+        orgFields: app.fieldsForCurrentOrg(currentUser, locales, user, organizationFields),
+        orgFieldsActivated: user && setting('orgFieldsActivated') && user.organization,
+        org: user && user.organization,
         orgTickets: organizationCounterLinks
       })
 
@@ -489,13 +503,16 @@ const app = {
   },
 
   onNotesOrDetailsChanged: debounce(function (e) {
-    return eClient.get('ticket.requester').then((requester) => {
+    return Promise.all([
+      eClient.get('ticket.requester'),
+      app.getUser()
+    ]).then(([requester, user]) => {
       const $textarea = $(e.currentTarget)
       const $textareas = $textarea.parent().parent().find('[data-editable =true] textarea')
       const type = $textarea.data('fieldType')
       const typeSingular = type.slice(0, -1)
       const data = {}
-      const id = type === 'organizations' ? storage('user').organization.id : requester.id
+      const id = type === 'organizations' ? user.organization.id : requester.id
 
       // Build the data object, with the valid resource name and data
       data[typeSingular] = {}
@@ -611,7 +628,10 @@ const app = {
     const userFields = storage('userFields')
     if (userFields !== undefined) return Promise.resolve(userFields)
 
-    return ajax('getUserFields').then((data) => {
+    return Promise.all([
+      ajax('getUserFields'),
+      app.getUser()
+    ]).then(([data, user]) => {
       const fields = [
         {
           key: '##builtin_tags',
@@ -633,7 +653,7 @@ const app = {
           description: '',
           position: Number.MAX_SAFE_INTEGER - 1,
           active: true,
-          editable: app.isUserEditable()
+          editable: app.isUserEditable(user)
         },
         {
           key: '##builtin_notes',
@@ -641,7 +661,7 @@ const app = {
           description: '',
           position: Number.MAX_SAFE_INTEGER,
           active: true,
-          editable: app.isUserEditable()
+          editable: app.isUserEditable(user)
         }
       ].concat(data.user_fields)
 
