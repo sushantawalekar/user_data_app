@@ -26,8 +26,6 @@ const MINUTES_TO_MILLISECONDS = 60000
 
 const app = {
   init: function () {
-    storage('ticketsCounters', {})
-    storage('orgTicketsCounters', {})
     storage('user', null)
 
     app.getInformation().then(() => {
@@ -95,15 +93,9 @@ const app = {
       promises.push(user)
       storage('user', user)
 
-      if (data.user.organization_id) {
-        promises.push(app.getTickets('organization', data.user.organization_id))
-      }
-
       if (ticketId) {
         promises.push(app.getTicketAudits())
       }
-
-      promises.push(app.getTickets('requester', user.id))
 
       return Promise.all(promises)
     })
@@ -174,13 +166,16 @@ const app = {
     })
   },
 
-  getTickets: function (type, id) {
+  getTicketsCounters: function (type, id) {
     const TYPES = {
       requester: { ajax: 'getTickets', storage: 'ticketsCounters' },
       organization: { ajax: 'getOrganizationTickets', storage: 'orgTicketsCounters' }
     }
 
-    if (!TYPES[type]) throw new Error('no such type defined.')
+    if (!TYPES[type]) Promise.reject(new Error('No such type defined'))
+
+    const cache = storage(TYPES[type].storage)
+    if (cache !== undefined) return Promise.resolve(cache)
 
     // First use search to decide what to do
     return ajax('searchTickets', `${type}:${id}`).then((data) => {
@@ -335,23 +330,37 @@ const app = {
 
   showDisplay: function () {
     return Promise.all([
-      eClient.get(['currentUser', 'ticket.requester', 'ticket.id']),
+      eClient.get(['currentUser', 'ticket.requester', 'ticket.id', 'ticket.organization.id']),
       app.getLocales(),
       app.getUserFields(),
-      app.getOrganizationFields(),
-      app.makeTicketsLinks('requester', storage('ticketsCounters')),
-      app.makeTicketsLinks('organization', storage('orgTicketsCounters'))
-    ]).then(([[currentUser, requester, ticketId], locales, userFields, organizationFields, requesterCounters, orgCounters]) => {
+      app.getOrganizationFields()
+    ]).then(([[currentUser, requester, ticketId, ticketOrganizationId], locales, userFields, organizationFields]) => {
+      return Promise.all([
+        app.getTicketsCounters('requester', requester.id),
+        app.getTicketsCounters('organization', ticketOrganizationId)
+      ]).then(([requesterCounters, organizationCounters]) => {
+        return [currentUser, requester, ticketId, locales, userFields, organizationFields, requesterCounters, organizationCounters]
+      })
+
+    }).then(([currentUser, requester, ticketId, locales, userFields, organizationFields, requesterCounters, organizationCounters]) => {
+      return Promise.all([
+        app.makeTicketsLinks('requester', requesterCounters),
+        app.makeTicketsLinks('requester', organizationCounters)
+      ]).then(([requesterCounterLinks, organizationCounterLinks]) => {
+        return [currentUser, requester, ticketId, locales, userFields, organizationFields, requesterCounterLinks, organizationCounterLinks]
+      })
+
+    }).then(([currentUser, requester, ticketId, locales, userFields, organizationFields, requesterCounterLinks, organizationCounterLinks]) => {
       const view = renderDisplay({
         ticketId: ticketId,
         isAdmin: currentUser.role === 'admin',
         user: storage('user'),
-        tickets: requesterCounters,
+        tickets: requesterCounterLinks,
         fields: app.fieldsForCurrentUser(currentUser, locales, userFields),
         orgFields: app.fieldsForCurrentOrg(currentUser, locales, organizationFields),
         orgFieldsActivated: storage('user') && setting('orgFieldsActivated') && storage('user').organization,
         org: storage('user') && storage('user').organization,
-        orgTickets: orgCounters
+        orgTickets: organizationCounterLinks
       })
 
       $('[data-main]').html(view)
