@@ -29,7 +29,6 @@ const app = {
     storage('ticketsCounters', {})
     storage('orgTicketsCounters', {})
     storage('user', null)
-    storage('locales', null)
     storage('organizationFields', null)
     storage('userFields', null)
 
@@ -72,7 +71,6 @@ const app = {
         promises.push(getCustomRolesPromise)
       }
 
-      promises.push(app.getLocales())
       promises.push(ajax('getOrganizationFields').then(app.onGetOrganizationFieldsDone))
 
       // We need to make sure all promiss are done, because they set certain storage values.
@@ -160,7 +158,6 @@ const app = {
         return [locale.locale, locale.name]
       }))
 
-      storage('locales', locales)
       return locales
     })
   },
@@ -302,25 +299,25 @@ const app = {
     }))
   },
 
-  fieldsForCurrentUser: function () {
+  fieldsForCurrentUser: function (locales) {
     if (!storage('user')) { return {} }
     return app.formatFields(
       storage('user'),
       storage('userFields'),
       setting('selectedFields') ? JSON.parse(setting('selectedFields')) : ['##builtin_tags', '##builtin_details', '##builtin_notes'],
       storage('user').user_fields,
-      storage('locales')
+      locales
     )
   },
 
-  fieldsForCurrentOrg: function () {
+  fieldsForCurrentOrg: function (locales) {
     if (!storage('user') || !storage('user').organization) { return {} }
     return app.formatFields(
       storage('user').organization,
       storage('organizationFields'),
       setting('orgFields') ? JSON.parse(setting('orgFields')) : [],
       storage('user').organization.organization_fields,
-      storage('locales')
+      locales
     )
   },
 
@@ -347,28 +344,32 @@ const app = {
   },
 
   showDisplay: function () {
-    const currentUser = storage('currentUser')
-    const view = renderDisplay({
-      ticketId: storage('ticketId'),
-      isAdmin: currentUser.role === 'admin',
-      user: storage('user'),
-      tickets: app.makeTicketsLinks('requester', storage('ticketsCounters')),
-      fields: app.fieldsForCurrentUser(),
-      orgFields: app.fieldsForCurrentOrg(),
-      orgFieldsActivated: storage('user') && setting('orgFieldsActivated') && storage('user').organization,
-      org: storage('user') && storage('user').organization,
-      orgTickets: app.makeTicketsLinks('organization', storage('orgTicketsCounters'))
+    return Promise.all([
+      eClient.get('currentUser'),
+      app.getLocales()
+    ]).then(([currentUser, locales]) => {
+      const view = renderDisplay({
+        ticketId: storage('ticketId'),
+        isAdmin: currentUser.role === 'admin',
+        user: storage('user'),
+        tickets: app.makeTicketsLinks('requester', storage('ticketsCounters')),
+        fields: app.fieldsForCurrentUser(locales),
+        orgFields: app.fieldsForCurrentOrg(locales),
+        orgFieldsActivated: storage('user') && setting('orgFieldsActivated') && storage('user').organization,
+        org: storage('user') && storage('user').organization,
+        orgTickets: app.makeTicketsLinks('organization', storage('orgTicketsCounters'))
+      })
+
+      $('[data-main]').html(view)
+      appResize()
+
+      if (storage('spokeData')) {
+        app.displaySpoke()
+      }
+      if (localStorage('expanded')) {
+        app.onClickExpandBar({}, true)
+      }
     })
-
-    $('[data-main]').html(view)
-    appResize()
-
-    if (storage('spokeData')) {
-      app.displaySpoke()
-    }
-    if (localStorage('expanded')) {
-      app.onClickExpandBar({}, true)
-    }
   },
 
   makeTicketsLinks: function (type, counters = {}) {
