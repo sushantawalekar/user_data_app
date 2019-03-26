@@ -45,12 +45,11 @@ const app = {
   },
 
   getInformation: function () {
-    return eClient.get(['ticket.requester', 'ticket.id', 'ticket.organization', 'currentUser', 'currentUser.organizations']).then((data) => {
-      const [ requester, ticketId, ticketOrg, currentUser, currentUserOrganizations ] = data
+    return eClient.get(['ticket.requester', 'ticket.id', 'currentUser', 'currentUser.organizations']).then((data) => {
+      const [ requester, ticketId, currentUser, currentUserOrganizations ] = data
       currentUser.organizations = currentUserOrganizations
       const promises = []
 
-      storage('ticketOrg', ticketOrg)
       storage('orgEditable.general', currentUser.role === 'admin')
       storage('orgEditable.notes', true)
 
@@ -59,7 +58,7 @@ const app = {
       if (!requester) return Promise.reject(new Error('no requester'))
 
       promises.push(ajax('getUserFields'))
-      promises.push(app.getUserInformation(ticketOrg))
+      promises.push(app.getUserInformation())
 
       // If not admin or agent
       let getCustomRolesPromise
@@ -79,12 +78,12 @@ const app = {
     })
   },
 
-  getUserInformation: function (ticketOrg) {
-    return eClient.get(['ticket.requester', 'ticket.id']).then(([requester, ticketId]) => {
+  getUserInformation: function () {
+    return eClient.get(['ticket.requester', 'ticket.id', 'ticket.organization']).then(([requester, ticketId, ticketOrganization]) => {
       return ajax('getUser', requester.id).then((userData) => {
-        return [requester, ticketId, userData]
+        return [requester, ticketId, ticketOrganization, userData]
       })
-    }).then(([requester, ticketId, data]) => {
+    }).then(([requester, ticketId, ticketOrganization, data]) => {
       const promises = []
       const user = data.user
 
@@ -100,9 +99,9 @@ const app = {
       })
 
       user.organization = data.organizations[0]
-      if (ticketOrg) {
+      if (ticketOrganization) {
         user.organization = find(data.organizations, function (org) {
-          return org.id === ticketOrg.id
+          return org.id === ticketOrganization.id
         })
       }
       promises.push(user)
@@ -380,16 +379,15 @@ const app = {
 
   makeTicketsLinks: function (type, counters = {}) {
     return Promise.all([
-      eClient.get(['ticket.requester', 'ticket.id'])
-    ]).then(([[requester, ticketId]]) => {
+      eClient.get(['ticket.requester', 'ticket.id', 'ticket.organization.id'])
+    ]).then(([[requester, ticketId, ticketOrganizationId]]) => {
       const requesterId = requester.id
-      const orgId = storage('ticketOrg') && storage('ticketOrg').id
 
       const origin = parseQueryString().origin
       const base = `${origin}/agent`
 
       const user = (ticketId) ? `tickets/${ticketId}/requester/requested_tickets` : `users/${requesterId}/requested_tickets`
-      const org = (ticketId) ? `tickets/${ticketId}/organization/tickets` : `organizations/${orgId}/tickets`
+      const org = (ticketId) ? `tickets/${ticketId}/organization/tickets` : `organizations/${ticketOrganizationId}/tickets`
 
       const links = Object.keys(counters).reduce((memo, status) => {
         const value = counters[status]
