@@ -12,6 +12,7 @@ function handleClientError (error) {
 const _cache = {}
 const tools = {
   unqiue: function (obj) {
+    if (typeof obj === 'string') return obj
     return Object.keys(obj).map((key) => {
       const value = obj[key]
       return (typeof value === 'object') ? tools.unqiue(value) : `${key}:${value}`

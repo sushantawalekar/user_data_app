@@ -1,4 +1,4 @@
-import { ajax, urlify, appResize, localStorage, storage, setting, parseNum, parseQueryString } from './lib/helpers'
+import { ajax, urlify, appResize, localStorage, render, storage, setting, parseNum, parseQueryString, promiseTrain } from './lib/helpers'
 import I18n from './lib/i18n'
 import eClient from './lib/extended_client'
 
@@ -26,51 +26,17 @@ const MINUTES_TO_MILLISECONDS = 60000
 
 const app = {
   init: function () {
-    app.getInformation().then(() => {
+    return eClient.get('ticket.requester').then((requester) => {
+      if (!requester) {
+        render(renderNoRequester)
+        appResize()
+        return
+      }
       app.showDisplay()
     }).catch((err) => {
       console.error(err)
-      const view = (err.message === 'no requester') ? renderNoRequester() : errorMessage({ msg: err.message })
-      $('[data-main]').html(view)
+      render(errorMessage, { msg: err.message })
       appResize()
-    })
-  },
-
-  getInformation: function () {
-    return eClient.get(['ticket.requester', 'ticket.id', 'currentUser', 'currentUser.organizations']).then((data) => {
-      const [ requester, ticketId, currentUser, currentUserOrganizations ] = data
-      currentUser.organizations = currentUserOrganizations
-      const promises = []
-
-      I18n.loadTranslations(currentUser.locale)
-
-      if (!requester) return Promise.reject(new Error('no requester'))
-
-      promises.push(app.getUserInformation())
-
-      // If not admin or agent
-      let getCustomRolesPromise
-      if (['admin', 'agent'].indexOf(currentUser.role) === -1) {
-        getCustomRolesPromise = app.getCustomRoles()
-        promises.push(getCustomRolesPromise)
-      }
-
-      return Promise.all(promises)
-    })
-  },
-
-  getUserInformation: function () {
-    return eClient.get(['ticket.requester', 'ticket.id', 'ticket.organization']).then(([requester, ticketId, ticketOrganization]) => {
-      return ajax('getUser', requester.id).then((userData) => {
-        return [requester, ticketId, ticketOrganization, userData]
-      })
-    }).then(([requester, ticketId, ticketOrganization, data]) => {
-      const promises = []
-      const user = data.user
-
-      promises.push(user)
-
-      return Promise.all(promises)
     })
   },
 
@@ -78,11 +44,14 @@ const app = {
     const user = storage('user')
     if (user !== undefined) return Promise.resolve(user)
 
-    return eClient.get(['ticket.requester', 'ticket.organization']).then(([requester, ticketOrganization]) => {
-      return ajax('getUser', requester.id).then((data) => {
-        return [requester, ticketOrganization, data]
-      })
-    }).then(([requester, ticketOrganization, data]) => {
+    return promiseTrain([
+      eClient.get(['ticket.requester', 'ticket.organization'])
+
+    ]).then(([train, [requester]]) => {
+      return train([
+        ajax('getUser', requester.id)
+      ])
+    }).then(([train, [requester, ticketOrganization], data]) => {
       const user = data.user
 
       user.identities = data.identities.filter(function (ident) {
@@ -183,7 +152,7 @@ const app = {
 
   getTicketAudits: function () {
     return eClient.get('ticket.id').then((ticketId) => {
-      return ajax('getTicketAudits', ticketId)
+      return ticketId ? ajax('getTicketAudits', ticketId) : { audits: { audits: [] } }
     }).then((data) => {
       let spokeData
 
@@ -228,7 +197,7 @@ const app = {
         return app.getTicketsThroughSearch(`${type}:${id}`)
       }
     }).then((data) => {
-      const res = app.fillEmptyStatuses( app.processTicketData(data) )
+      const res = app.fillEmptyStatuses(app.processTicketData(data))
       storage(TYPES[type].storage, res)
       return res
     })
@@ -333,13 +302,13 @@ const app = {
     )
   },
 
-  fieldsForCurrentOrg: function (currentUser, locales, user, organizationFields) {
-    if (!user || !user.organization) { return {} }
+  fieldsForCurrentOrg: function (currentUser, locales, organization, organizationFields) {
+    if (!organization) { return {} }
     return app.formatFields(
-      user.organization,
+      organization,
       organizationFields,
       setting('orgFields') ? JSON.parse(setting('orgFields')) : [],
-      user.organization.organization_fields,
+      organization.organizationFields,
       currentUser,
       locales
     )
@@ -365,37 +334,31 @@ const app = {
   },
 
   showDisplay: function () {
-    return Promise.all([
-      eClient.get(['currentUser', 'ticket.requester', 'ticket.id', 'ticket.organization.id']),
-      app.getLocales(),
-      app.getUserFields(),
-      app.getOrganizationFields()
-    ]).then(([[currentUser, requester, ticketId, ticketOrganizationId], locales, userFields, organizationFields]) => {
-      return Promise.all([
-        app.getTicketsCounters('requester', requester.id),
-        app.getTicketsCounters('organization', ticketOrganizationId)
-      ]).then(([requesterCounters, organizationCounters]) => {
-        return [currentUser, requester, ticketId, locales, userFields, organizationFields, requesterCounters, organizationCounters]
-      })
-
-    }).then(([currentUser, requester, ticketId, locales, userFields, organizationFields, requesterCounters, organizationCounters]) => {
-      return Promise.all([
+    return promiseTrain([
+      eClient.get(['ticket.requester', 'ticket.organization', 'currentUser', 'ticket.id'])
+    ]).then(([train, [requester, ticketOrganization]]) => {
+      return train([
+        requester && app.getTicketsCounters('requester', requester.id),
+        ticketOrganization && app.getTicketsCounters('organization', ticketOrganization.id)
+      ])
+    }).then(([train, _, requesterCounters, organizationCounters]) => {
+      return train([
         app.getUser(),
+        app.getLocales(),
+        app.getUserFields(),
+        app.getOrganizationFields(),
         app.makeTicketsLinks('requester', requesterCounters),
-        app.makeTicketsLinks('requester', organizationCounters)
-      ]).then(([user, requesterCounterLinks, organizationCounterLinks]) => {
-        return [currentUser, requester, ticketId, locales, user, userFields, organizationFields, requesterCounterLinks, organizationCounterLinks]
-      })
-
-    }).then(([currentUser, requester, ticketId, locales, user, userFields, organizationFields, requesterCounterLinks, organizationCounterLinks]) => {
+        app.makeTicketsLinks('organization', organizationCounters)
+      ])
+    }).then(([train, [requester, ticketOrganization, currentUser, ticketId], requesterCounters, organizationCounters, user, locales, userFields, organizationFields, requesterCounterLinks, organizationCounterLinks]) => {
       const view = renderDisplay({
         ticketId: ticketId,
         isAdmin: currentUser.role === 'admin',
         user: user,
         tickets: requesterCounterLinks,
         fields: app.fieldsForCurrentUser(currentUser, locales, user, userFields),
-        orgFields: app.fieldsForCurrentOrg(currentUser, locales, user, organizationFields),
-        orgFieldsActivated: user && setting('orgFieldsActivated') && user.organization,
+        orgFields: app.fieldsForCurrentOrg(currentUser, locales, ticketOrganization, organizationFields),
+        orgFieldsActivated: ticketOrganization && setting('orgFieldsActivated'),
         org: user && user.organization,
         orgTickets: organizationCounterLinks
       })
@@ -413,15 +376,15 @@ const app = {
 
   makeTicketsLinks: function (type, counters = {}) {
     return Promise.all([
-      eClient.get(['ticket.requester', 'ticket.id', 'ticket.organization.id'])
-    ]).then(([[requester, ticketId, ticketOrganizationId]]) => {
-      const requesterId = requester.id
+      eClient.get(['ticket.requester', 'ticket.id', 'ticket.organization'])
+    ]).then(([[requester, ticketId, ticketOrganization]]) => {
+      if (!ticketId || !ticketOrganization) return {}
 
       const origin = parseQueryString().origin
       const base = `${origin}/agent`
 
-      const user = (ticketId) ? `tickets/${ticketId}/requester/requested_tickets` : `users/${requesterId}/requested_tickets`
-      const org = (ticketId) ? `tickets/${ticketId}/organization/tickets` : `organizations/${ticketOrganizationId}/tickets`
+      const user = (ticketId) ? `tickets/${ticketId}/requester/requested_tickets` : `users/${requester.id}/requested_tickets`
+      const org = (ticketId) ? `tickets/${ticketId}/organization/tickets` : `organizations/${ticketOrganization.id}/tickets`
 
       const links = Object.keys(counters).reduce((memo, status) => {
         const value = counters[status]

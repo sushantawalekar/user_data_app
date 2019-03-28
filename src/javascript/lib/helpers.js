@@ -99,9 +99,13 @@ export function urlify (message, hostname) {
   }, message)
 }
 
-export function appResize (height = 0) {
-  let newHeight = height || Math.max(document.body.offsetHeight, 86)
-  eClient.invoke('resize', { height: newHeight })
+export function appResize (height, width) {
+  return Promise.resolve().then(() => {
+    if (width) return eClient.invoke('resize', { width })
+  }).then(() => {
+    let newHeight = height || Math.max(document.body.offsetHeight, 50)
+    eClient.invoke('resize', { height: newHeight })
+  })
 }
 
 export function templatingLoop (set, getTemplate) {
@@ -314,4 +318,17 @@ export function parseQueryString (search = document.location.search) {
     obj[key] = value
     return obj
   }, {})
+}
+
+export function promiseTrain (promiseOrArray) {
+  const _cache = []
+  return train(promiseOrArray)
+
+  function train (promiseOrArray = []) {
+    const promiseArray = Array.isArray(promiseOrArray) ? promiseOrArray : [ promiseOrArray ]
+    return Promise.all(promiseArray).then((dataArray) => {
+      _cache.push(...dataArray)
+      return [].concat(train, _cache)
+    })
+  }
 }
