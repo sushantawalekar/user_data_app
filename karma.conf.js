@@ -13,7 +13,7 @@ module.exports = function (config) {
     files: [
       'https://assets.zendesk.com/apps/sdk/2.0/zaf_sdk.js',
       'spec/before.js',
-      'spec/*_spec.js'
+      'spec/*.spec.js'
     ],
 
     // allow cors for zaf_sdk.js
@@ -22,7 +22,7 @@ module.exports = function (config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'spec/**/*_spec.js': 'webpack'
+      'spec/**/*.spec.js': 'webpack'
     },
 
     webpack: webpackConfig,
