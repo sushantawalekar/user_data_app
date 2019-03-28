@@ -1,7 +1,7 @@
 /* eslint-env mocha */
 import * as helpers from '../src/javascript/lib/helpers'
 import requests from '../src/javascript/lib/requests'
-import client from '../src/javascript/lib/client'
+import client from '../src/javascript/lib/extended_client'
 import assert from 'assert'
 import sinon from 'sinon'
 
@@ -234,6 +234,59 @@ describe('Helpers', () => {
       const result = helpers.parseQueryString('?obj={"foo":"bar","num":123,"bool":true}')
       assert.deepStrictEqual(result, {
         obj: { foo: 'bar', num: 123, bool: true }
+      })
+    })
+  })
+
+  describe('#promiseTrain', () => {
+    function promise1 () {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(100)
+        }, 5)
+      })
+    }
+
+    function promise2 () {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(200)
+        }, 5)
+      })
+    }
+
+    it('takes a promise and resolve it with a train function as the first argument', (done) => {
+      helpers.promiseTrain(promise1()).then((data) => {
+        const train = data.shift()
+        assert.strictEqual(typeof train, 'function')
+        assert.deepStrictEqual(data, [ 100 ])
+        done()
+      })
+    })
+
+    it('takes an array of promises', (done) => {
+      helpers.promiseTrain([ promise1(), promise2() ]).then((data) => {
+        const train = data.shift()
+        assert.strictEqual(typeof train, 'function')
+        assert.deepStrictEqual(data, [ 100, 200 ])
+        done()
+      })
+    })
+
+    it('alwyas resolves with all arguments of all promises in the order they were added to the train', (done) => {
+      helpers.promiseTrain(promise1()).then((data) => {
+        const train = data.shift()
+        return train(promise2())
+      }).then((data) => {
+        const train = data.shift()
+        assert.strictEqual(typeof train, 'function')
+        assert.deepStrictEqual(data, [ 100, 200 ])
+        return train([ promise1(), promise2() ])
+      }).then((data) => {
+        const train = data.shift()
+        assert.strictEqual(typeof train, 'function')
+        assert.deepStrictEqual(data, [ 100, 200, 100, 200 ])
+        done()
       })
     })
   })
