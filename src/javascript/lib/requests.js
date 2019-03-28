@@ -36,9 +36,9 @@ export default {
     }
   },
 
-  getTickets: function (userId, page = 1) {
+  getTickets: function (userId) {
     return {
-      url: `/api/v2/users/${userId}/tickets/requested.json?page=${page}`,
+      url: `/api/v2/users/${userId}/tickets/requested.json`,
       cachable: true
     }
   },
