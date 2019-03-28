@@ -213,10 +213,22 @@ export function timeStringToSeconds (timeString, simple = false) {
   }
 }
 
-export function delegateEvent (eventName, selector, fn) {
+export function delegateEvents (events, instance) {
+  Object.keys(events).forEach((key) => {
+    delegateEvent(key, events[key], instance)
+  })
+}
+
+export function delegateEvent (eventString, fn, instance) {
+  const [ eventName, selector ] = eventString.split(/ (.*)/, 2)
+  if (typeof fn === 'string') fn = instance[fn]
+  if (typeof fn !== 'function') throw new Error(`Event: ${eventName} has no function`)
+  if (!selector) return eClient.on(eventName, fn.bind(instance))
+
   document.addEventListener(eventName, (event) => {
     const path = event.path || []
-    if (!event.path) {
+
+    if (!path.length) {
       let a = event.target
       while (a) {
         path.unshift(a)
@@ -224,20 +236,16 @@ export function delegateEvent (eventName, selector, fn) {
       }
     }
 
-    let elm
-    path.forEach((element) => {
+    const element = path.find((element) => {
       // Fix for IE11
       element.matches = element.matches || element.msMatchesSelector
-      if (!element.matches) return false
-
-      const e = element.matches(selector)
-      if (e) elm = e
+      return (element.matches) ? element.matches(selector) : false
     })
 
-    if (!elm) return
-    event.eventTarget = elm
+    if (!element) return
+    event.eventTarget = element
 
-    fn(event)
+    fn.call(instance, event)
   })
 }
 

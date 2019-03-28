@@ -1,7 +1,7 @@
 import I18n from './lib/i18n'
 import eClient from './lib/extended_client'
 
-import { ajax, urlify, appResize, localStorage, render, setting, parseNum, parseQueryString, promiseTrain } from './lib/helpers'
+import { ajax, urlify, delegateEvents, appResize, localStorage, render, setting, parseNum, parseQueryString, promiseTrain } from './lib/helpers'
 import apiHelpers from './lib/api_helpers'
 import TICKET_STATUSES from './lib/ticket_statuses'
 
@@ -43,6 +43,7 @@ const app = {
   },
 
   processTicketData: function (data) {
+    if (!data) return {}
     let res
 
     // If data.tickets it means it's a tickets repsonse
@@ -213,8 +214,6 @@ const app = {
     return Promise.all([
       eClient.get(['ticket.requester', 'ticket.id', 'ticket.organization'])
     ]).then(([[requester, ticketId, ticketOrganization]]) => {
-      if (!requester || !ticketOrganization) return {}
-
       const origin = parseQueryString().origin
       const base = `${origin}/agent`
 
@@ -245,12 +244,8 @@ const app = {
     })
   },
 
-  onRequesterEmailChanged: function (email) {
-    return eClient.get('ticket.requester').then((requester) => {
-      if (email && requester.email !== email) {
-        app.init()
-      }
-    })
+  onRequesterEmailChanged: function () {
+    app.init()
   },
 
   onClickExpandBar: function (event, immediate) {
@@ -362,14 +357,17 @@ const app = {
   }
 }
 
-$(document).on('click', 'a.expand_bar', app.onClickExpandBar)
-$(document).on('click', '.cog', app.onCogClick)
-$(document).on('change keyup input paste', '.notes-or-details', app.onNotesOrDetailsChanged)
-$(document).on('change', '.org_fields_activate', app.onActivateOrgFieldsChange)
-$(document).on('click', '.back', app.onBackClick)
-$(document).on('click', '.save', app.onSaveClick)
-$(document).on('mouseup', 'textarea', debounce(appResize, 300))
-$(document).on('click', '.card.user .counts a, .card.user .contacts .name a', (event) => app.goToTab(event, 'requester'))
-$(document).on('click', '.card.org .counts a, .card.user .contacts .organization a, .card.org .contacts .name a', (event) => app.goToTab(event, 'organization'))
+delegateEvents({
+  'ticket.requester.email.changed': 'onRequesterEmailChanged',
+  'click a.expand_bar': 'onClickExpandBar',
+  'click .cog': 'onCogClick',
+  'change keyup input paste .notes-or-details': 'onNotesOrDetailsChanged',
+  'change .org_fields_activate': 'onActivateOrgFieldsChange',
+  'click .back': 'onBackClick',
+  'click .save': 'onSaveClick',
+  'mouseup textarea': debounce(appResize, 300),
+  'click .card.user .counts a, .card.user .contacts .name a': (event) => app.goToTab(event, 'requester'),
+  'click .card.org .counts a, .card.user .contacts .organization a, .card.org .contacts .name a': (event) => app.goToTab(event, 'organization')
+}, app)
 
 export default app

@@ -31,5 +31,3 @@ eClient.on('app.registered', function (context) {
     app.init()
   })
 })
-
-eClient.on('ticket.requester.email.changed', app.onRequesterEmailChanged)
