@@ -1,6 +1,9 @@
-import { ajax, urlify, appResize, localStorage, render, storage, setting, parseNum, parseQueryString, promiseTrain } from './lib/helpers'
 import I18n from './lib/i18n'
 import eClient from './lib/extended_client'
+
+import { ajax, urlify, appResize, localStorage, render, setting, parseNum, parseQueryString, promiseTrain } from './lib/helpers'
+import apiHelpers from './lib/api_helpers'
+import TICKET_STATUSES from './lib/ticket_statuses'
 
 import renderAdmin from '../templates/admin.hdbs'
 import renderDisplay from '../templates/display.hdbs'
@@ -19,9 +22,8 @@ import 'jquery/src/dimensions'
 import 'jquery/src/css'
 import 'jquery/src/data'
 
-import { debounce, filter, map, find, reduce, includes, sortBy, each, compact, groupBy, fromPairs, isEmpty } from 'lodash'
+import { debounce, map, find, reduce, compact, groupBy, fromPairs } from 'lodash'
 
-const TICKET_STATUSES = ['new', 'open', 'solved', 'pending', 'hold', 'closed']
 const MINUTES_TO_MILLISECONDS = 60000
 
 const app = {
@@ -29,185 +31,15 @@ const app = {
     return eClient.get('ticket.requester').then((requester) => {
       if (!requester) {
         render(renderNoRequester)
-        appResize()
-        return
+        return appResize()
       }
-      app.showDisplay()
+
+      return app.showDisplay()
     }).catch((err) => {
       console.error(err)
       render(errorMessage, { msg: err.message })
       appResize()
     })
-  },
-
-  getUser: function () {
-    const user = storage('user')
-    if (user !== undefined) return Promise.resolve(user)
-
-    return promiseTrain([
-      eClient.get(['ticket.requester', 'ticket.organization'])
-
-    ]).then(([train, [requester]]) => {
-      return train([
-        ajax('getUser', requester.id)
-      ])
-    }).then(([train, [requester, ticketOrganization], data]) => {
-      const user = data.user
-
-      user.identities = data.identities.filter(function (ident) {
-        return includes(['twitter', 'facebook'], ident.type)
-      }).map(function (ident) {
-        if (ident.type === 'twitter') {
-          ident.value = `https://twitter.com/${ident.value}`
-        } else if (ident.type === 'facebook') {
-          ident.value = `https://facebook.com/${ident.value}`
-        }
-        return ident
-      })
-
-      user.organization = data.organizations[0]
-      if (ticketOrganization) {
-        user.organization = find(data.organizations, function (org) {
-          return org.id === ticketOrganization.id
-        })
-      }
-
-      storage('user', user)
-      return user
-    })
-  },
-
-  getCustomRoles: function () {
-    return Promise.all([
-      ajax('getCustomRoles'),
-      eClient.get('currentUser'),
-      app.getOrganizationFields()
-    ]).then(([data, currentUser, organizationFields]) => {
-      const roles = data.custom_roles
-
-      const role = find(roles, (role) => {
-        return role.id === currentUser.role
-      })
-
-      each(organizationFields, (field) => {
-        if (field.key === '##builtin_tags') {
-        } else if (field.key === '##builtin_notes') {
-          field.editable = role.configuration.organization_notes_editing
-        } else {
-          field.editable = role.configuration.organization_editing
-        }
-      })
-
-      return data
-    })
-  },
-
-  isUserEditable: function (user) {
-    return user.abilities && user.abilities.can_edit
-  },
-
-  isOrganizationEditable: function () {
-    return eClient.get('currentUser.role').then((currentUserRole) => {
-      if (currentUserRole === 'admin') return true
-
-      if (['admin', 'agent'].indexOf(currentUserRole) === -1) {
-        return app.getCustomRoles().then(({roles}) => {
-          const role = find(roles, (role) => {
-            return role.id === currentUserRole
-          })
-
-          return role && role.configuration.organization_editing
-        })
-      }
-
-      return false
-    })
-  },
-
-  isOrganizationNotesEditable: function () {
-    return eClient.get('currentUser.role').then((currentUserRole) => {
-      if (['admin', 'agent'].indexOf(currentUserRole) === -1) {
-        return app.getCustomRoles().then(({roles}) => {
-          const role = find(roles, (role) => {
-            return role.id === currentUserRole
-          })
-
-          return role && role.configuration.organization_notes_editing
-        })
-      }
-
-      return true
-    })
-  },
-
-  getLocales: function () {
-    return ajax('getLocales').then((data) => {
-      const locales = fromPairs(map(data.locales, function (locale) {
-        return [locale.locale, locale.name]
-      }))
-
-      return locales
-    })
-  },
-
-  getTicketAudits: function () {
-    return eClient.get('ticket.id').then((ticketId) => {
-      return ticketId ? ajax('getTicketAudits', ticketId) : { audits: { audits: [] } }
-    }).then((data) => {
-      let spokeData
-
-      each(data.audits.audits, (audit) => {
-        each(audit.events, (e) => {
-          if (app.auditEventIsSpoke(e)) {
-            spokeData = app.spokeData(e)
-          }
-        })
-      })
-
-      return {
-        audits: data.audits,
-        spokeData
-      }
-    })
-  },
-
-  getTicketsCounters: function (type, id) {
-    const TYPES = {
-      requester: { ajax: 'getTickets', storage: 'ticketsCounters' },
-      organization: { ajax: 'getOrganizationTickets', storage: 'orgTicketsCounters' }
-    }
-
-    if (!TYPES[type]) Promise.reject(new Error('No such type defined'))
-
-    const cache = storage(TYPES[type].storage)
-    if (cache !== undefined) return Promise.resolve(cache)
-
-    // First use search to decide what to do
-    return ajax('searchTickets', `${type}:${id}`).then((data) => {
-      if (data.count === 1) {
-        // If only 1 result, we already have that result, and trick processTicketData
-        // into thinking we got the data from tickets response
-        data.tickets = data.results
-        return data
-      } else if (data.count <= 100) {
-        // If we only needed 1 requests
-        return ajax(TYPES[type].ajax, id)
-      } else {
-        // If we need more requests
-        return app.getTicketsThroughSearch(`${type}:${id}`)
-      }
-    }).then((data) => {
-      const res = app.fillEmptyStatuses(app.processTicketData(data))
-      storage(TYPES[type].storage, res)
-      return res
-    })
-  },
-
-  getTicketsThroughSearch: function (searchTerm) {
-    const promises = TICKET_STATUSES.map((status) => {
-      return ajax('searchTickets', `${searchTerm} status:${status}`)
-    })
-    return Promise.all(promises)
   },
 
   processTicketData: function (data) {
@@ -338,15 +170,18 @@ const app = {
       eClient.get(['ticket.requester', 'ticket.organization', 'currentUser', 'ticket.id'])
     ]).then(([train, [requester, ticketOrganization]]) => {
       return train([
-        requester && app.getTicketsCounters('requester', requester.id),
-        ticketOrganization && app.getTicketsCounters('organization', ticketOrganization.id)
+        requester && apiHelpers.getTicketsCounters('requester', requester.id),
+        ticketOrganization && apiHelpers.getTicketsCounters('organization', ticketOrganization.id)
       ])
     }).then(([train, _, requesterCounters, organizationCounters]) => {
+      requesterCounters = app.fillEmptyStatuses(app.processTicketData(requesterCounters))
+      organizationCounters = app.fillEmptyStatuses(app.processTicketData(organizationCounters))
+
       return train([
-        app.getUser(),
-        app.getLocales(),
-        app.getUserFields(),
-        app.getOrganizationFields(),
+        apiHelpers.getUser(),
+        apiHelpers.getLocales(),
+        apiHelpers.getUserFields(),
+        apiHelpers.getOrganizationFields(),
         app.makeTicketsLinks('requester', requesterCounters),
         app.makeTicketsLinks('organization', organizationCounters)
       ])
@@ -378,7 +213,7 @@ const app = {
     return Promise.all([
       eClient.get(['ticket.requester', 'ticket.id', 'ticket.organization'])
     ]).then(([[requester, ticketId, ticketOrganization]]) => {
-      if (!ticketId || !ticketOrganization) return {}
+      if (!requester || !ticketOrganization) return {}
 
       const origin = parseQueryString().origin
       const base = `${origin}/agent`
@@ -431,8 +266,8 @@ const app = {
 
   onCogClick: function () {
     return Promise.all([
-      app.getOrganizationFields(),
-      app.getUserFields()
+      apiHelpers.getOrganizationFields(),
+      apiHelpers.getUserFields()
     ]).then(([organizationFields, userFields]) => {
       const html = renderAdmin({
         fields: userFields,
@@ -468,7 +303,7 @@ const app = {
   onNotesOrDetailsChanged: debounce(function (e) {
     return Promise.all([
       eClient.get('ticket.requester'),
-      app.getUser()
+      apiHelpers.getUser()
     ]).then(([requester, user]) => {
       const $textarea = $(e.currentTarget)
       const $textareas = $textarea.parent().parent().find('[data-editable =true] textarea')
@@ -501,155 +336,12 @@ const app = {
   },
 
   displaySpoke: function () {
-    app.getTicketAudits().then(({spokeData}) => {
+    apiHelpers.getTicketAudits().then(({spokeData}) => {
       if (!spokeData) return
 
       const html = renderSpoke(spokeData)
       $('.spoke').html(html)
       appResize()
-    })
-  },
-
-  auditEventIsSpoke: function (event) {
-    return event.type === 'Comment' && /spoke_id_/.test(event.body)
-  },
-
-  spokeData: function (event) {
-    const data = /spoke_id_(.*) *\n *spoke_account_(.*) *\n *requester_email_(.*) *\n *requester_phone_(.*)/.exec(event.body)
-
-    if (isEmpty(data)) {
-      return false
-    }
-
-    return {
-      id: data[1].trim(),
-      account: data[2].trim(),
-      email: data[3].trim(),
-      phone: data[4].trim()
-    }
-  },
-
-  getOrganizationFields: function () {
-    const organizationFields = storage('organizationFields')
-    if (organizationFields !== undefined) return Promise.resolve(organizationFields)
-
-    return Promise.all([
-      ajax('getOrganizationFields'),
-      app.isOrganizationEditable(),
-      app.isOrganizationNotesEditable()
-    ]).then(([data, isOrganizationEditable, isOrganizationNotesEditable]) => {
-      const fields = [
-        {
-          key: '##builtin_tags',
-          title: I18n.t('tags'),
-          description: '',
-          position: 0,
-          active: true
-        },
-        {
-          key: '##builtin_details',
-          title: I18n.t('details'),
-          description: '',
-          position: Number.MAX_SAFE_INTEGER - 1,
-          active: true,
-          editable: isOrganizationEditable
-        },
-        {
-          key: '##builtin_notes',
-          title: I18n.t('notes'),
-          description: '',
-          position: Number.MAX_SAFE_INTEGER,
-          active: true,
-          editable: isOrganizationNotesEditable
-        }
-      ].concat(data.organization_fields)
-
-      const activeFields = filter(fields, function (field) {
-        return field.active
-      })
-
-      const restrictedFields = map(activeFields, (field) => {
-        return {
-          key: field.key,
-          title: field.title,
-          description: field.description,
-          custom_field_options: field.custom_field_options,
-          position: field.position,
-          selected: includes(setting('orgFields') ? JSON.parse(setting('orgFields')) : [], field.key),
-          editable: field.editable,
-          type: field.type
-        }
-      })
-
-      const organizationFields = sortBy(restrictedFields, 'position')
-      storage('organizationFields', organizationFields)
-      return organizationFields
-    })
-  },
-
-  getUserFields: function () {
-    const userFields = storage('userFields')
-    if (userFields !== undefined) return Promise.resolve(userFields)
-
-    return Promise.all([
-      ajax('getUserFields'),
-      app.getUser()
-    ]).then(([data, user]) => {
-      const fields = [
-        {
-          key: '##builtin_tags',
-          title: I18n.t('tags'),
-          description: '',
-          position: 0,
-          active: true
-        },
-        {
-          key: '##builtin_locale',
-          title: I18n.t('locale'),
-          description: '',
-          position: 1,
-          active: true
-        },
-        {
-          key: '##builtin_details',
-          title: I18n.t('details'),
-          description: '',
-          position: Number.MAX_SAFE_INTEGER - 1,
-          active: true,
-          editable: app.isUserEditable(user)
-        },
-        {
-          key: '##builtin_notes',
-          title: I18n.t('notes'),
-          description: '',
-          position: Number.MAX_SAFE_INTEGER,
-          active: true,
-          editable: app.isUserEditable(user)
-        }
-      ].concat(data.user_fields)
-
-      const activeFields = filter(fields, function (field) {
-        return field.active
-      })
-
-      const restrictedFields = map(activeFields, (field) => {
-        return {
-          key: field.key,
-          title: field.title,
-          description: field.description,
-          position: field.position,
-          selected: includes(setting('selectedFields')
-            ? JSON.parse(setting('selectedFields'))
-            : ['##builtin_tags', '##builtin_details', '##builtin_notes'], field.key),
-          editable: field.editable,
-          type: field.type,
-          custom_field_options: field.custom_field_options
-        }
-      })
-
-      const userFields = sortBy(restrictedFields, 'position')
-      storage('userFields', userFields)
-      return userFields
     })
   },
 
