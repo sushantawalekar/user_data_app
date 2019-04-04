@@ -67,6 +67,9 @@ eClient.get = function (stringOrArray) {
 }
 
 eClient.request = function (obj) {
+  // duplicate the object, because we are deleting cachable
+  obj = JSON.parse(JSON.stringify(obj))
+
   const cached = !!obj.cachable
   delete obj.cachable
   const cacheName = tools.unqiue(obj)

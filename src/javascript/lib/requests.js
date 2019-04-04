@@ -45,7 +45,8 @@ export default {
 
   searchTickets: function (searchTerm = '') {
     return {
-      url: `/api/v2/search.json?query=type:ticket ${searchTerm}&per_page=1`
+      url: `/api/v2/search.json?query=type:ticket ${searchTerm}&per_page=1`,
+      cachable: true
     }
   },
 
