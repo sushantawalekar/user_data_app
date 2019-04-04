@@ -197,7 +197,7 @@ describe('App', () => {
         return Promise.resolve([{id: 100}, {id: 200}, {}, 50])
       })
 
-      sandbox.stub(apiHelpers, 'getTicketsCounters').callsFake(() => {
+      sandbox.stub(apiHelpers, 'getTicketCounters').callsFake(() => {
         return Promise.resolve({tickets: {new: 23}})
       })
 
