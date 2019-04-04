@@ -1,1 +1,1 @@
-export default ['new', 'open', 'solved', 'pending', 'hold', 'closed']
+export default ['new', 'open', 'pending', 'hold', 'solved', 'closed']

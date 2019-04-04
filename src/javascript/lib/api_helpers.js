@@ -3,7 +3,7 @@ import I18n from './i18n'
 import { ajax, setting, promiseTrain } from './helpers'
 import TICKET_STATUSES from './ticket_statuses'
 
-import { includes, find, filter, map, sortBy, fromPairs, each, isEmpty } from 'lodash'
+import { includes, find, filter, map, sortBy, fromPairs, each, isEmpty, groupBy, reduce } from 'lodash'
 
 const apiHelpers = {
   getUser: function () {
@@ -74,7 +74,7 @@ const apiHelpers = {
     })
   },
 
-  getTicketsCounters: function (type, id) {
+  getTicketCounters: function (type, id) {
     const TYPES = {
       requester: 'getTickets',
       organization: 'getOrganizationTickets'
@@ -84,20 +84,46 @@ const apiHelpers = {
 
     // First use search to decide what to do
     return ajax('searchTickets', `${type}:${id}`).then((data) => {
+      // A) If only 1 result, we already have that, so return it
       if (data.count === 1) {
-        // If only 1 result, we already have that result, and trick processTicketData
-        // into thinking we got the data from tickets response
-        data.tickets = data.results
         return data
+
+      // B) If we only needed 1 requests
       } else if (data.count <= 100) {
-        // If we only needed 1 requests
         return ajax(TYPES[type], id)
+
+      // C) If we need more requests
       } else {
-        // If we need more requests
         return apiHelpers.getTicketsThroughSearch(`${type}:${id}`)
       }
     }).then((data) => {
-      return data
+      let counters = {}
+
+      // C) If data is an array, it's a `getTicketsThroughSearch` response
+      if (Array.isArray(data)) {
+        counters = TICKET_STATUSES.reduce((memo, status, i) => {
+          memo[status] = data[i].count
+          return memo
+        }, {})
+
+      // B) If data.tickets it means it's a api/v2/tickets response
+      } else if (data.tickets) {
+        const grouped = groupBy(data.tickets, 'status')
+        counters = fromPairs(map(grouped, (value, key) => {
+          return [key, value.length]
+        }))
+
+      // A) Else it was a single search response, with 1 ticket
+      } else {
+        const status = data.results[0].status
+        counters = {}
+        counters[status] = data.count // should always be 1
+      }
+
+      return reduce(TICKET_STATUSES, function (memo, status) {
+        memo[status] = memo[status] || 0
+        return memo
+      }, counters)
     })
   },
 

@@ -3,7 +3,6 @@ import eClient from './lib/extended_client'
 
 import { ajax, urlify, delegateEvents, appResize, localStorage, render, setting, parseNum, parseQueryString, promiseTrain } from './lib/helpers'
 import apiHelpers from './lib/api_helpers'
-import TICKET_STATUSES from './lib/ticket_statuses'
 
 import renderAdmin from '../templates/admin.hdbs'
 import renderDisplay from '../templates/display.hdbs'
@@ -22,7 +21,7 @@ import 'jquery/src/dimensions'
 import 'jquery/src/css'
 import 'jquery/src/data'
 
-import { debounce, map, find, reduce, compact, groupBy, fromPairs } from 'lodash'
+import { debounce, map, find, reduce, compact } from 'lodash'
 
 const MINUTES_TO_MILLISECONDS = 60000
 
@@ -40,28 +39,6 @@ const app = {
       render(errorMessage, { msg: err.message })
       appResize()
     })
-  },
-
-  processTicketData: function (data) {
-    if (!data) return {}
-    let res
-
-    // If data.tickets it means it's a tickets repsonse
-    if (data.tickets) {
-      const grouped = groupBy(data.tickets, 'status')
-      res = fromPairs(map(grouped, (value, key) => {
-        return [key, parseNum(value.length)]
-      }))
-
-    // Else it's a search response
-    } else {
-      res = TICKET_STATUSES.reduce((memo, status, i) => {
-        memo[status] = parseNum(data[i].count)
-        return memo
-      }, {})
-    }
-
-    return res
   },
 
   formatFields: function (target, fields, selected, values, currentUser, locales) {
@@ -147,11 +124,12 @@ const app = {
     )
   },
 
-  fillEmptyStatuses: function (list) {
-    return reduce(TICKET_STATUSES, function (memo, status) {
-      memo[status] = list[status] ? list[status] : '-'
+  // Converts numbers into strings for all counters. 1000 => 1k, 0 => '-', 122332 => 123k, etc
+  parseNumbers: function (counters) {
+    return reduce(counters, function (memo, status) {
+      memo[status] = counters[status] ? parseNum(counters[status]) : '-'
       return memo
-    }, {})
+    }, counters)
   },
 
   couldHideField: function (field) {
@@ -171,20 +149,17 @@ const app = {
       eClient.get(['ticket.requester', 'ticket.organization', 'currentUser', 'ticket.id'])
     ]).then(([train, [requester, ticketOrganization]]) => {
       return train([
-        requester && apiHelpers.getTicketsCounters('requester', requester.id),
-        ticketOrganization && apiHelpers.getTicketsCounters('organization', ticketOrganization.id)
+        requester && apiHelpers.getTicketCounters('requester', requester.id),
+        ticketOrganization && apiHelpers.getTicketCounters('organization', ticketOrganization.id)
       ])
     }).then(([train, _, requesterCounters, organizationCounters]) => {
-      requesterCounters = app.fillEmptyStatuses(app.processTicketData(requesterCounters))
-      organizationCounters = app.fillEmptyStatuses(app.processTicketData(organizationCounters))
-
       return train([
         apiHelpers.getUser(),
         apiHelpers.getLocales(),
         apiHelpers.getUserFields(),
         apiHelpers.getOrganizationFields(),
-        app.makeTicketsLinks('requester', requesterCounters),
-        app.makeTicketsLinks('organization', organizationCounters)
+        app.makeTicketsLinks('requester', app.parseNumbers(requesterCounters)),
+        app.makeTicketsLinks('organization', app.parseNumbers(organizationCounters))
       ])
     }).then(([train, [requester, ticketOrganization, currentUser, ticketId], requesterCounters, organizationCounters, user, locales, userFields, organizationFields, requesterCounterLinks, organizationCounterLinks]) => {
       const view = renderDisplay({
