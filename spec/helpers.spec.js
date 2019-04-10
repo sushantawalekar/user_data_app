@@ -238,54 +238,38 @@ describe('Helpers', () => {
     })
   })
 
-  describe('#promiseTrain', () => {
-    function promise1 () {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(100)
-        }, 5)
-      })
-    }
-
-    function promise2 () {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(200)
-        }, 5)
-      })
-    }
-
-    it('takes a promise and resolve it with a train function as the first argument', (done) => {
-      helpers.promiseTrain(promise1()).then((data) => {
-        const train = data.shift()
-        assert.strictEqual(typeof train, 'function')
+  describe('#promiseChain', () => {
+    it('takes a promise and resolve it with a chain function as the first argument', (done) => {
+      helpers.promiseChain(Promise.resolve(100)).then((data) => {
+        const chain = data.shift()
+        assert.strictEqual(typeof chain, 'function')
         assert.deepStrictEqual(data, [ 100 ])
         done()
       })
     })
 
     it('takes an array of promises', (done) => {
-      helpers.promiseTrain([ promise1(), promise2() ]).then((data) => {
-        const train = data.shift()
-        assert.strictEqual(typeof train, 'function')
+      helpers.promiseChain([ Promise.resolve(100), Promise.resolve(200) ]).then((data) => {
+        const chain = data.shift()
+        assert.strictEqual(typeof chain, 'function')
         assert.deepStrictEqual(data, [ 100, 200 ])
         done()
       })
     })
 
-    it('alwyas resolves with all arguments of all promises in the order they were added to the train', (done) => {
-      helpers.promiseTrain(promise1()).then((data) => {
-        const train = data.shift()
-        return train(promise2())
+    it('alwyas resolves with all arguments of all promises in the order they were added to the chain', (done) => {
+      helpers.promiseChain(Promise.resolve(100)).then((data) => {
+        const chain = data.shift()
+        return chain(Promise.resolve(200))
       }).then((data) => {
-        const train = data.shift()
-        assert.strictEqual(typeof train, 'function')
+        const chain = data.shift()
+        assert.strictEqual(typeof chain, 'function')
         assert.deepStrictEqual(data, [ 100, 200 ])
-        return train([ promise1(), promise2() ])
+        return chain([ Promise.resolve(300), Promise.resolve(400) ])
       }).then((data) => {
-        const train = data.shift()
-        assert.strictEqual(typeof train, 'function')
-        assert.deepStrictEqual(data, [ 100, 200, 100, 200 ])
+        const chain = data.shift()
+        assert.strictEqual(typeof chain, 'function')
+        assert.deepStrictEqual(data, [ 100, 200, 300, 400 ])
         done()
       })
     })

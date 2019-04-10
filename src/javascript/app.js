@@ -1,7 +1,7 @@
 import I18n from './lib/i18n'
 import eClient from './lib/extended_client'
 
-import { ajax, urlify, delegateEvents, appResize, localStorage, render, setting, parseNum, parseQueryString, promiseTrain } from './lib/helpers'
+import { ajax, urlify, delegateEvents, appResize, localStorage, render, setting, parseNum, parseQueryString, promiseChain } from './lib/helpers'
 import apiHelpers from './lib/api_helpers'
 
 import renderAdmin from '../templates/admin.hdbs'
@@ -145,15 +145,15 @@ const app = {
   },
 
   showDisplay: function () {
-    return promiseTrain([
+    return promiseChain([
       eClient.get(['ticket.requester', 'ticket.organization', 'currentUser', 'ticket.id'])
-    ]).then(([train, [requester, ticketOrganization]]) => {
-      return train([
+    ]).then(([chain, [requester, ticketOrganization]]) => {
+      return chain([
         requester && apiHelpers.getTicketCounters('requester', requester.id),
         ticketOrganization && apiHelpers.getTicketCounters('organization', ticketOrganization.id)
       ])
-    }).then(([train, _, requesterCounters, organizationCounters]) => {
-      return train([
+    }).then(([chain, _, requesterCounters, organizationCounters]) => {
+      return chain([
         apiHelpers.getUser(),
         apiHelpers.getLocales(),
         apiHelpers.getUserFields(),
@@ -161,7 +161,7 @@ const app = {
         app.makeTicketsLinks('requester', app.parseNumbers(requesterCounters)),
         app.makeTicketsLinks('organization', app.parseNumbers(organizationCounters))
       ])
-    }).then(([train, [requester, ticketOrganization, currentUser, ticketId], requesterCounters, organizationCounters, user, locales, userFields, organizationFields, requesterCounterLinks, organizationCounterLinks]) => {
+    }).then(([chain, [requester, ticketOrganization, currentUser, ticketId], requesterCounters, organizationCounters, user, locales, userFields, organizationFields, requesterCounterLinks, organizationCounterLinks]) => {
       const view = renderDisplay({
         ticketId: ticketId,
         isAdmin: currentUser.role === 'admin',

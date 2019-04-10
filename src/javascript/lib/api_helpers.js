@@ -1,20 +1,20 @@
 import eClient from './extended_client'
 import I18n from './i18n'
-import { ajax, setting, promiseTrain } from './helpers'
+import { ajax, setting, promiseChain } from './helpers'
 import TICKET_STATUSES from './ticket_statuses'
 
 import { includes, find, filter, map, sortBy, fromPairs, each, isEmpty, groupBy, reduce } from 'lodash'
 
 const apiHelpers = {
   getUser: function () {
-    return promiseTrain([
+    return promiseChain([
       eClient.get(['ticket.requester', 'ticket.organization'])
 
-    ]).then(([train, [requester]]) => {
-      return train([
+    ]).then(([chain, [requester]]) => {
+      return chain([
         ajax('getUser', requester.id)
       ])
-    }).then(([train, [requester, ticketOrganization], data]) => {
+    }).then(([chain, [requester, ticketOrganization], data]) => {
       const user = data.user
 
       user.identities = data.identities.filter(function (ident) {

@@ -328,15 +328,15 @@ export function parseQueryString (search = document.location.search) {
   }, {})
 }
 
-export function promiseTrain (promiseOrArray) {
+export function promiseChain (promiseOrArray) {
   const _cache = []
-  return train(promiseOrArray)
+  return chain(promiseOrArray)
 
-  function train (promiseOrArray = []) {
+  function chain (promiseOrArray = []) {
     const promiseArray = Array.isArray(promiseOrArray) ? promiseOrArray : [ promiseOrArray ]
     return Promise.all(promiseArray).then((dataArray) => {
       _cache.push(...dataArray)
-      return [].concat(train, _cache)
+      return [].concat(chain, _cache)
     })
   }
 }
