@@ -280,7 +280,7 @@ const app = {
       const type = $textarea.data('fieldType')
       const typeSingular = type.slice(0, -1)
       const data = {}
-      const id = type === 'organizations' ? user.organization.id : requester.id
+      const id = (type === 'organizations') ? user.organization.id : requester.id
 
       // Build the data object, with the valid resource name and data
       data[typeSingular] = {}
