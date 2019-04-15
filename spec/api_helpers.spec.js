@@ -22,7 +22,7 @@ describe('Api Helpers', () => {
       sandbox.stub(apiHelpers, 'isOrganizationNotesEditable').callsFake(() => Promise.resolve(true))
     })
 
-    it('it combines the standard fields with the ajax "getOrganizationFields" requests', (done) => {
+    it('combines the standard fields with the ajax "getOrganizationFields" requests', (done) => {
       apiHelpers.getOrganizationFields().then((fields) => {
         assert.strictEqual(fields.length, 4)
         done()

@@ -170,11 +170,10 @@ const apiHelpers = {
 
   getTicketAudits: function () {
     return eClient.get('ticket.id').then((ticketId) => {
-      return ticketId ? ajax('getTicketAudits', ticketId) : { audits: { audits: [] } }
+      return ticketId ? ajax('getTicketAudits', ticketId) : { audits: [] }
     }).then((data) => {
       let sd
-
-      each(data.audits.audits, (audit) => {
+      each(data.audits, (audit) => {
         each(audit.events, (e) => {
           if (apiHelpers.auditEventIsSpoke(e)) {
             sd = apiHelpers.spokeData(e)

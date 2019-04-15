@@ -185,6 +185,7 @@ describe('App', () => {
 
   describe('link actions', () => {
     let invokeSpy
+    const WAIT_FOR_CLICK_EVENT_TIME = 5
 
     beforeEach((done) => {
       document.body.innerHTML = ('<section data-main></section>')
@@ -233,7 +234,7 @@ describe('App', () => {
       setTimeout(() => {
         assert(invokeSpy.withArgs('routeTo', 'nav_bar', '', sinon.match('requester/requested_tickets')).called)
         done()
-      }, 5)
+      }, WAIT_FOR_CLICK_EVENT_TIME)
     })
 
     it('routes to the requester when clicked on the ticket numbers', (done) => {
@@ -241,7 +242,7 @@ describe('App', () => {
       setTimeout(() => {
         assert(invokeSpy.withArgs('routeTo', 'nav_bar', '', sinon.match('requester/requested_tickets')).called)
         done()
-      }, 5)
+      }, WAIT_FOR_CLICK_EVENT_TIME)
     })
 
     it('routes to the organization when clicked on the name', (done) => {
@@ -249,7 +250,7 @@ describe('App', () => {
       setTimeout(() => {
         assert(invokeSpy.withArgs('routeTo', 'nav_bar', '', sinon.match('organization/tickets')).called)
         done()
-      }, 5)
+      }, WAIT_FOR_CLICK_EVENT_TIME)
     })
 
     it('routes to the organization when clicked on the ticket numbers', (done) => {
@@ -257,7 +258,7 @@ describe('App', () => {
       setTimeout(() => {
         assert(invokeSpy.withArgs('routeTo', 'nav_bar', '', sinon.match('organization/tickets')).called)
         done()
-      }, 5)
+      }, WAIT_FOR_CLICK_EVENT_TIME)
     })
   })
 })
