@@ -1,5 +1,5 @@
 import requests from './requests'
-import client from './client'
+import eClient from './extended_client'
 
 const MAX_PAGES = 10
 
@@ -9,7 +9,7 @@ export function ajax (...args) {
   const obj = typeof funcOrObj === 'function' ? funcOrObj.apply(window, args) : funcOrObj
   if (!obj) return Promise.reject(new Error(`no such request: "${funcName}"`))
   if (!obj.url) return Promise.resolve()
-  return client.request(obj)
+  return eClient.request(obj)
 }
 
 /**
@@ -32,7 +32,7 @@ export function ajaxPaging (...args) {
         lastNextPage = data.next_page
         pages++
 
-        client.request({
+        eClient.request({
           url: data.next_page
         }).then(done).catch(fail)
       } else {
@@ -50,7 +50,7 @@ export function ajaxPaging (...args) {
 
         lastNextPage = null
 
-        client.request({
+        eClient.request({
           url: nextPage
         }).then(done).catch(fail)
       } else {
@@ -99,9 +99,13 @@ export function urlify (message, hostname) {
   }, message)
 }
 
-export function appResize (height = 0) {
-  let newHeight = height || Math.max(document.body.offsetHeight, 86)
-  client.invoke('resize', { height: newHeight })
+export function appResize (height, width) {
+  return Promise.resolve().then(() => {
+    if (width) return eClient.invoke('resize', { width })
+  }).then(() => {
+    let newHeight = height || Math.max(document.body.offsetHeight, 50)
+    eClient.invoke('resize', { height: newHeight })
+  })
 }
 
 export function templatingLoop (set, getTemplate) {
@@ -209,10 +213,22 @@ export function timeStringToSeconds (timeString, simple = false) {
   }
 }
 
-export function delegateEvent (eventName, selector, fn) {
+export function delegateEvents (events, instance) {
+  Object.keys(events).forEach((key) => {
+    delegateEvent(key, events[key], instance)
+  })
+}
+
+export function delegateEvent (eventString, fn, instance) {
+  const [ eventName, selector ] = eventString.split(/ (.*)/, 2)
+  if (typeof fn === 'string') fn = instance[fn]
+  if (typeof fn !== 'function') throw new Error(`Event: ${eventName} has no function`)
+  if (!selector) return eClient.on(eventName, fn.bind(instance))
+
   document.addEventListener(eventName, (event) => {
     const path = event.path || []
-    if (!event.path) {
+
+    if (!path.length) {
       let a = event.target
       while (a) {
         path.unshift(a)
@@ -220,20 +236,16 @@ export function delegateEvent (eventName, selector, fn) {
       }
     }
 
-    let elm
-    path.forEach((element) => {
+    const element = path.find((element) => {
       // Fix for IE11
       element.matches = element.matches || element.msMatchesSelector
-      if (!element.matches) return false
-
-      const e = element.matches(selector)
-      if (e) elm = e
+      return (element.matches) ? element.matches(selector) : false
     })
 
-    if (!elm) return
-    event.eventTarget = elm
+    if (!element) return
+    event.eventTarget = element
 
-    fn(event)
+    fn.call(instance, event)
   })
 }
 
@@ -275,12 +287,12 @@ export function setMainClass (name) {
 }
 
 export function createModal () {
-  return client.invoke('instances.create', {
+  return eClient.invoke('instances.create', {
     location: 'modal',
     url: 'assets/modal.html'
   }).then((modalContext) => {
     const instanceGuid = modalContext['instances.create'][0].instanceGuid
-    const modalClient = client.instance(instanceGuid)
+    const modalClient = eClient.instance(instanceGuid)
 
     return new Promise((resolve) => {
       modalClient.on('model.done', () => {
@@ -314,4 +326,17 @@ export function parseQueryString (search = document.location.search) {
     obj[key] = value
     return obj
   }, {})
+}
+
+export function promiseChain (promiseOrArray) {
+  const _cache = []
+  return chain(promiseOrArray)
+
+  function chain (promiseOrArray = []) {
+    const promiseArray = Array.isArray(promiseOrArray) ? promiseOrArray : [ promiseOrArray ]
+    return Promise.all(promiseArray).then((dataArray) => {
+      _cache.push(...dataArray)
+      return [].concat(chain, _cache)
+    })
+  }
 }

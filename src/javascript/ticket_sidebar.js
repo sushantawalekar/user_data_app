@@ -1,15 +1,18 @@
 import app from './app'
-import client from './lib/client'
+import eClient from './lib/extended_client'
+import I18n from './lib/i18n'
 import { storage, setting } from './lib/helpers'
 
-client.on('app.registered', function (context) {
-  const installationId = context.metadata.installationId
+eClient.on('app.registered', function (context) {
+  const { appId, installationId } = context.metadata
+  storage('appId', appId)
   storage('installationId', installationId)
 
-  client.get('currentUser').then((currentUser) => {
+  eClient.get('currentUser').then((currentUser) => {
+    I18n.loadTranslations(currentUser.locale)
     return currentUser.role === 'admin'
   }).then((isAdmin) => {
-    return (isAdmin) ? client.request(`/api/v2/apps/installations/${installationId}.json`) : Promise.reject(new Error('not an agent'))
+    return (isAdmin) ? eClient.request(`/api/v2/apps/installations/${installationId}.json`) : Promise.reject(new Error('not an agent'))
   }).then((data) => {
     return data.settings
   }).catch(() => {
@@ -24,8 +27,7 @@ client.on('app.registered', function (context) {
 
       setting(key, value)
     })
+
     app.init()
   })
 })
-
-client.on('ticket.requester.email.changed', app.onRequesterEmailChanged)

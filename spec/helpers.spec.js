@@ -1,7 +1,7 @@
 /* eslint-env mocha */
 import * as helpers from '../src/javascript/lib/helpers'
 import requests from '../src/javascript/lib/requests'
-import client from '../src/javascript/lib/client'
+import client from '../src/javascript/lib/extended_client'
 import assert from 'assert'
 import sinon from 'sinon'
 
@@ -234,6 +234,43 @@ describe('Helpers', () => {
       const result = helpers.parseQueryString('?obj={"foo":"bar","num":123,"bool":true}')
       assert.deepStrictEqual(result, {
         obj: { foo: 'bar', num: 123, bool: true }
+      })
+    })
+  })
+
+  describe('#promiseChain', () => {
+    it('takes a promise and resolve it with a chain function as the first argument', (done) => {
+      helpers.promiseChain(Promise.resolve(100)).then((data) => {
+        const chain = data.shift()
+        assert.strictEqual(typeof chain, 'function')
+        assert.deepStrictEqual(data, [ 100 ])
+        done()
+      })
+    })
+
+    it('takes an array of promises', (done) => {
+      helpers.promiseChain([ Promise.resolve(100), Promise.resolve(200) ]).then((data) => {
+        const chain = data.shift()
+        assert.strictEqual(typeof chain, 'function')
+        assert.deepStrictEqual(data, [ 100, 200 ])
+        done()
+      })
+    })
+
+    it('alwyas resolves with all arguments of all promises in the order they were added to the chain', (done) => {
+      helpers.promiseChain(Promise.resolve(100)).then((data) => {
+        const chain = data.shift()
+        return chain(Promise.resolve(200))
+      }).then((data) => {
+        const chain = data.shift()
+        assert.strictEqual(typeof chain, 'function')
+        assert.deepStrictEqual(data, [ 100, 200 ])
+        return chain([ Promise.resolve(300), Promise.resolve(400) ])
+      }).then((data) => {
+        const chain = data.shift()
+        assert.strictEqual(typeof chain, 'function')
+        assert.deepStrictEqual(data, [ 100, 200, 300, 400 ])
+        done()
       })
     })
   })

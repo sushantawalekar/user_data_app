@@ -1,5 +1,3 @@
-<div class="admin" style="display: none"></div>
-
-<div class="no_requester">
+<div class="c-callout c-callout--info">
   {{t "no_requester"}}
 </div>
