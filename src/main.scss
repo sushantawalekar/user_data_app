@@ -3,6 +3,8 @@
 @import '~@zendeskgarden/css-forms';
 @import '~@zendeskgarden/css-buttons';
 @import '~@zendeskgarden/css-callouts';
+@import '~@zendeskgarden/css-tooltips';
+@import '~@zendeskgarden/css-arrows';
 
 html, body {
   overflow: hidden;
@@ -168,6 +170,7 @@ html, body {
   }
 
   .card {
+    position: relative;
 
     &.org {
       border-top: 1px solid #E9EBED;
@@ -192,6 +195,22 @@ html, body {
           color: #68737D;
         }
       }
+    }
+
+    .email {
+      .copy-email {
+        cursor: pointer;
+      }
+
+      .copy-email:hover + .email-tooltip {
+        visibility: visible;
+      }
+    }
+
+    .email-tooltip {
+      visibility: hidden;
+      position: absolute;
+      right: 0px;
     }
 
     .social {

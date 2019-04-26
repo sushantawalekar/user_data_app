@@ -34,10 +34,13 @@
           {{/each}}
         </div>
       {{/if}}
-
+      <!-- TODO: change Copy email' -> "I18n.t('email.click_to_copy')", respectively -->
       <div class="contacts">
         <div class="name"><a href="{{tickets.user.href}}">{{user.name}}</a></div>
-        <div class="email">{{user.email}}</div>
+        <div class="email">
+          <span class="copy-email">{{user.email}}</span>
+          <span class="c-tooltip c-arrow c-arrow--l email-tooltip">Copy email</span>
+        </div>
         <div class="phone">{{user.phone}}</div>
         {{#if user.organization}}
           <div class="organization">
