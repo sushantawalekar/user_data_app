@@ -333,10 +333,10 @@ const app = {
 
   onEmailClick: function (event) {
     copyToClipboard(event.target.innerText)
-    // TODO: change 'Copied' & 'Copy email' -> "I18n.t('email.copied')" & "I18n.t('email.click_to_copy')", respectively
-    $('.email-tooltip').text('Copied')
+
+    $('.email-tooltip').text(I18n.t('email.copied'))
     setTimeout(() => {
-      $('.email-tooltip').text('Copy email')
+      $('.email-tooltip').text(I18n.t('email.click_to_copy'))
     }, 500)
   }
 }
@@ -344,7 +344,7 @@ const app = {
 delegateEvents({
   'ticket.requester.email.changed': 'onRequesterEmailChanged',
   'click .copy-email': 'onEmailClick',
-  'click a.expand_bar': 'onClickExpandBar',
+  'click .expand_bar': 'onClickExpandBar',
   'click .cog': 'onCogClick',
   'change keyup input paste .notes-or-details': 'onNotesOrDetailsChanged',
   'change .org_fields_activate': 'onActivateOrgFieldsChange',
