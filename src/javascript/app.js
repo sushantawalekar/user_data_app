@@ -225,12 +225,11 @@ const app = {
 
   onClickExpandBar: function (event, immediate) {
     const additional = $('.more-info')
-    const expandBar = $('.expand_bar i')
-    expandBar.attr('class', 'arrow')
+    const expandBar = $('.expand_bar svg')
     const visible = additional.is(':visible')
     additional.toggle(!visible, appResize)
     localStorage('expanded', !visible)
-    expandBar.addClass(visible ? 'arrow_down' : 'arrow_up')
+    expandBar.toggleClass('expanded')
     appResize()
   },
 
@@ -334,11 +333,11 @@ const app = {
 
 delegateEvents({
   'ticket.requester.email.changed': 'onRequesterEmailChanged',
-  'click a.expand_bar': 'onClickExpandBar',
+  'click .expand_bar': 'onClickExpandBar',
   'click .cog': 'onCogClick',
   'change keyup input paste .notes-or-details': 'onNotesOrDetailsChanged',
   'change .org_fields_activate': 'onActivateOrgFieldsChange',
-  'click .back': 'onBackClick',
+  'click .icon_circle_arrow_left': 'onBackClick',
   'click .save': 'onSaveClick',
   'mouseup textarea': debounce(appResize, 300),
   'click .card.user .counts a, .card.user .contacts .name a': (event) => app.goToTab(event, 'requester'),

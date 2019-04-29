@@ -65,15 +65,23 @@ html, body {
   }
 }
 
-i.icon_circle_arrow_left {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  line-height: 14px;
-  vertical-align: text-top;
-  background-image: url("images/glyphicons.png");
-  background-position: -264px -144px;
-  background-repeat: no-repeat;
+.icon_circle_arrow_left {
+  color: black;
+  cursor: pointer;
+
+  svg {
+    top: 2px;
+    float: right;
+    position: relative;
+    margin-right: 2px;
+    width: 12px;
+    height: 12px;
+    display: inline-block;
+
+    &:hover {
+      color: #68737D;
+    }
+  }
 }
 
 .ticket_status_label {
@@ -168,24 +176,28 @@ i.icon_circle_arrow_left {
     }
 
     .cog {
-      float: right;
-      position: relative;
-      top: 0px;
-      left: 0px;
-      width: 12px;
-      height: 12px;
-      display: inline-block;
-      background-image: url("images/ico-settings-normal.png");
+      color: black;
+      cursor: pointer;
 
-      &:hover {
-        background-image: url("images/ico-settings-hover.png");
+      svg {
+        float: right;
+        position: relative;
+        top: 2px;
+        left: 0px;
+        width: 16px;
+        height: 16px;
+        display: inline-block;
+
+        &:hover {
+          color: #68737D;
+        }
       }
     }
 
     .social {
       float: right;
       margin-top: 23px;
-      left: 12px;
+      margin-right: -12px;
 
       a {
         display: inline-block;
@@ -306,46 +318,23 @@ i.icon_circle_arrow_left {
 
   .expand_bar {
     cursor: pointer;
-    background-color: #fff;
     border-top: 1px solid #f0f0f0;
     padding: 0px;
     display: block;
     margin-top: 12px;
+    padding-top: 5px;
+    height: 18px;
 
-    .arrow {
-      margin-top: 12px;
-      height: 6px;
-      min-width: 11px;
-      display: block;
-      background-repeat: no-repeat;
-      background-position: center;
+    svg {
+      color: black;
 
-      &.arrow_down {
-        background-image: url("images/ico-arrow-down-normal.png");
-        &:hover {
-          background-image: url("images/ico-arrow-down-hover.png");
-        }
+      &.expanded {
+        transform: rotate(180deg);
       }
 
-      &.arrow_up {
-        background-image: url("images/ico-arrow-up-normal.png");
-        &:hover {
-          background-image: url("images/ico-arrow-up-hover.png");
-        }
+      &:hover {
+        stroke-width: 2;
       }
-    }
-
-    &:hover {
-      background-image: url("images/hover-bg.png");
-      background-repeat: no-repeat;
-      background-position: center top;
-    }
-
-    span {
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-      opacity: 0.4;
     }
   }
 }

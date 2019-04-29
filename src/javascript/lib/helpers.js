@@ -236,14 +236,18 @@ export function delegateEvent (eventString, fn, instance) {
       }
     }
 
-    const element = path.find((element) => {
+    let elm
+    path.forEach((element) => {
       // Fix for IE11
       element.matches = element.matches || element.msMatchesSelector
-      return (element.matches) ? element.matches(selector) : false
+      if (!element.matches) return false
+
+      const e = element.matches(selector)
+      if (e) elm = e
     })
 
-    if (!element) return
-    event.eventTarget = element
+    if (!elm) return
+    event.eventTarget = elm
 
     fn.call(instance, event)
   })
