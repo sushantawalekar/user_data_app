@@ -165,3 +165,13 @@ By enabling this app, You agree to the [Built by Zendesk Terms of Use](https://w
       key: "txt.apps.user_data_app.spoke_ticket_id"
       title: "this is the ticket ID from the spoke of that user"
       value: "Spoke ticket ID"
+  - translation:
+      key: "txt.apps.user_data_app.email.click_to_copy"
+      title: "Tooltip that asks user to click to copy the email to their clipboard"
+      value: "Copy email"
+      screenshot: "https://drive.google.com/open?id=11oU9H6NV09JINYllPa7aLOuLITOAMN9y"
+  - translation:
+      key: "txt.apps.user_data_app.email.copied"
+      title: "Tooltip message to indicate that email has been copied to clipboard"
+      value: "Copied"
+      screenshot: "https://drive.google.com/open?id=1rcqcoVVV1r_k2yACEpsfA3wXMRgeAvdy"
