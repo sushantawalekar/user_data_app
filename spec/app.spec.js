@@ -261,4 +261,28 @@ describe('App', () => {
       }, WAIT_FOR_CLICK_EVENT_TIME)
     })
   })
+
+  describe('#parseNumbers', () => {
+    it('parses the numbers', () => {
+      const numbers = app.parseNumbers({
+        new: 866,
+        open: 0,
+        pending: 1771,
+        hold: 12574,
+        solved: 132008,
+        closed: 2277424
+      })
+
+      const expected = {
+        new: '866',
+        open: '-',
+        pending: '1771',
+        hold: '12k',
+        solved: '132k',
+        closed: '2.2M'
+      }
+
+      assert.deepStrictEqual(numbers, expected)
+    })
+  })
 })
