@@ -39,31 +39,6 @@ const apiHelpers = {
     })
   },
 
-  getCustomRoles: function () {
-    return Promise.all([
-      ajax('getCustomRoles'),
-      eClient.get('currentUser'),
-      apiHelpers.getOrganizationFields()
-    ]).then(([data, currentUser, organizationFields]) => {
-      const roles = data.custom_roles
-
-      const role = find(roles, (role) => {
-        return role.id === currentUser.role
-      })
-
-      each(organizationFields, (field) => {
-        if (field.key === '##builtin_tags') {
-        } else if (field.key === '##builtin_notes') {
-          field.editable = role.configuration.organization_notes_editing
-        } else {
-          field.editable = role.configuration.organization_editing
-        }
-      })
-
-      return data
-    })
-  },
-
   getLocales: function () {
     return ajax('getLocales').then((data) => {
       const locales = fromPairs(map(data.locales, function (locale) {
@@ -139,7 +114,7 @@ const apiHelpers = {
       if (currentUserRole === 'admin') return true
 
       if (currentUserRole !== 'agent') {
-        return apiHelpers.getCustomRoles().then(({roles}) => {
+        return ajax('getCustomRoles').then(({custom_roles: roles}) => {
           const role = find(roles, (role) => {
             return role.id === currentUserRole
           })
@@ -155,7 +130,7 @@ const apiHelpers = {
   isOrganizationNotesEditable: function () {
     return eClient.get('currentUser.role').then((currentUserRole) => {
       if (['admin', 'agent'].indexOf(currentUserRole) === -1) {
-        return apiHelpers.getCustomRoles().then(({roles}) => {
+        return ajax('getCustomRoles').then(({custom_roles: roles}) => {
           const role = find(roles, (role) => {
             return role.id === currentUserRole
           })
