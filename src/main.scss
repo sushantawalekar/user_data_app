@@ -4,6 +4,9 @@
 @import '~@zendeskgarden/css-buttons';
 @import '~@zendeskgarden/css-callouts';
 
+$svg-default-color: #68737D;
+$svg-onhover-color: #D8DCDE;
+
 html, body {
   overflow: hidden;
   padding: 0 3px;
@@ -67,7 +70,7 @@ html, body {
 }
 
 .icon_circle_arrow_left {
-  color: #68737D;
+  color: $svg-default-color;
   cursor: pointer;
 
   svg {
@@ -80,7 +83,7 @@ html, body {
     display: inline-block;
 
     &:hover {
-      color: #D8DCDE;
+      color: $svg-onhover-color;
     }
   }
 }
@@ -177,7 +180,7 @@ html, body {
     }
 
     .cog {
-      color: #68737D;
+      color: $svg-default-color;
       cursor: pointer;
 
       svg {
@@ -190,7 +193,7 @@ html, body {
         display: inline-block;
 
         &:hover {
-          color: #D8DCDE;
+          color: $svg-onhover-color;
         }
       }
     }
@@ -253,7 +256,7 @@ html, body {
       margin-left: 34px;
 
       div {
-        color: #68737D;
+        color: $svg-default-color;
         font-size: 14px;
         word-wrap: break-word;
 
@@ -268,7 +271,7 @@ html, body {
 
         &.organization {
           a {
-            color: #68737D;
+            color: $svg-default-color;
           }
         }
 
@@ -291,7 +294,7 @@ html, body {
       li {
         display: inline-block;
         font-size: 12px;
-        color: #68737D;
+        color: $svg-default-color;
         line-height: 1.486;
 
         a {
@@ -327,7 +330,7 @@ html, body {
     height: 18px;
 
     svg {
-      color: #68737D;
+      color: $svg-default-color;
 
       &.expanded {
         transform: rotate(180deg);
@@ -335,7 +338,7 @@ html, body {
 
       &:hover {
         stroke-width: 2;
-        color: #D8DCDE
+        color: $svg-onhover-color;
       }
     }
   }
