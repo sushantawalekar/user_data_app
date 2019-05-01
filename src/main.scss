@@ -26,6 +26,7 @@ html, body {
 }
 
 .admin {
+  margin-top: 2px;
   margin-bottom: 15px;
 
   .c_chk {
@@ -66,7 +67,7 @@ html, body {
 }
 
 .icon_circle_arrow_left {
-  color: black;
+  color: #68737D;
   cursor: pointer;
 
   svg {
@@ -79,7 +80,7 @@ html, body {
     display: inline-block;
 
     &:hover {
-      color: #68737D;
+      color: #D8DCDE;
     }
   }
 }
@@ -176,7 +177,7 @@ html, body {
     }
 
     .cog {
-      color: black;
+      color: #68737D;
       cursor: pointer;
 
       svg {
@@ -189,7 +190,7 @@ html, body {
         display: inline-block;
 
         &:hover {
-          color: #68737D;
+          color: #D8DCDE;
         }
       }
     }
@@ -326,7 +327,7 @@ html, body {
     height: 18px;
 
     svg {
-      color: black;
+      color: #68737D;
 
       &.expanded {
         transform: rotate(180deg);
@@ -334,6 +335,7 @@ html, body {
 
       &:hover {
         stroke-width: 2;
+        color: #D8DCDE
       }
     }
   }
