@@ -126,8 +126,8 @@ const app = {
 
   // Converts numbers into strings for all counters. 1000 => 1k, 0 => '-', 122332 => 123k, etc
   parseNumbers: function (counters) {
-    return reduce(counters, function (memo, status) {
-      memo[status] = counters[status] ? parseNum(counters[status]) : '-'
+    return reduce(counters, function (memo, count, status) {
+      memo[status] = count ? parseNum(count) : '-'
       return memo
     }, counters)
   },
