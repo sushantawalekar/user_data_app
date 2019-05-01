@@ -138,7 +138,7 @@ const apiHelpers = {
     return eClient.get('currentUser.role').then((currentUserRole) => {
       if (currentUserRole === 'admin') return true
 
-      if (['admin', 'agent'].indexOf(currentUserRole) === -1) {
+      if (currentUserRole !== 'agent') {
         return apiHelpers.getCustomRoles().then(({roles}) => {
           const role = find(roles, (role) => {
             return role.id === currentUserRole
