@@ -10,6 +10,7 @@ import renderNoRequester from '../templates/no_requester.hdbs'
 import errorMessage from '../templates/error.hdbs'
 import renderSpoke from '../templates/spoke.hdbs'
 import renderTags from '../templates/tags.hdbs'
+import renderSpinner from '../templates/spinner.hdbs'
 
 import $ from 'jquery/src/core'
 import 'jquery/src/core/parseHTML'
@@ -27,6 +28,8 @@ const MINUTES_TO_MILLISECONDS = 60000
 
 const app = {
   init: function () {
+    render(renderSpinner())
+
     return eClient.get('ticket.requester').then((requester) => {
       if (!requester) {
         render(renderNoRequester())
