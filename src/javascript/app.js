@@ -41,7 +41,7 @@ const app = {
     })
   },
 
-  formatFields: function (target, fields, selected, values, currentUser, locales) {
+  formatFields: function (target, fields, selected, values = [], currentUser, locales) {
     return compact(map(selected, function (key) {
       const field = find(fields, function (field) {
         return field.key === key
