@@ -276,12 +276,8 @@ export function find (set, fn) {
   return el
 }
 
-let _renderAllowed = true
-export function render (template, dataObject = {}, moreRenderAllowed = true) {
-  if (!_renderAllowed) return
-  _renderAllowed = moreRenderAllowed
-
-  document.querySelector('[data-main]').innerHTML = template(dataObject)
+export function render (htmlString, selector = '[data-main]') {
+  document.querySelector(selector).innerHTML = htmlString
 }
 
 export function setMainClass (name) {

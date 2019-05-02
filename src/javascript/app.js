@@ -29,14 +29,14 @@ const app = {
   init: function () {
     return eClient.get('ticket.requester').then((requester) => {
       if (!requester) {
-        render(renderNoRequester)
+        render(renderNoRequester())
         return appResize()
       }
 
       return app.showDisplay()
     }).catch((err) => {
       console.error(err)
-      render(errorMessage, { msg: err.message })
+      render(errorMessage({ msg: err.message }))
       appResize()
     })
   },
@@ -174,7 +174,7 @@ const app = {
         orgTickets: organizationCounterLinks
       })
 
-      $('[data-main]').html(view)
+      render(view)
       appResize()
 
       app.displaySpoke()
@@ -245,7 +245,8 @@ const app = {
         orgFieldsActivated: setting('orgFieldsActivated'),
         hideEmptyFields: setting('hideEmptyFields')
       })
-      $('.admin').html(html).show()
+      render(html, '.admin')
+      $('.admin').show()
       $('.whole').hide()
       appResize()
     })
@@ -309,8 +310,7 @@ const app = {
     apiHelpers.getTicketAudits().then(({spokeData}) => {
       if (!spokeData) return
 
-      const html = renderSpoke(spokeData)
-      $('.spoke').html(html)
+      render(renderSpoke(spokeData), '.spoke')
       appResize()
     })
   },
