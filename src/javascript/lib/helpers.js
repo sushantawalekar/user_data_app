@@ -278,6 +278,7 @@ export function find (set, fn) {
 
 export function render (htmlString, selector = '[data-main]') {
   document.querySelector(selector).innerHTML = htmlString
+  appResize()
 }
 
 export function setMainClass (name) {

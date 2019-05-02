@@ -30,14 +30,13 @@ const app = {
     return eClient.get('ticket.requester').then((requester) => {
       if (!requester) {
         render(renderNoRequester())
-        return appResize()
+        return
       }
 
       return app.showDisplay()
     }).catch((err) => {
       console.error(err)
       render(errorMessage({ msg: err.message }))
-      appResize()
     })
   },
 
@@ -175,7 +174,6 @@ const app = {
       })
 
       render(view)
-      appResize()
 
       app.displaySpoke()
 
@@ -245,7 +243,9 @@ const app = {
         orgFieldsActivated: setting('orgFieldsActivated'),
         hideEmptyFields: setting('hideEmptyFields')
       })
+
       render(html, '.admin')
+
       $('.admin').show()
       $('.whole').hide()
       appResize()
@@ -311,7 +311,6 @@ const app = {
       if (!spokeData) return
 
       render(renderSpoke(spokeData), '.spoke')
-      appResize()
     })
   },
 
