@@ -191,9 +191,10 @@ const app = {
     ]).then(([[requester, ticketId, ticketOrganization]]) => {
       const origin = parseQueryString().origin
       const base = `${origin}/agent`
+      const ticketOrganizationId = ticketOrganization ? ticketOrganization.id : undefined
 
       const user = (ticketId) ? `tickets/${ticketId}/requester/requested_tickets` : `users/${requester.id}/requested_tickets`
-      const org = (ticketId) ? `tickets/${ticketId}/organization/tickets` : `organizations/${ticketOrganization.id}/tickets`
+      const org = (ticketId) ? `tickets/${ticketId}/organization/tickets` : `organizations/${ticketOrganizationId}/tickets`
 
       const links = Object.keys(counters).reduce((memo, status) => {
         const value = counters[status]
