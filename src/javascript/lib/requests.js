@@ -41,9 +41,9 @@ export default {
       url: `/api/v2/users/${userId}/tickets/requested.json`,
       cachable: true,
       data: {
-          exclude_count: true,
-          exclude_archived: true
-        }
+        exclude_count: true,
+        exclude_archived: true
+      }
     }
   },
 
