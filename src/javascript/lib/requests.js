@@ -39,7 +39,11 @@ export default {
   getTickets: function (userId) {
     return {
       url: `/api/v2/users/${userId}/tickets/requested.json`,
-      cachable: true
+      cachable: true,
+      data: {
+          exclude_count: true,
+          exclude_archived: true
+        }
     }
   },
 
