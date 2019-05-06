@@ -10,6 +10,7 @@ import renderNoRequester from '../templates/no_requester.hdbs'
 import errorMessage from '../templates/error.hdbs'
 import renderSpoke from '../templates/spoke.hdbs'
 import renderTags from '../templates/tags.hdbs'
+import renderSpinner from '../templates/spinner.hdbs'
 
 import $ from 'jquery/src/core'
 import 'jquery/src/core/parseHTML'
@@ -27,17 +28,18 @@ const MINUTES_TO_MILLISECONDS = 60000
 
 const app = {
   init: function () {
+    render(renderSpinner())
+
     return eClient.get('ticket.requester').then((requester) => {
       if (!requester) {
-        render(renderNoRequester)
-        return appResize()
+        render(renderNoRequester())
+        return
       }
 
       return app.showDisplay()
     }).catch((err) => {
       console.error(err)
-      render(errorMessage, { msg: err.message })
-      appResize()
+      render(errorMessage({ msg: err.message }))
     })
   },
 
@@ -174,8 +176,7 @@ const app = {
         orgTickets: organizationCounterLinks
       })
 
-      $('[data-main]').html(view)
-      appResize()
+      render(view)
 
       app.displaySpoke()
 
@@ -191,9 +192,10 @@ const app = {
     ]).then(([[requester, ticketId, ticketOrganization]]) => {
       const origin = parseQueryString().origin
       const base = `${origin}/agent`
+      const ticketOrganizationId = ticketOrganization ? ticketOrganization.id : undefined
 
       const user = (ticketId) ? `tickets/${ticketId}/requester/requested_tickets` : `users/${requester.id}/requested_tickets`
-      const org = (ticketId) ? `tickets/${ticketId}/organization/tickets` : `organizations/${ticketOrganization.id}/tickets`
+      const org = (ticketId) ? `tickets/${ticketId}/organization/tickets` : `organizations/${ticketOrganizationId}/tickets`
 
       const links = Object.keys(counters).reduce((memo, status) => {
         const value = counters[status]
@@ -244,7 +246,10 @@ const app = {
         orgFieldsActivated: setting('orgFieldsActivated'),
         hideEmptyFields: setting('hideEmptyFields')
       })
-      $('.admin').html(html).show()
+
+      render(html, '.admin')
+
+      $('.admin').show()
       $('.whole').hide()
       appResize()
     })
@@ -308,9 +313,7 @@ const app = {
     apiHelpers.getTicketAudits().then(({spokeData}) => {
       if (!spokeData) return
 
-      const html = renderSpoke(spokeData)
-      $('.spoke').html(html)
-      appResize()
+      render(renderSpoke(spokeData), '.spoke')
     })
   },
 
